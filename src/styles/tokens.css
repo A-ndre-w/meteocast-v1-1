@@ -29,6 +29,11 @@
   --data-snow: #47DAFF;
   --data-snow-soft: #47DAFF24;
   --map-water: #DEE6EC;
+  --accent-on-dark: #9DBBFF;
+  --data-snow-strong: #1FB8E0;
+  --data-temp-soft: #F3E9D6;
+  --data-temp: #9A6B3F;
+  --map-edge: #D6D4D0;
 
   /* radius */
   --radius-xs: 2px;
@@ -38,12 +43,19 @@
   --radius-pill: 999px;
 
   /* shadow */
+  --shadow-sm: 0 1px 2px #14120F14, 0 2px 6px #14120F14;
   --shadow-md: 0 1px 2px #14120F0A, 0 8px 28px #14120F14;
   --shadow-lg: 0 2px 6px #14120F0F, 0 18px 60px #14120F1F;
 
   /* font */
   --font-sans: 'Geist Variable', 'Geist', system-ui, sans-serif;
   --font-mono: 'Geist Mono Variable', 'Geist Mono', ui-monospace, monospace;
+
+  /* size */
+  --size-sm: 24px;
+  --size-md: 32px;
+  --size-lg: 40px;
+  --size-xl: 44px;
 
   /* font size */
   --font-size-xs: 11px;

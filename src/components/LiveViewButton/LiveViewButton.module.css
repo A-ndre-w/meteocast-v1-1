@@ -1,5 +1,5 @@
 .root {
-  height: 23px;
+  height: var(--size-sm);
   padding: 0 10px;
   border-radius: var(--radius-lg);
   font-size: var(--font-size-sm);

@@ -57,6 +57,7 @@
 
 .undo {
   flex: none;
+  height: var(--size-sm);
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -73,8 +74,8 @@
 
 .close {
   flex: none;
-  width: 26px;
-  height: 26px;
+  width: var(--size-sm);
+  height: var(--size-sm);
   display: grid;
   place-items: center;
   border-radius: var(--radius-sm);

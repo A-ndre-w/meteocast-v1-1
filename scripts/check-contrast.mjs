@@ -48,6 +48,7 @@ const pairs = [
   ['accent/strong', 'bg/deep', 4.5, 'Back to live (archive pill)'],
   ['accent/strong', 'bg/forecast', 4.5, 'Back to live (forecast pill)'],
   ['mode/forecast-strong', 'surface/raised', 4.5, '"Forecast" word in toast'],
+  ['text/primary', 'accent/soft', 4.5, 'selected layer label and speed chip (accent-soft fill)'],
   ['status/danger', 'surface/raised', 3, 'bell icon (non-text, 3:1)'],
   // Supplementary cue: mode is always also given by text + icon, so 1.4.11 does not require 3:1.
   ['mode/forecast', 'bg/forecast', 3, 'INFO forecast stripe (supplementary, mode also in text)', true],

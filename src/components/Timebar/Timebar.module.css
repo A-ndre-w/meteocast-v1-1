@@ -15,7 +15,7 @@
 .row {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 16px;
   min-width: 0;
 }
 
@@ -42,8 +42,8 @@
 }
 
 .stepBtn {
-  width: 24px;
-  height: 30px;
+  width: var(--size-sm);
+  height: var(--size-md);
   display: grid;
   place-items: center;
   border-radius: var(--radius-sm);
@@ -55,8 +55,8 @@
 }
 
 .play {
-  width: 30px;
-  height: 30px;
+  width: var(--size-md);
+  height: var(--size-md);
   display: grid;
   place-items: center;
   border-radius: var(--radius-pill);
@@ -124,7 +124,10 @@
 }
 
 .speed {
-  padding: 2px 8px;
+  min-width: var(--size-sm);
+  height: var(--size-sm);
+  padding: 0 8px;
+  border: 1px solid transparent;
   border-radius: var(--radius-lg);
   background: var(--surface-sunken);
   color: var(--text-tertiary);
@@ -136,10 +139,11 @@
   color: var(--text-primary);
 }
 
+/* Choice controls share one 'selected' look with LayerItem: accent-soft fill + accent border. */
 .speed[aria-pressed='true'] {
-  background: var(--border-default);
+  background: var(--accent-soft);
+  border-color: var(--accent-default);
   color: var(--text-primary);
-  box-shadow: inset 0 0 0 1px var(--border-strong);
 }
 
 .bottom {
@@ -253,7 +257,7 @@
   border-radius: var(--radius-pill);
   background: var(--surface-raised);
   border: 1.5px solid var(--text-tertiary);
-  box-shadow: 0 1px 3px #14120f26;
+  box-shadow: var(--shadow-sm);
   transition: left 0.12s ease;
 }
 

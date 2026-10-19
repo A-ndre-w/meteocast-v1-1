@@ -5,8 +5,8 @@
 }
 
 .arrow {
-  width: 20px;
-  height: 30px;
+  width: var(--size-sm);
+  height: var(--size-md);
   display: grid;
   place-items: center;
   border-radius: var(--radius-sm);

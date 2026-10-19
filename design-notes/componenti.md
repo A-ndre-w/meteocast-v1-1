@@ -146,3 +146,16 @@ Altre scelte: "adesso" simulato = Thu 15 Oct 2026 13:00; i livelli a 5 minuti si
 - **Gesti manuali = azione esplicita:** clic su giorno, clic o trascinamento sulla traccia, frecce, Shift+frecce, pulsanti ‹ ›. Possono attraversare "adesso". Se il livello non ha dati lì ma il gemello sì, la selezione passa al gemello e compare un Toast con Undo: il cambio non è mai silenzioso.
 - Se né il livello né il gemello hanno dati (orizzonte superato, livello senza archivio): il tempo non si sposta e compare il Toast warning (Screen 03).
 - "Now" e "Back to live" tornano a Live e, se serve, al gemello real time, senza Toast: l'intenzione è esplicita.
+
+## Regole del design system dopo la UX review (2026-10-20)
+
+- **Altezze dei controlli** (`size/*`): sm 24 (toggle piccoli e badge: velocità, Back to live, badge di modalità, azioni dei Toast) · md 32 (chip dei giorni, ‹ ▶ ›, zoom, localizza) · lg 40 (Rail) · xl 44 (ricerca, allarmi). Nessuna area cliccabile sotto i 24px.
+- **Selezione, tre ruoli distinti:**
+  - *scelta* (LayerItem, chip velocità): fondo `accent/soft`, bordo `accent/default`, testo `text/primary`;
+  - *navigazione* (Rail): disco scuro `text/secondary`;
+  - *tempo* (DayChip): colore della modalità, perché lì la modalità è il contenuto.
+  - Il blu pieno (`accent/strong`) indica solo azioni: Back to live, Undo, link.
+- **Elevazione:** `shadow/sm` per gli oggetti sulla mappa (etichette, pin, cursore della traccia), `shadow/md` per pannelli, card, timebar, pill e Toast, `shadow/lg` per gli overlay. Il pin usa un `drop-shadow` per la forma.
+- **Forme:** pillola per i toggle piccoli (velocità, Back to live) e per la Rail; 10px per card, chip con testo e campi.
+- **Tipografia:** pesi 400 / 500 (controlli) / 600 (titoli) / 700 (solo numeri display e logo). Mono solo per etichette maiuscole e dati tabellari (badge, etichette sulla mappa, intervallo); date e ore in sans.
+- **Un nome, un formato:** l'azione è sempre "Back to live"; date assolute "Wed 14 Oct, 13:00"; distanza da adesso "−24h / +24h".

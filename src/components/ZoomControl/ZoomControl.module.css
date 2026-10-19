@@ -10,8 +10,8 @@
 }
 
 .button {
-  width: 34px;
-  height: 32px;
+  width: var(--size-md);
+  height: var(--size-md);
   display: grid;
   place-items: center;
   border-radius: var(--radius-sm);

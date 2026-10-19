@@ -128,9 +128,10 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  min-height: var(--size-sm);
   font-size: var(--font-size-sm);
   font-weight: 500;
-  color: #9DBBFF; /* accent on dark: 7.9:1 on text/primary */
+  color: var(--accent-on-dark);
 }
 
 .tipAction:hover {
@@ -138,7 +139,7 @@
 }
 
 .tipAction:focus-visible {
-  outline-color: #9DBBFF;
+  outline-color: var(--accent-on-dark);
 }
 
 /* Invisible bridge over the 10px gap, so the pointer can travel to "Go to live" without closing the tip. */

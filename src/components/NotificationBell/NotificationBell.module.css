@@ -1,7 +1,7 @@
 .root {
   position: relative;
-  width: 45px;
-  height: 45px;
+  width: var(--size-xl);
+  height: var(--size-xl);
   display: grid;
   place-items: center;
   background: var(--surface-raised);

@@ -18,6 +18,7 @@ section('color', entries(tokens.color).map(([k, v]) => [toVar(k), v]))
 section('radius', entries(tokens.radius).map(([k, v]) => [toVar('radius', k), `${v}px`]))
 section('shadow', entries(tokens.shadow).map(([k, v]) => [toVar('shadow', k), v]))
 section('font', entries(tokens.font).map(([k, v]) => [toVar('font', k), v]))
+section('size', entries(tokens.size).map(([k, v]) => [toVar('size', k), `${v}px`]))
 section('font size', entries(tokens.fontSize).map(([k, v]) => [toVar('font-size', k), `${v}px`]))
 section('stroke', entries(tokens.stroke).map(([k, v]) => [toVar('stroke', k), `${v}px`]))
 

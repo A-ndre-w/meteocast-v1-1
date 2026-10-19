@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
-  height: 30px;
+  height: var(--size-md);
   padding: 0 12px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-default);
@@ -30,10 +30,9 @@
   background: var(--surface-sunken);
 }
 
-/* Selected: mode colour (archive / forecast-strong), neutral in Live. Figma: 14px text, slightly larger chip. */
+/* Selected: mode colour (archive / forecast-strong), neutral in Live. Figma: 14px text.
+   Same height as the other chips, so selecting never shifts the strip. */
 .root[data-selected] {
-  height: 32px;
-  padding: 0 13px;
   font-size: var(--font-size-md);
   background: var(--mode-fill);
   border-color: var(--mode-fill);
@@ -41,7 +40,7 @@
 }
 
 .root[data-selected][data-time='future'] {
-  border-color: rgb(255 255 255 / 0.7);
+  border-color: color-mix(in srgb, var(--icon-selected) 70%, transparent);
   outline: 1px solid var(--mode-fill);
 }
 

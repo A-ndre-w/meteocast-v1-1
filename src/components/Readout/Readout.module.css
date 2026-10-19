@@ -121,7 +121,7 @@
 
 /* Warm ramp without orange/red: those are reserved for alerts. */
 .bar[data-ramp='temp'] {
-  background: linear-gradient(to right, #f3e9d6, #9a6b3f);
+  background: linear-gradient(to right, var(--data-temp-soft), var(--data-temp));
 }
 
 .bar[data-ramp='neutral'] {
@@ -144,7 +144,7 @@
 }
 
 .bar[data-ramp='snow'] .marker {
-  background: #1fb8e0;
+  background: var(--data-snow-strong);
 }
 
 .bar[data-ramp='temp'] .marker,

@@ -2,7 +2,7 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
-  background: #d6d4d0;
+  background: var(--map-edge);
 }
 
 /* The map keeps the 1440×840 design frame and covers the viewport (like background-size: cover). */
