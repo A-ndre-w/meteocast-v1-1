@@ -1,0 +1,8 @@
+.root {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+}

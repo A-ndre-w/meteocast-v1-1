@@ -1,0 +1,19 @@
+.root {
+  display: flex;
+  align-items: center;
+  width: 192px;
+  height: 30px;
+  padding: 0 11px;
+  background: var(--surface-raised);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+/* accent/strong rather than accent/default: 14px bold text needs 4.5:1. */
+.cast {
+  color: var(--accent-strong);
+}

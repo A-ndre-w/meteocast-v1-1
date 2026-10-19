@@ -1,0 +1,33 @@
+.root {
+  position: relative;
+  width: 45px;
+  height: 45px;
+  display: grid;
+  place-items: center;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--status-danger);
+}
+
+.root:hover {
+  background: var(--surface-sunken);
+}
+
+.badge {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  min-width: 16px;
+  height: 14px;
+  padding: 0 4px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--status-danger);
+  color: var(--accent-on);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1;
+  box-shadow: 0 0 0 1.5px var(--surface-raised);
+}

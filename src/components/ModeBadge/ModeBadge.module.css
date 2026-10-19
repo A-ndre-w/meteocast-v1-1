@@ -1,0 +1,55 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 26px;
+  min-width: 130px;
+  padding: 0 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  background: var(--mode-fill);
+  color: var(--icon-selected);
+}
+
+.root[data-mode='live'] {
+  background: var(--surface-raised);
+  color: var(--text-tertiary);
+}
+
+/* Figma uses a green dot; green is reserved for alerts (brief), so Live gets a neutral pulsing dot. */
+.dot {
+  position: relative;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--text-secondary);
+}
+
+.dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 1.5px solid var(--text-secondary);
+  opacity: 0;
+  animation: pulse 2s ease-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+    scale: 0.6;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.6;
+  }
+}
+
+.offset {
+  text-transform: none;
+}

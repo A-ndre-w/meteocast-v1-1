@@ -1,0 +1,63 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+  background: var(--surface-default);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+.root[data-time='future'] {
+  border: 1px dashed var(--border-strong);
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+}
+
+.root:hover,
+.root[data-hover] {
+  background: var(--surface-sunken);
+}
+
+/* Selected: mode colour (archive / forecast-strong), neutral in Live. Figma: 14px text, slightly larger chip. */
+.root[data-selected] {
+  height: 32px;
+  padding: 0 13px;
+  font-size: var(--font-size-md);
+  background: var(--mode-fill);
+  border-color: var(--mode-fill);
+  color: var(--icon-selected);
+}
+
+.root[data-selected][data-time='future'] {
+  border-color: rgb(255 255 255 / 0.7);
+  outline: 1px solid var(--mode-fill);
+}
+
+/* Unavailable: no data for this layer on this day. Hatched, muted, never hidden. */
+.root[data-unavailable] {
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+  background-image: repeating-linear-gradient(
+    -45deg,
+    transparent 0 4px,
+    color-mix(in srgb, var(--border-default) 70%, transparent) 4px 5px
+  );
+  text-decoration: line-through;
+  text-decoration-color: var(--border-strong);
+}
+
+.root[data-unavailable]:hover {
+  background-color: var(--surface-default);
+}

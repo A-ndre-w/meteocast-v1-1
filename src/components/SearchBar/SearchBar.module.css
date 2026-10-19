@@ -1,0 +1,65 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 292px;
+  height: 45px;
+  padding: 0 4px 0 10px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+.root:focus-within {
+  border-color: var(--border-strong);
+}
+
+.searchIcon {
+  flex: none;
+  color: var(--text-secondary);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+.input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* The form shows focus via :focus-within; the input itself needs no second ring. */
+.input:focus-visible {
+  outline: none;
+}
+
+.root:has(.input:focus-visible) {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.divider {
+  flex: none;
+  width: 1px;
+  height: 22px;
+  background: var(--border-default);
+}
+
+.locate {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+.locate:hover {
+  background: var(--surface-sunken);
+}

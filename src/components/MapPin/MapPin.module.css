@@ -1,0 +1,20 @@
+.root {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.label {
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+  box-shadow: 0 1px 2px #14120f14;
+}
+
+.pin {
+  display: block;
+  filter: drop-shadow(0 2px 3px #14120f33);
+}

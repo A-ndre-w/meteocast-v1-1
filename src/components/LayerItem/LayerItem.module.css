@@ -1,0 +1,152 @@
+.wrap {
+  position: relative;
+  width: 100%;
+}
+
+.root {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 13px;
+  text-align: left;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.icon {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-pill);
+  display: grid;
+  place-items: center;
+  background: var(--surface-sunken);
+  color: var(--icon-default);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+.meta {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.root:not([aria-disabled]):hover,
+.root[data-status='hover'] {
+  background: var(--surface-sunken);
+  border-color: var(--border-strong);
+}
+
+.root:not([aria-disabled]):hover .icon,
+.root[data-status='hover'] .icon {
+  background: var(--surface-raised);
+}
+
+.root[data-status='selected'],
+.root[data-status='selected']:hover {
+  background: color-mix(in srgb, var(--accent-default) 14%, var(--surface-raised));
+  border-color: var(--accent-default);
+}
+
+.root[data-status='selected'] .icon {
+  background: var(--accent-default);
+  color: var(--accent-on);
+}
+
+/* Disabled stays focusable (aria-disabled) so keyboard users reach the tooltip. */
+.root[aria-disabled] {
+  cursor: not-allowed;
+  border-style: dashed;
+}
+
+.root[aria-disabled] .label,
+.root[aria-disabled] .meta,
+.root[aria-disabled] .icon {
+  color: var(--text-tertiary);
+}
+
+.lock {
+  flex: none;
+  color: var(--text-tertiary);
+}
+
+.tip {
+  position: absolute;
+  z-index: 20;
+  left: calc(100% + 10px);
+  top: 50%;
+  translate: 0 -50%;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--text-primary);
+  color: var(--surface-raised);
+  font-size: var(--font-size-xs);
+  line-height: 1.35;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  /* Hidden with opacity only: Go to live stays in the tab order and opens the tip on focus. */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.tip::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  translate: 0 -50%;
+  border: 6px solid transparent;
+  border-right-color: var(--text-primary);
+}
+
+.wrap:hover .tip,
+.wrap:focus-within .tip,
+.wrap[data-force-tip] .tip {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.tipAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: #9DBBFF; /* accent on dark: 7.9:1 on text/primary */
+}
+
+.tipAction:hover {
+  text-decoration: underline;
+}
+
+.tipAction:focus-visible {
+  outline-color: #9DBBFF;
+}
+
+/* Invisible bridge over the 10px gap, so the pointer can travel to "Go to live" without closing the tip. */
+.wrap[data-status='disabled']::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+}

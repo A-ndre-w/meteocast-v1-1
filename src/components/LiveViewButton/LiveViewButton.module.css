@@ -1,0 +1,22 @@
+.root {
+  height: 23px;
+  padding: 0 10px;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  transition: background-color 0.15s ease;
+}
+
+.root[data-status='on'] {
+  background: var(--accent-strong);
+  color: var(--accent-on);
+}
+
+.root[data-status='on']:hover {
+  background: color-mix(in srgb, var(--accent-strong) 85%, black);
+}
+
+.root[data-status='off'] {
+  background: var(--surface-sunken);
+  color: var(--text-tertiary);
+}
