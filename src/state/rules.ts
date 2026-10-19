@@ -29,6 +29,8 @@ export type Notice =
   | { type: 'blockedModes'; layer: Layer; modes: Mode[] }
   /** Rule 8: beyond the stream's archive or forecast horizon. Time does not move. */
   | { type: 'blockedHorizon'; layer: Layer; day: string; lastDay: string }
+  /** Buttons outside the v1 scope (search, alerts, presets): say so instead of doing nothing. */
+  | { type: 'notInPrototype'; feature: string }
 
 export type Result = { view: View; notice?: Notice }
 

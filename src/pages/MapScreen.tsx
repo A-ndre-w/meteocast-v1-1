@@ -65,7 +65,12 @@ export function MapScreen() {
       </div>
 
       <div className={styles.rail}>
-        <Rail groups={groups} selectedGroupId={view.groupId} onSelect={actions.selectGroup} />
+        <Rail
+          groups={groups}
+          selectedGroupId={view.groupId}
+          onSelect={actions.selectGroup}
+          onAdd={() => actions.notInPrototype('Creating presets')}
+        />
       </div>
 
       <div className={styles.panel}>
@@ -84,7 +89,7 @@ export function MapScreen() {
       </div>
 
       {toast && state.notice && (
-        <div className={toast.tone === 'warning' ? styles.toastBottom : styles.toastTop}>
+        <div className={styles.toast}>
           <Toast
             key={state.notice.key}
             mode={toast.mode}
@@ -99,8 +104,8 @@ export function MapScreen() {
       )}
 
       <div className={styles.top}>
-        <SearchBar />
-        <NotificationBell count={3} />
+        <SearchBar onSearch={() => actions.notInPrototype('Search')} onLocate={() => actions.notInPrototype('Locating you')} />
+        <NotificationBell count={3} onClick={() => actions.notInPrototype('The alerts panel')} />
       </div>
 
       <div className={styles.readout}>

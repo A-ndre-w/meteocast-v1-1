@@ -81,15 +81,23 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  min-width: 150px;
-  margin: 0;
+  /* 150 + the 12px of padding that the negative margins give back: the layout matches Figma. */
+  min-width: 162px;
+  height: var(--size-md);
+  padding: 0 6px;
+  margin: 0 -6px;
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-lg);
   white-space: nowrap;
 }
 
 /* Daily layers: no hour, so no reserved width (Figma Mode=forecastdaily keeps Now next to the date). */
 .datetime[data-daily] {
-  min-width: 118px;
+  min-width: 130px;
+}
+
+.datetime:hover {
+  background: var(--surface-sunken);
 }
 
 .calendar {

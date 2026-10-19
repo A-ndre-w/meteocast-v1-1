@@ -59,12 +59,8 @@ export function MapView({ mode, ramp, intensity, labels, pin, zoom = 1 }: MapVie
       <div className={styles.frame} style={{ '--zoom': zoom } as CSSProperties}>
         <img className={styles.base} src={`${import.meta.env.BASE_URL}basemap.svg`} alt="" draggable={false} />
         <div className={styles.lat} aria-hidden="true">
-          {[
-            ['40°N', 116],
-            ['35°N', 332],
-            ['30°N', 548],
-            ['25°N', 764],
-          ].map(([t, y]) => (
+          {/* 40°, 35° and 30°N sit under the rail at x 10: only the uncovered label is drawn (UX review U14). */}
+          {[['25°N', 764]].map(([t, y]) => (
             <span key={t} style={at([10, Number(y) - 9])}>
               {t}
             </span>

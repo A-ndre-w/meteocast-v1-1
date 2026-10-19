@@ -28,3 +28,30 @@
   color: var(--text-primary);
   border: 1px dashed var(--border-strong);
 }
+
+.wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Group name on hover and keyboard focus (UX review U10): the rail shows icons only. */
+.tip {
+  position: fixed;
+  z-index: 50;
+  translate: 0 -50%;
+  padding: 5px 9px;
+  border-radius: var(--radius-sm);
+  background: var(--text-primary);
+  color: var(--surface-raised);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}
+
+.wrap:hover .tip,
+.wrap:focus-within .tip {
+  opacity: 1;
+}

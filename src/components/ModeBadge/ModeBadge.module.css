@@ -16,16 +16,17 @@
 
 .root[data-mode='live'] {
   background: var(--surface-raised);
-  color: var(--text-tertiary);
+  /* Secondary text + dark dot: reads 'on air' without green (UX review U8). */
+  color: var(--text-secondary);
 }
 
 /* Figma uses a green dot; green is reserved for alerts (brief), so Live gets a neutral pulsing dot. */
 .dot {
   position: relative;
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
   border-radius: var(--radius-pill);
-  background: var(--text-secondary);
+  background: var(--text-primary);
 }
 
 .dot::after {
@@ -33,7 +34,7 @@
   position: absolute;
   inset: -3px;
   border-radius: inherit;
-  border: 1.5px solid var(--text-secondary);
+  border: 1.5px solid var(--text-primary);
   opacity: 0;
   animation: pulse 2s ease-out infinite;
 }

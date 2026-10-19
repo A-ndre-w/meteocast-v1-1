@@ -77,6 +77,16 @@ export function toastFor(n: Notice): ToastContent {
           </>
         ),
       }
+    case 'notInPrototype':
+      return {
+        tone: 'info',
+        mode: 'live',
+        message: (
+          <>
+            <strong>{n.feature}</strong> is not part of this prototype yet.
+          </>
+        ),
+      }
     case 'blockedHorizon':
       return {
         tone: 'warning',

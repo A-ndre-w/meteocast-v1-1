@@ -74,6 +74,16 @@ export function useMeteo() {
     return () => clearInterval(t)
   }, [state.playing, state.speed])
 
+  // Deep links (#/?s=archive) also apply when only the hash changes on an open page.
+  useEffect(() => {
+    const onHash = () => {
+      const s = scenarioFromUrl()
+      if (s) setState((st) => ({ ...st, view: s.view, playing: false, notice: s.notice && { ...s.notice, key: 0 } }))
+    }
+    window.addEventListener('hashchange', onHash)
+    return () => window.removeEventListener('hashchange', onHash)
+  }, [])
+
   const actions = {
     // Manual gestures = explicit intent: may cross "now" (twin switch with toast) or be blocked with a warning.
     selectDay: (day: string) => apply((v) => moveExplicit(v, { ...v.sel, day })),
@@ -86,6 +96,8 @@ export function useMeteo() {
     selectGroup: (groupId: string) => apply((v) => selectGroup(v, groupId), { stopPlay: false }),
     undo: (view: View) => setState((s) => ({ ...s, view, notice: undefined, playing: false })),
     dismissNotice: () => setState((s) => ({ ...s, notice: undefined })),
+    notInPrototype: (feature: string) =>
+      setState((s) => ({ ...s, notice: { type: 'notInPrototype', feature, key: ++noticeKey } })),
     zoomBy: (d: number) => setState((s) => ({ ...s, zoom: Math.min(2, Math.max(1, +(s.zoom + d).toFixed(2))) })),
     togglePlay: () => setState((s) => ({ ...s, playing: !s.playing })),
     setSpeed: (speed: Speed) => setState((s) => ({ ...s, speed })),

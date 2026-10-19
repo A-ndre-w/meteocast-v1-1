@@ -1,4 +1,4 @@
-import { useEffect, useRef, type KeyboardEvent, type PointerEvent } from 'react'
+import { useEffect, useId, useRef, type KeyboardEvent, type PointerEvent } from 'react'
 import { Icon } from '../../icons/Icon'
 import { fmtDayLong, fmtDayMedium, fmtHour } from '../../time'
 import { modeLabel, type Mode } from '../../types'
@@ -59,6 +59,7 @@ export function Timebar({
   onSpeedChange,
 }: TimebarProps) {
   const rootRef = useRef<HTMLElement>(null)
+  const playHintId = useId()
   const trackRef = useRef<HTMLDivElement>(null)
   const daily = interval === 'day'
   const selected = days.find((d) => d.day === selectedDay)
@@ -125,10 +126,15 @@ export function Timebar({
               className={styles.play}
               aria-label={playing ? 'Pause animation' : 'Play animation'}
               aria-pressed={playing}
+              aria-describedby={playHintId}
+              title="Loops the hours of this day that have data, never past now"
               onClick={onTogglePlay}
             >
               <Icon name={playing ? 'pause' : 'play'} size={18} />
             </button>
+            <span id={playHintId} className="visually-hidden">
+              Loops the hours of this day that have data, never past now.
+            </span>
             <button type="button" className={styles.stepBtn} aria-label={daily ? 'Next day' : 'Next hour'} onClick={() => step(1)}>
               <Icon name="chevron-right" size={16} />
             </button>
@@ -138,11 +144,18 @@ export function Timebar({
             <ModeBadge mode={mode} offset={offset} />
           </span>
 
-          <p className={styles.datetime} data-daily={daily || undefined}>
+          {/* The calendar icon promised a picker (UX review U9): the date now takes you to the day chips. */}
+          <button
+            type="button"
+            className={styles.datetime}
+            data-daily={daily || undefined}
+            aria-label={`Choose a day. Showing ${valueText}`}
+            onClick={() => rootRef.current?.querySelector<HTMLElement>('[data-daystrip] [aria-pressed="true"]')?.focus()}
+          >
             <Icon name="calendar" size={18} className={styles.calendar} />
             <span className={styles.date}>{fmtDayMedium(selectedDay)}</span>
             {!daily && <span className={styles.hour}>{fmtHour(selectedHour)}</span>}
-          </p>
+          </button>
 
           <LiveViewButton status={mode === 'live' ? 'off' : 'on'} onClick={onNow} />
         </div>

@@ -53,8 +53,6 @@
     transparent 0 4px,
     color-mix(in srgb, var(--border-default) 70%, transparent) 4px 5px
   );
-  text-decoration: line-through;
-  text-decoration-color: var(--border-strong);
 }
 
 .root[data-unavailable]:hover {
