@@ -14,6 +14,7 @@ import { ValueLabel } from '../components/ValueLabel/ValueLabel'
 import { ZoomControl } from '../components/ZoomControl/ZoomControl'
 import { Icon, iconNames } from '../icons/Icon'
 import type { Mode } from '../types'
+import { BigSpecimens } from './BigSpecimens'
 import styles from './ComponentsPage.module.css'
 import { Specimen, Variant } from './Specimen'
 
@@ -42,6 +43,7 @@ export function ComponentsPage() {
           <a href="#tokens-color" onClick={jump}>Tokens</a>
           <a href="#icons" onClick={jump}>Icons</a>
           <a href="#small" onClick={jump}>Small components</a>
+          <a href="#big" onClick={jump}>Big components</a>
         </nav>
       </header>
 
@@ -287,6 +289,11 @@ export function ComponentsPage() {
           <Logo />
         </Variant>
       </Specimen>
+
+      <h2 className={styles.part} id="big">
+        Big components
+      </h2>
+      <BigSpecimens />
     </div>
   )
 }

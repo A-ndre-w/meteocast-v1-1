@@ -1,0 +1,256 @@
+/* Mode is signalled here by: top stripe (3px) + background tint + ModeBadge text/icon. */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 17px 20px 16px;
+  background: var(--mode-tint);
+  border: 1px solid var(--mode-color);
+  border-top: var(--stroke-modestripe) solid var(--mode-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-width: 0;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stepBtn {
+  width: 20px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+.stepBtn:hover {
+  background: var(--surface-sunken);
+}
+
+.play {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  background: var(--text-secondary);
+  color: var(--icon-selected);
+}
+
+.play:hover {
+  background: var(--text-primary);
+}
+
+.badgeSlot {
+  display: flex;
+  min-width: 135px;
+}
+
+.badgeSlot > * {
+  flex: 1;
+}
+
+.datetime {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 150px;
+  margin: 0;
+  font-size: var(--font-size-lg);
+  white-space: nowrap;
+}
+
+.calendar {
+  color: var(--text-secondary);
+}
+
+.date {
+  color: var(--text-primary);
+}
+
+.hour {
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.divider {
+  flex: none;
+  width: 1px;
+  height: 15px;
+  background: var(--border-strong);
+}
+
+.row2 {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.speeds {
+  display: flex;
+  gap: 4px;
+}
+
+.speed {
+  padding: 2px 8px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-sunken);
+  color: var(--text-tertiary);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.speed:hover {
+  color: var(--text-primary);
+}
+
+.speed[aria-pressed='true'] {
+  background: var(--text-secondary);
+  color: var(--icon-selected);
+}
+
+.bottom {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.interval {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  width: 100px;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.intervalLabel {
+  color: var(--text-tertiary);
+}
+
+/* ---- Hour track ---- */
+
+.trackWrap {
+  flex: 1;
+  min-width: 0;
+  padding-top: 12px;
+}
+
+.track {
+  position: relative;
+  height: 14px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.ticks {
+  position: absolute;
+  inset: 0;
+}
+
+.tick {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 5px;
+  translate: -1px 0;
+  background: var(--border-default);
+}
+
+.lineSolid,
+.lineDashed {
+  position: absolute;
+  top: 6px;
+  height: 2px;
+}
+
+/* Observed data: solid. */
+.lineSolid {
+  background: var(--text-tertiary);
+  border-radius: 2px;
+}
+
+/* Forecast: dashed. */
+.lineDashed {
+  background-image: linear-gradient(to right, var(--text-tertiary) 0 4px, transparent 4px 8px);
+  background-size: 8px 2px;
+  opacity: 0.55;
+}
+
+/* Hours with no data for the current layer. */
+.gap {
+  position: absolute;
+  top: 2px;
+  height: 10px;
+  background-color: var(--mode-tint);
+  background-image: repeating-linear-gradient(-45deg, var(--text-tertiary) 0 1px, transparent 1px 4px);
+  opacity: 0.7;
+  border-radius: 2px;
+}
+
+.now {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 0;
+  border-left: 1.5px solid var(--text-primary);
+}
+
+.nowTag {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  translate: -50% -1px;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  line-height: 1;
+  color: var(--text-primary);
+  text-transform: uppercase;
+}
+
+.thumb {
+  position: absolute;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  translate: -50% 0;
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  border: 1.5px solid var(--text-tertiary);
+  box-shadow: 0 1px 3px #14120f26;
+  transition: left 0.12s ease;
+}
+
+.thumb:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+}

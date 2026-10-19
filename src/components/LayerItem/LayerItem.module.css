@@ -84,10 +84,8 @@
 }
 
 .tip {
-  position: absolute;
-  z-index: 20;
-  left: calc(100% + 10px);
-  top: 50%;
+  position: fixed;
+  z-index: 50;
   translate: 0 -50%;
   width: 200px;
   display: flex;

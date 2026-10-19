@@ -1,0 +1,94 @@
+{
+  "_doc": "Layer catalogue. modes = where data exists on the single timeline; interval = timebar step; archiveDays / horizonDays = how far back / ahead data exists (rule 8). Water & Storms and Snow mirror the Figma panels; the other groups are plausible fillers so the rail can switch groups (rule 10).",
+  "groups": [
+    {
+      "id": "water",
+      "title": "Water & Storms",
+      "icon": "drizzle",
+      "layers": [
+        { "id": "rain-1h", "name": "Hourly rainfall", "meta": "mm - hourly", "icon": "drizzle", "unit": "mm", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 20, "ramp": "rain" } },
+        { "id": "rain-acc-1h", "name": "Accumulated rainfall per hour", "meta": "mm - hourly", "icon": "drizzle", "unit": "mm", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 20, "ramp": "rain" } },
+        { "id": "precip-24h", "name": "Accumulated precipitation in 24h", "meta": "mm - daily", "icon": "drizzle", "unit": "mm", "modes": ["live", "archive"], "interval": "day", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 60, "ramp": "rain" } },
+        { "id": "rain-rate", "name": "Rainfall rate", "meta": "mm/h - 5min", "icon": "drizzle", "unit": "mm/h", "modes": ["live"], "interval": "hour", "archiveDays": 0, "horizonDays": 0, "scale": { "max": 20, "ramp": "rain" } },
+        { "id": "lightning", "name": "Lightning", "meta": "last 60 min - 5min", "icon": "sever-thunderstorm", "unit": "strikes", "modes": ["live"], "interval": "hour", "archiveDays": 0, "horizonDays": 0, "scale": { "max": 50, "ramp": "rain" } },
+        { "id": "hydro", "name": "Hydrometric level", "meta": "cm - hourly", "icon": "humidity", "unit": "cm", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 400, "ramp": "rain" }, "liveDelayMin": 40 },
+        { "id": "leaf", "name": "Leaf wetness", "meta": "h - hourly", "icon": "humidity", "unit": "h", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 24, "ramp": "rain" }, "noDataHours": [[-1, 9, 11], [0, 12, 13]] },
+        { "id": "rain-1h-fc", "name": "Hourly rainfall", "meta": "mm - hourly", "icon": "drizzle", "unit": "mm", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 20, "ramp": "rain" } },
+        { "id": "rain-acc-1h-fc", "name": "Accumulated rainfall per hour", "meta": "mm - hourly", "icon": "drizzle", "unit": "mm", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 20, "ramp": "rain" } },
+        { "id": "rain-rate-fc", "name": "Rainfall rate", "meta": "mm/h - 5min", "icon": "drizzle", "unit": "mm/h", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 2, "scale": { "max": 20, "ramp": "rain" } },
+        { "id": "lightning-fc", "name": "Lightning", "meta": "last 60 min - 5min", "icon": "sever-thunderstorm", "unit": "strikes", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 2, "scale": { "max": 50, "ramp": "rain" } },
+        { "id": "hydro-fc", "name": "Hydrometric level", "meta": "cm - hourly", "icon": "humidity", "unit": "cm", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 3, "scale": { "max": 400, "ramp": "rain" } },
+        { "id": "leaf-fc", "name": "Leaf wetness", "meta": "h - hourly", "icon": "humidity", "unit": "h", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 3, "scale": { "max": 24, "ramp": "rain" } }
+      ]
+    },
+    {
+      "id": "snow",
+      "title": "Snow",
+      "icon": "snow",
+      "layers": [
+        { "id": "snow-ground", "name": "Snow on the ground", "meta": "cm - hourly", "icon": "snow", "unit": "cm", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 100, "ramp": "snow" } },
+        { "id": "snow-acc-1h", "name": "Accumulated snow per hour", "meta": "mm - hourly", "icon": "snow", "unit": "mm", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 20, "ramp": "snow" } },
+        { "id": "snow-prob", "name": "Snow probability", "meta": "% - daily", "icon": "snow", "unit": "%", "modes": ["forecast"], "interval": "day", "archiveDays": 0, "horizonDays": 3, "scale": { "max": 100, "ramp": "snow" } },
+        { "id": "snow-acc", "name": "Accumulated snow", "meta": "cm - daily", "icon": "snow", "unit": "cm", "modes": ["forecast"], "interval": "day", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 100, "ramp": "snow" } },
+        { "id": "snow-acc-run", "name": "Accumulated snow (run)", "meta": "cm - daily", "icon": "snow", "unit": "cm", "modes": ["forecast"], "interval": "day", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 100, "ramp": "snow" } }
+      ]
+    },
+    {
+      "id": "clouds",
+      "title": "Clouds",
+      "icon": "cloudy",
+      "layers": [
+        { "id": "cloud-cover", "name": "Cloud cover", "meta": "% - hourly", "icon": "cloudy", "unit": "%", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 100, "ramp": "neutral" } },
+        { "id": "cloud-cover-fc", "name": "Cloud cover", "meta": "% - hourly", "icon": "cloudy", "unit": "%", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 100, "ramp": "neutral" } },
+        { "id": "fog-fc", "name": "Fog probability", "meta": "% - hourly", "icon": "fog", "unit": "%", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 2, "scale": { "max": 100, "ramp": "neutral" } }
+      ]
+    },
+    {
+      "id": "temperature",
+      "title": "Temperature",
+      "icon": "thermometer",
+      "layers": [
+        { "id": "temp", "name": "Air temperature", "meta": "°C - hourly", "icon": "thermometer", "unit": "°C", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 40, "ramp": "temp" } },
+        { "id": "temp-fc", "name": "Air temperature", "meta": "°C - hourly", "icon": "thermometer", "unit": "°C", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 40, "ramp": "temp" } },
+        { "id": "temp-max-fc", "name": "Maximum temperature", "meta": "°C - daily", "icon": "thermometer", "unit": "°C", "modes": ["forecast"], "interval": "day", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 40, "ramp": "temp" } }
+      ]
+    },
+    {
+      "id": "sun",
+      "title": "Sun & Radiation",
+      "icon": "sunny",
+      "layers": [
+        { "id": "radiation", "name": "Solar radiation", "meta": "W/m² - hourly", "icon": "sunny", "unit": "W/m²", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 1000, "ramp": "temp" } },
+        { "id": "uv-fc", "name": "UV index", "meta": "index - daily", "icon": "sunny", "unit": "UV", "modes": ["forecast"], "interval": "day", "archiveDays": 0, "horizonDays": 3, "scale": { "max": 11, "ramp": "temp" } }
+      ]
+    },
+    {
+      "id": "wind",
+      "title": "Wind",
+      "icon": "wind",
+      "layers": [
+        { "id": "wind-speed", "name": "Wind speed", "meta": "km/h - hourly", "icon": "wind", "unit": "km/h", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 100, "ramp": "neutral" } },
+        { "id": "wind-gust", "name": "Wind gusts", "meta": "km/h - 5min", "icon": "wind", "unit": "km/h", "modes": ["live"], "interval": "hour", "archiveDays": 0, "horizonDays": 0, "scale": { "max": 120, "ramp": "neutral" } },
+        { "id": "wind-speed-fc", "name": "Wind speed", "meta": "km/h - hourly", "icon": "wind", "unit": "km/h", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 100, "ramp": "neutral" } }
+      ]
+    },
+    {
+      "id": "storms",
+      "title": "Thunderstorms",
+      "icon": "sever-thunderstorm",
+      "layers": [
+        { "id": "storm-cells", "name": "Storm cells", "meta": "dBZ - 5min", "icon": "sever-thunderstorm", "unit": "dBZ", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 2, "horizonDays": 0, "scale": { "max": 70, "ramp": "rain" } },
+        { "id": "storm-prob-fc", "name": "Thunderstorm probability", "meta": "% - hourly", "icon": "sever-thunderstorm", "unit": "%", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 2, "scale": { "max": 100, "ramp": "rain" } }
+      ]
+    },
+    {
+      "id": "sea",
+      "title": "Sea & Rivers",
+      "icon": "waves",
+      "layers": [
+        { "id": "wave-height", "name": "Wave height", "meta": "m - hourly", "icon": "waves", "unit": "m", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 6, "ramp": "rain" } },
+        { "id": "wave-height-fc", "name": "Wave height", "meta": "m - hourly", "icon": "waves", "unit": "m", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 6, "ramp": "rain" } }
+      ]
+    }
+  ]
+}

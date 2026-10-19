@@ -4,7 +4,6 @@
   justify-content: center;
   gap: 8px;
   height: 26px;
-  min-width: 130px;
   padding: 0 10px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-default);

@@ -252,3 +252,12 @@
   background: var(--bg-canvas);
   border-radius: var(--radius-sm);
 }
+
+.variant[data-wide] .stage {
+  justify-content: flex-start;
+}
+
+.full {
+  width: 100%;
+  overflow-x: auto;
+}

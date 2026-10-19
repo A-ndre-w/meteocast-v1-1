@@ -1,0 +1,159 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  width: 307px;
+  padding: 15px 20px 14px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.place p {
+  margin: 0;
+}
+
+.location {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+}
+
+.location svg {
+  color: var(--text-primary);
+}
+
+.coords {
+  font-size: var(--font-size-sm);
+  color: var(--text-tertiary);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+}
+
+.layer {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+}
+
+.valueRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.value {
+  margin: 0;
+  font-size: var(--font-size-display);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text-tertiary);
+  font-variant-numeric: tabular-nums;
+}
+
+.unit {
+  font-size: var(--font-size-xl);
+  font-weight: 400;
+}
+
+.time {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.notice {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.root[data-state='stale'] .time {
+  text-decoration: underline dotted var(--border-strong);
+  text-underline-offset: 3px;
+}
+
+/* ---- Scale ---- */
+
+.scale {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bar {
+  position: relative;
+  height: 12px;
+  border-radius: var(--radius-md);
+}
+
+.bar[data-ramp='rain'] {
+  background: linear-gradient(to right, var(--data-rain-soft), var(--data-rain));
+}
+
+.bar[data-ramp='snow'] {
+  background: linear-gradient(to right, var(--data-snow-soft), var(--data-snow));
+}
+
+/* Warm ramp without orange/red: those are reserved for alerts. */
+.bar[data-ramp='temp'] {
+  background: linear-gradient(to right, #f3e9d6, #9a6b3f);
+}
+
+.bar[data-ramp='neutral'] {
+  background: linear-gradient(to right, var(--surface-sunken), var(--text-tertiary));
+}
+
+.root[data-state='noData'] .bar {
+  opacity: 0.35;
+}
+
+/* Triangle pointing up, sitting on the bar (Figma Polygon). */
+.marker {
+  position: absolute;
+  bottom: -2px;
+  width: 16px;
+  height: 13px;
+  translate: -50% 0;
+  background: var(--accent-default);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.bar[data-ramp='snow'] .marker {
+  background: #1fb8e0;
+}
+
+.bar[data-ramp='temp'] .marker,
+.bar[data-ramp='neutral'] .marker {
+  background: var(--text-secondary);
+}
+
+.ticks {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+}

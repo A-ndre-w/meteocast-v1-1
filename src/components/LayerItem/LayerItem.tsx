@@ -1,4 +1,4 @@
-import { useId } from 'react'
+import { useId, useState } from 'react'
 import { Icon, type IconName } from '../../icons/Icon'
 import styles from './LayerItem.module.css'
 
@@ -28,9 +28,20 @@ export function LayerItem({
 }: LayerItemProps) {
   const tipId = useId()
   const disabled = status === 'disabled'
+  // Fixed position so the tip escapes the panel's scroll clipping; DOM order (and Tab order) unchanged.
+  const [tipPos, setTipPos] = useState<{ top: number; left: number }>()
+  const place = (el: HTMLElement) => {
+    const r = el.getBoundingClientRect()
+    setTipPos({ top: r.top + r.height / 2, left: r.right + 10 })
+  }
 
   return (
-    <div className={styles.wrap} data-status={status}>
+    <div
+      className={styles.wrap}
+      data-status={status}
+      onMouseEnter={disabled ? (e) => place(e.currentTarget) : undefined}
+      onFocus={disabled ? (e) => place(e.currentTarget) : undefined}
+    >
       <button
         type="button"
         className={styles.root}
@@ -51,7 +62,7 @@ export function LayerItem({
       </button>
 
       {disabled && (
-        <div className={styles.tip} id={tipId} role="tooltip">
+        <div className={styles.tip} id={tipId} role="tooltip" style={tipPos}>
           <span>{disabledReason}</span>
           {onGoLive && (
             <button type="button" className={styles.tipAction} onClick={onGoLive}>
