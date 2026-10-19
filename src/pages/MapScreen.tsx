@@ -7,8 +7,10 @@ import { Rail } from '../components/Rail/Rail'
 import { Readout } from '../components/Readout/Readout'
 import { SearchBar } from '../components/SearchBar/SearchBar'
 import { Timebar } from '../components/Timebar/Timebar'
+import { Toast } from '../components/Toast/Toast'
 import { ZoomControl } from '../components/ZoomControl/ZoomControl'
 import { groups, location, mapPoints, pointValue, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
+import { disabledReason } from '../state/rules'
 import { useMeteo } from '../state/useMeteo'
 import {
   dayWindow,
@@ -22,27 +24,31 @@ import {
   NOW,
   pad2,
 } from '../time'
+import { modeLabel } from '../types'
 import styles from './MapScreen.module.css'
+import { toastFor } from './notices'
 
 const days = dayWindow()
 
-/** The prototype screen (Figma: Screen 01 — Live / Archive / Forecast data). */
+/** The prototype screen (Figma: Screens 01–03). */
 export function MapScreen() {
-  const { state, layer, actions } = useMeteo()
-  const { sel } = state
-  const mode = modeOf(sel)
-  const group = groups.find((g) => g.id === state.groupId)!
-  const daily = layer.interval === 'day'
+  const { state, view, layer, actions } = useMeteo()
+  const { sel } = view
+  const mode = modeOf(sel) // rule 1
+  const group = groups.find((g) => g.id === view.groupId)!
+  const daily = layer.interval === 'day' // rule 6
 
+  // Rule 9: Live shows "Updated HH:MM"; late data is "stale" with its delay; missing data is "—".
   const value = valueAt(layer.id, sel)
   const stale = mode === 'live' && value !== null && layer.liveDelayMin !== undefined
-  const updatedAt = stale ? NOW.hour * 60 - layer.liveDelayMin! : NOW.hour * 60
+  const updatedAt = NOW.hour * 60 - (stale ? layer.liveDelayMin! : 0)
   const readoutTime =
     mode === 'live' ? `${pad2(Math.floor(updatedAt / 60))}:${pad2(updatedAt % 60)}` : daily ? fmtDayShort(sel.day) : fmtReadoutTime(sel)
 
-  const unavailableHours = Array.from({ length: 24 }, (_, h) => h).filter(
-    (h) => !streamInstantAvailable(layer, { day: sel.day, hour: h }),
-  )
+  // Rule 8: what the stream (layer + twin) can show on the timeline.
+  const unavailableHours = Array.from({ length: 24 }, (_, h) => h).filter((h) => !streamInstantAvailable(layer, { day: sel.day, hour: h }))
+
+  const toast = state.notice && toastFor(state.notice)
 
   return (
     <div className={styles.screen}>
@@ -55,23 +61,43 @@ export function MapScreen() {
         zoom={state.zoom}
       />
 
-      <h1 className="visually-hidden">MeteoCast — {layer.name}, {location.name}</h1>
+      <h1 className="visually-hidden">MeteoCast</h1>
 
       <div className={styles.logo}>
         <Logo />
       </div>
 
       <div className={styles.rail}>
-        <Rail groups={groups} selectedGroupId={state.groupId} onSelect={actions.selectGroup} />
+        <Rail groups={groups} selectedGroupId={view.groupId} onSelect={actions.selectGroup} />
       </div>
 
       <div className={styles.panel}>
-        <LayerPanel group={group} selectedLayerId={state.layerId} onSelect={actions.selectLayer} />
+        <LayerPanel
+          group={group}
+          selectedLayerId={view.layerId}
+          getDisabledReason={(l) => disabledReason(l, view)}
+          onSelect={actions.selectLayer}
+          onGoLive={actions.goLiveWith}
+        />
       </div>
 
+      {/* Rule 2: the ModePill is one of the three mode signals; hidden in Live. */}
       <div className={styles.pill}>
         <ModePill mode={mode} time={fmtPillTime(sel)} relative={fmtRelative(sel)} onBackToLive={actions.goNow} />
       </div>
+
+      {toast && state.notice && (
+        <div className={toast.tone === 'warning' ? styles.toastBottom : styles.toastTop}>
+          <Toast
+            key={state.notice.key}
+            mode={toast.mode}
+            tone={toast.tone}
+            message={toast.message}
+            onUndo={toast.undo && (() => actions.undo(toast.undo!))}
+            onClose={actions.dismissNotice}
+          />
+        </div>
+      )}
 
       <div className={styles.top}>
         <SearchBar />
@@ -129,10 +155,10 @@ export function MapScreen() {
         Components
       </a>
 
-      {/* Announces what the map now shows when layer, time or mode change. */}
+      {/* Announces what the map now shows when layer, time or mode change (not on every Play frame). */}
       <p className="visually-hidden" aria-live="polite">
-        {layer.name}, {fmtDayShort(sel.day)}
-        {!daily && ` ${fmtHour(sel.hour)}`}, {mode}
+        {!state.playing &&
+          `${layer.name}, ${fmtDayShort(sel.day)}${daily ? '' : ` ${fmtHour(sel.hour)}`}, ${modeLabel[mode]}`}
       </p>
     </div>
   )

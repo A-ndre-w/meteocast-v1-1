@@ -137,3 +137,12 @@ Varianti: Default (archive), Variant2 (forecast). Nessuna variante live (coerent
 4. **Screen 03 "Blocca e avvisa":** alcuni livelli real-time non hanno archivio (es. Lightning, Rainfall rate). Per loro i giorni e le ore passate sono "unavailable"; se l'utente prova ad andarci compare il Toast warning e il tempo non si sposta.
 
 Altre scelte: "adesso" simulato = Thu 15 Oct 2026 13:00; i livelli a 5 minuti si muovono a passi di 1 ora; mappa = map.png più sovrapposizioni SVG per livello; font Geist via @fontsource; Vite `base: './'` con routing a hash; striscia della Timebar 3px (brief) invece di 5px (Figma); scala del Readout a 11px invece di 8px.
+
+## Modello dati e comportamenti — decisioni (2026-10-19, prima del passo 5)
+
+**Modello A + proposta del designer.**
+- I livelli con lo stesso `stream` (campo esplicito in layers.json) sono un unico dato sulla timeline: per esempio Hourly rainfall in Real time e in Forecast. Disponibilità dei giorni e delle ore = unione dei gemelli.
+- **Play (movimento automatico):** non attraversa mai "adesso". Gira in loop sulle ore disponibili del giorno visibile per il livello selezionato (oggi in Live/Archive: 00→13, poi di nuovo 00; in Forecast oggi: 14→23).
+- **Gesti manuali = azione esplicita:** clic su giorno, clic o trascinamento sulla traccia, frecce, Shift+frecce, pulsanti ‹ ›. Possono attraversare "adesso". Se il livello non ha dati lì ma il gemello sì, la selezione passa al gemello e compare un Toast con Undo: il cambio non è mai silenzioso.
+- Se né il livello né il gemello hanno dati (orizzonte superato, livello senza archivio): il tempo non si sposta e compare il Toast warning (Screen 03).
+- "Now" e "Back to live" tornano a Live e, se serve, al gemello real time, senza Toast: l'intenzione è esplicita.

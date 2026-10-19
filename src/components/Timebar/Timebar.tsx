@@ -1,4 +1,4 @@
-import { useRef, type KeyboardEvent, type PointerEvent } from 'react'
+import { useEffect, useRef, type KeyboardEvent, type PointerEvent } from 'react'
 import { Icon } from '../../icons/Icon'
 import { fmtDayLong, fmtDayMedium, fmtHour } from '../../time'
 import { modeLabel, type Mode } from '../../types'
@@ -91,8 +91,6 @@ export function Timebar({
     if (dir && (e.shiftKey || onChip)) {
       e.preventDefault()
       onStepDay?.(dir)
-      // Keep focus on the selected chip so repeated arrows keep walking the days.
-      if (onChip) requestAnimationFrame(() => rootRef.current?.querySelector<HTMLElement>('[data-daystrip] [aria-pressed="true"]')?.focus())
     } else if (dir && onSlider) {
       e.preventDefault()
       onStepHour?.(dir)
@@ -104,6 +102,12 @@ export function Timebar({
       onSelectHour?.(e.key === 'Home' ? 0 : 23)
     }
   }
+
+  // Keyboard on the day chips: focus follows the selected day, so repeated arrows keep walking.
+  useEffect(() => {
+    const strip = rootRef.current?.querySelector('[data-daystrip]')
+    if (strip?.contains(document.activeElement)) strip.querySelector<HTMLElement>('[aria-pressed="true"]')?.focus()
+  }, [selectedDay])
 
   const step = (dir: number) => (daily ? onStepDay?.(dir) : onStepHour?.(dir))
   const valueText = `${fmtDayLong(selectedDay)}${daily ? '' : `, ${fmtHour(selectedHour)}`} — ${modeLabel[mode]}`

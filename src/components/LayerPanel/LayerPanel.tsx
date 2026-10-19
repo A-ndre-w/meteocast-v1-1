@@ -8,15 +8,14 @@ import styles from './LayerPanel.module.css'
 export type LayerPanelProps = {
   group: LayerGroup
   selectedLayerId?: string
-  /** Rule 7: layers that can't show data at the selected instant (real-time only while in Forecast). */
-  isDisabled?: (layer: Layer) => boolean
-  disabledReason?: string
+  /** Rule 7: why a layer can't be picked at the selected instant (null = enabled). Shown in its tooltip. */
+  getDisabledReason?: (layer: Layer) => string | null
   onSelect?: (layerId: string) => void
   onGoLive?: (layerId: string) => void
 }
 
 /** Figma: Panel (2036:19020). One layer group, split into Real time / Forecast, single selection (rule 10). */
-export function LayerPanel({ group, selectedLayerId, isDisabled, disabledReason, onSelect, onGoLive }: LayerPanelProps) {
+export function LayerPanel({ group, selectedLayerId, getDisabledReason, onSelect, onGoLive }: LayerPanelProps) {
   const baseId = useId()
   const sections = [
     { key: 'realtime', title: 'Real time', layers: group.layers.filter((l) => sectionOf(l) === 'realtime') },
@@ -34,7 +33,8 @@ export function LayerPanel({ group, selectedLayerId, isDisabled, disabledReason,
             <SectionLabel id={`${baseId}-${s.key}`}>{s.title}</SectionLabel>
             <ul className={styles.list}>
               {s.layers.map((layer) => {
-                const disabled = isDisabled?.(layer) ?? false
+                const reason = getDisabledReason?.(layer) ?? null
+                const disabled = reason !== null
                 return (
                   <li key={layer.id}>
                     <LayerItem
@@ -42,9 +42,9 @@ export function LayerPanel({ group, selectedLayerId, isDisabled, disabledReason,
                       label={layer.name}
                       meta={layer.meta}
                       status={disabled ? 'disabled' : layer.id === selectedLayerId ? 'selected' : 'default'}
-                      disabledReason={disabledReason}
+                      disabledReason={reason ?? undefined}
+                      onGoLive={onGoLive && layer.modes.includes('live') ? () => onGoLive(layer.id) : undefined}
                       onSelect={() => onSelect?.(layer.id)}
-                      onGoLive={onGoLive && (() => onGoLive(layer.id))}
                     />
                   </li>
                 )

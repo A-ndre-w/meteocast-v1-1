@@ -80,3 +80,22 @@
 .componentsLink:hover {
   text-decoration: underline;
 }
+
+/* Toasts: info under the ModePill (Screen 02), warning above the timebar (Screen 03). */
+.toastTop,
+.toastBottom {
+  position: absolute;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 30;
+  width: max-content;
+  max-width: calc(100% - 700px);
+}
+
+.toastTop {
+  top: 78px;
+}
+
+.toastBottom {
+  bottom: 182px;
+}

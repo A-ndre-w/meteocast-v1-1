@@ -212,7 +212,7 @@ export function BigSpecimens() {
       <Specimen
         name="LayerPanel"
         figma="Panel · 2036:19020"
-        props="group, selectedLayerId, isDisabled, disabledReason, onSelect, onGoLive"
+        props="group, selectedLayerId, getDisabledReason, onSelect, onGoLive"
         note="Single selection. Right: in Forecast, real-time layers are disabled with a tooltip and “Go to live” (rule 7)."
       >
         <Variant label="Water & Storms · live">
@@ -225,7 +225,7 @@ export function BigSpecimens() {
             <LayerPanel
               group={snowGroup}
               selectedLayerId="snow-prob"
-              isDisabled={(l) => sectionOf(l) === 'realtime'}
+              getDisabledReason={(l) => (sectionOf(l) === 'realtime' ? 'Real-time data only. Not available as forecast.' : null)}
               onGoLive={() => {}}
             />
           </div>

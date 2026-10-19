@@ -7,6 +7,8 @@ export type Ramp = 'rain' | 'snow' | 'temp' | 'neutral'
 
 export type Layer = {
   id: string
+  /** One data quantity. A Real time and a Forecast layer with the same stream are twins. */
+  stream: string
   name: string
   meta: string
   icon: IconName
@@ -88,11 +90,11 @@ export function pointValue(layerId: string, sel: TimeSel, factor: number): numbe
 
 // ---- Twins: the same quantity split into a Real time and a Forecast layer ----
 // "The user thinks about the data, not the mode": Hourly rainfall (real time) and Hourly rainfall
-// (forecast) are one data stream on the timeline. Availability is the union of both.
+// (forecast) share a stream id: one data stream on the timeline. Availability is the union of both.
 
-/** The layer with the same name in the other section of the same group, if any. */
+/** The other layer of the same stream (declared in layers.json, not guessed from the name). */
 export function twinOf(layer: Layer): Layer | undefined {
-  return groupOf(layer.id).layers.find((l) => l.id !== layer.id && l.name === layer.name)
+  return allLayers.find((l) => l.id !== layer.id && l.stream === layer.stream)
 }
 
 /** Rule 8 for the timeline: a day is unavailable only if neither the layer nor its twin has data. */
