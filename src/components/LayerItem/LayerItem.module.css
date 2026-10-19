@@ -32,6 +32,8 @@
   flex-direction: column;
   min-width: 0;
   flex: 1;
+  /* Figma uses line-height "normal" (~1.2 for Geist): 43px single-line items. */
+  line-height: 1.2;
 }
 
 .label {

@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 17px 20px 16px;
+  padding: 22px 20px 23px;
   background: var(--mode-tint);
   border: 1px solid var(--mode-color);
   border-top: var(--stroke-modestripe) solid var(--mode-color);
@@ -25,14 +25,24 @@
   gap: 16px;
 }
 
+/* Figma: chevron 4px · 12 · play 30 · 12 · chevron 4px (62px). The chevrons keep a 24px hit area
+   by overlapping the gaps with negative margins. */
 .player {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 2px;
+}
+
+.player > :first-child {
+  margin-left: -10px;
+}
+
+.player > :last-child {
+  margin-right: -10px;
 }
 
 .stepBtn {
-  width: 20px;
+  width: 24px;
   height: 30px;
   display: grid;
   place-items: center;
@@ -77,6 +87,11 @@
   white-space: nowrap;
 }
 
+/* Daily layers: no hour, so no reserved width (Figma Mode=forecastdaily keeps Now next to the date). */
+.datetime[data-daily] {
+  min-width: 118px;
+}
+
 .calendar {
   color: var(--text-secondary);
 }
@@ -100,7 +115,7 @@
 .row2 {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
 }
 
 .speeds {
@@ -154,12 +169,12 @@
 .trackWrap {
   flex: 1;
   min-width: 0;
-  padding-top: 12px;
+  padding-top: 4px;
 }
 
 .track {
   position: relative;
-  height: 14px;
+  height: 10px;
   cursor: pointer;
   touch-action: none;
 }
@@ -181,7 +196,7 @@
 .lineSolid,
 .lineDashed {
   position: absolute;
-  top: 6px;
+  top: 4px;
   height: 2px;
 }
 
@@ -201,7 +216,7 @@
 /* Hours with no data for the current layer. */
 .gap {
   position: absolute;
-  top: 2px;
+  top: 0;
   height: 10px;
   background-color: var(--mode-tint);
   background-image: repeating-linear-gradient(-45deg, var(--text-tertiary) 0 1px, transparent 1px 4px);
@@ -231,7 +246,7 @@
 
 .thumb {
   position: absolute;
-  top: 0;
+  top: -2px;
   width: 14px;
   height: 14px;
   translate: -50% 0;
@@ -250,7 +265,7 @@
 .labels {
   display: flex;
   justify-content: space-between;
-  margin-top: 6px;
+  margin-top: 2px;
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
   color: var(--text-tertiary);

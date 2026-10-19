@@ -138,7 +138,7 @@ export function Timebar({
             <ModeBadge mode={mode} offset={offset} />
           </span>
 
-          <p className={styles.datetime}>
+          <p className={styles.datetime} data-daily={daily || undefined}>
             <Icon name="calendar" size={18} className={styles.calendar} />
             <span className={styles.date}>{fmtDayMedium(selectedDay)}</span>
             {!daily && <span className={styles.hour}>{fmtHour(selectedHour)}</span>}

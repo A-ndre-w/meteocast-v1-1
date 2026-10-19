@@ -133,7 +133,7 @@
 /* Triangle pointing up, sitting on the bar (Figma Polygon). */
 .marker {
   position: absolute;
-  bottom: -2px;
+  bottom: 1px;
   width: 16px;
   height: 13px;
   translate: -50% 0;

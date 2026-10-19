@@ -45,6 +45,9 @@ const blobs: Record<Ramp, { c: Point; r: number; color: string }[]> = {
   ],
 }
 
+// Snow reads as a faint veil in the Figma screens; rain is the strongest field.
+const strength: Record<Ramp, number> = { rain: 1, snow: 0.45, temp: 0.6, neutral: 0.5 }
+
 /**
  * Map = base image + separate data layer (rule 11). No filter ever touches the data;
  * in Archive only the base map is slightly desaturated.
@@ -68,18 +71,18 @@ export function MapView({ mode, ramp, intensity, labels, pin, zoom = 1 }: MapVie
           ))}
         </div>
 
-        <svg className={styles.data} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true" style={{ opacity: intensity === null ? 0 : 0.35 + 0.65 * k }}>
+        <svg className={styles.data} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true" style={{ opacity: intensity === null ? 0 : Math.min(1, 0.65 + 0.5 * k) }}>
           <defs>
             {blobs[ramp].map((b, i) => (
               <radialGradient key={i} id={`blob-${ramp}-${i}`}>
-                <stop offset="0" stopColor={b.color} stopOpacity="0.85" />
-                <stop offset="0.55" stopColor={b.color} stopOpacity="0.38" />
+                <stop offset="0" stopColor={b.color} stopOpacity={0.85 * strength[ramp]} />
+                <stop offset="0.55" stopColor={b.color} stopOpacity={0.38 * strength[ramp]} />
                 <stop offset="1" stopColor={b.color} stopOpacity="0" />
               </radialGradient>
             ))}
           </defs>
           {blobs[ramp].map((b, i) => (
-            <circle key={i} className={styles.blob} cx={b.c[0]} cy={b.c[1]} r={b.r * (0.75 + 0.5 * k)} fill={`url(#blob-${ramp}-${i})`} />
+            <circle key={i} className={styles.blob} cx={b.c[0]} cy={b.c[1]} r={b.r * (0.9 + 0.5 * k)} fill={`url(#blob-${ramp}-${i})`} />
           ))}
         </svg>
 

@@ -13,6 +13,7 @@ import {
   type Result,
   type View,
 } from './rules'
+import { scenarioFromUrl } from './scenarios'
 
 type State = {
   view: View
@@ -23,11 +24,16 @@ type State = {
   notice?: Notice & { key: number }
 }
 
-const initial: State = {
-  view: { groupId: 'water', layerId: 'rain-1h', sel: NOW },
-  zoom: 1,
-  playing: false,
-  speed: 1,
+function initialState(): State {
+  const scenario = scenarioFromUrl()
+  return {
+    view: scenario?.view ?? { groupId: 'water', layerId: 'rain-1h', sel: NOW },
+    zoom: 1,
+    playing: false,
+    speed: 1,
+    // Scenario toasts stay open (no timer) so the screen can be compared with Figma.
+    notice: scenario?.notice && { ...scenario.notice, key: 0 },
+  }
 }
 
 /** Frame length of the Play loop at 1x. */
@@ -48,7 +54,7 @@ function keepNotice(n: State['notice'], view: View): State['notice'] {
 
 /** App state. All behaviour rules live in ./rules.ts; this hook only applies their results. */
 export function useMeteo() {
-  const [state, setState] = useState<State>(initial)
+  const [state, setState] = useState<State>(initialState)
 
   const apply = (fn: (view: View) => Result, opts: { stopPlay?: boolean } = { stopPlay: true }) =>
     setState((s) => {

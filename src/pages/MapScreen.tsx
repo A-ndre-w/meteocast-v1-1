@@ -95,6 +95,8 @@ export function MapScreen() {
             message={toast.message}
             onUndo={toast.undo && (() => actions.undo(toast.undo!))}
             onClose={actions.dismissNotice}
+            // key 0 = opened by a QA scenario: keep it on screen for the comparison.
+            duration={state.notice.key === 0 ? 0 : undefined}
           />
         </div>
       )}
@@ -150,6 +152,9 @@ export function MapScreen() {
           onSpeedChange={actions.setSpeed}
         />
       </div>
+
+      {/* Figma: Archive and Forecast screens carry a thin frame in the mode colour around the viewport. */}
+      <div className={styles.modeFrame} data-mode={mode} aria-hidden="true" />
 
       <a className={styles.componentsLink} href="#/components">
         Components
