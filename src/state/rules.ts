@@ -48,9 +48,14 @@ export const modeOfView = (view: View) => modeOf(view.sel)
  * Manual gesture (click day, click/drag track, arrows, ‹ ›): may cross "now".
  * Layer has data → move. Twin has data → move + switch to twin (toast, Undo). Neither → block + warn.
  */
-export function moveExplicit(view: View, target: TimeSel): Result {
-  if (!inWindow(target)) return { view }
+/** Daily layers hide the hour: on today their instant is always "now". */
+const normalize = (layer: Layer, sel: TimeSel): TimeSel =>
+  layer.interval === 'day' && sel.day === NOW.day ? { ...sel, hour: NOW.hour } : sel
+
+export function moveExplicit(view: View, rawTarget: TimeSel): Result {
+  if (!inWindow(rawTarget)) return { view }
   const layer = layerById(view.layerId)
+  const target = normalize(layer, rawTarget)
   if (instantAvailable(layer, target)) return { view: { ...view, sel: target } }
 
   const twin = twinOf(layer)
@@ -149,7 +154,7 @@ export function playStep(view: View): View {
     const days = windowDays.filter((d) => dayAvailable(layer, d))
     if (!days.length) return view
     const i = days.indexOf(view.sel.day)
-    return { ...view, sel: { ...view.sel, day: days[(i + 1) % days.length] } }
+    return { ...view, sel: normalize(layer, { ...view.sel, day: days[(i + 1) % days.length] }) }
   }
   const hours = Array.from({ length: 24 }, (_, h) => h).filter((h) => instantAvailable(layer, { day: view.sel.day, hour: h }))
   if (!hours.length) return view

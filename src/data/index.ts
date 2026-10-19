@@ -47,7 +47,9 @@ export function dayAvailable(layer: Layer, day: string, now: TimeSel = NOW): boo
 /** Does this layer have data at this exact instant? */
 export function instantAvailable(layer: Layer, sel: TimeSel, now: TimeSel = NOW): boolean {
   if (!dayAvailable(layer, sel.day, now)) return false
-  if (layer.interval === 'day') return true
+  // Daily layers: one value per day. Past/future days are decided by the day; today needs the mode too,
+  // so a live-only daily layer is not available at a forecast hour of today (rule 7 disables it).
+  if (layer.interval === 'day') return dayDiff(sel.day, now.day) !== 0 || layer.modes.includes(modeOf(sel, now))
   return layer.modes.includes(modeOf(sel, now))
 }
 

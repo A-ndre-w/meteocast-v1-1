@@ -12,11 +12,12 @@
   top: 14px;
 }
 
+/* Figma height 486px; on short windows it stops 13px above the timebar and its list scrolls. */
 .rail {
   position: absolute;
   left: 13px;
   top: 61px;
-  height: min(486px, calc(100% - 61px - 190px));
+  height: min(486px, calc(100% - 61px - 172px));
   display: flex;
 }
 

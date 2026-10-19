@@ -49,17 +49,12 @@ export function toastFor(n: Notice): ToastContent {
         tone: 'info',
         mode: n.mode,
         undo: n.undo,
-        // Named after the panel section, not the mode: it stays true while the user keeps moving.
-        message:
-          n.mode === 'forecast' ? (
-            <>
-              <strong>{n.layer.name}</strong>: switched to the <ModeWord mode="forecast" /> layer.
-            </>
-          ) : (
-            <>
-              <strong>{n.layer.name}</strong>: switched to the Real time layer.
-            </>
-          ),
+        // Names the mode the user landed in. The hook closes this toast once the mode changes again.
+        message: (
+          <>
+            <strong>{n.layer.name}</strong>: switched to <ModeWord mode={n.mode} /> data.
+          </>
+        ),
       }
     case 'noLive':
       return {

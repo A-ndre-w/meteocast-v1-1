@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Speed } from '../components/Timebar/Timebar'
 import { layerById } from '../data'
-import { NOW, shiftHours } from '../time'
+import { modeOf, NOW, shiftHours } from '../time'
 import {
   goLive,
   moveExplicit,
@@ -36,6 +36,16 @@ const FRAME_MS = 900
 let noticeKey = 0
 const isWarning = (n: Notice) => n.type === 'blockedModes' || n.type === 'blockedHorizon'
 
+/**
+ * After a plain move (no new notice): keep an info toast so its Undo stays useful, but close it once it
+ * is no longer true — a warning about an attempt the user moved past, or a 'switched to X' after leaving X.
+ */
+function keepNotice(n: State['notice'], view: View): State['notice'] {
+  if (!n || isWarning(n)) return undefined
+  if (n.type === 'twin' && modeOf(view.sel) !== n.mode) return undefined
+  return n
+}
+
 /** App state. All behaviour rules live in ./rules.ts; this hook only applies their results. */
 export function useMeteo() {
   const [state, setState] = useState<State>(initial)
@@ -47,9 +57,7 @@ export function useMeteo() {
         ...s,
         view,
         playing: opts.stopPlay ? false : s.playing,
-        // A new notice replaces the old one. A plain move keeps an info toast (its Undo stays useful)
-        // but clears a warning: it was about an attempt the user has moved past.
-        notice: notice ? { ...notice, key: ++noticeKey } : s.notice && !isWarning(s.notice) ? s.notice : undefined,
+        notice: notice ? { ...notice, key: ++noticeKey } : keepNotice(s.notice, view),
       }
     })
 

@@ -26,7 +26,9 @@ export function Rail({ groups, selectedGroupId, onSelect, onAdd }: RailProps) {
           </li>
         ))}
       </ul>
-      <RailButton status="add" label="Create preset (coming soon)" onClick={onAdd} />
+      <div className={styles.add}>
+        <RailButton status="add" label="Create preset (coming soon)" onClick={onAdd} />
+      </div>
     </nav>
   )
 }
