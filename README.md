@@ -58,12 +58,7 @@ Il progetto è già configurato:
 Passi, una volta sola:
 
 1. Crea un repository vuoto su GitHub, per esempio `meteocast-v1-1`.
-2. Il branch locale si chiama `master`, mentre l'Action si avvia su `main`: rinominalo.
-
-```bash
-git branch -M main
-```
-
+2. Il branch locale è già `main`, quello su cui si avvia l'Action.
 3. Collega il repository (sostituisci `<utente>`) e fai il push.
 
 ```bash
