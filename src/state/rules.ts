@@ -86,7 +86,7 @@ const dayMode = (day: string): Mode => {
 }
 
 /**
- * Rule 7: a layer that cannot show data now and has no forecast is disabled (tooltip + Go to live).
+ * Rule 7: a layer that cannot show data now and has no forecast is disabled (tooltip + Back to live).
  * Forecast-capable layers are never disabled: picking them moves time instead (rule 5).
  */
 export function disabledReason(layer: Layer, view: View): string | null {
@@ -129,7 +129,7 @@ export function selectGroup(view: View, groupId: string): Result {
   return { view: { groupId, layerId: group.layers[0].id, sel: view.sel } }
 }
 
-/** "Now", "Back to live" and the tooltip's "Go to live". Explicit intent: no toast unless the layer changes unexpectedly. */
+/** Every "Back to live" (timebar, ModePill, disabled-layer tooltip). Explicit intent: no toast unless the layer changes unexpectedly. */
 export function goLive(view: View, layerId = view.layerId): Result {
   const layer = layerById(layerId)
   const sel = NOW

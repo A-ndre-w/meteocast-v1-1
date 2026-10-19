@@ -66,7 +66,7 @@ export function LayerItem({
           <span>{disabledReason}</span>
           {onGoLive && (
             <button type="button" className={styles.tipAction} onClick={onGoLive}>
-              Go to live
+              Back to live
               <Icon name="arrow-right" size={12} />
             </button>
           )}

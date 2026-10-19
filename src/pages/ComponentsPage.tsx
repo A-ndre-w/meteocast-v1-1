@@ -150,7 +150,7 @@ export function ComponentsPage() {
         name="LayerItem"
         figma="Layer/Item · 2007:7454"
         props="status: 'default' | 'hover' | 'selected' | 'disabled', icon, label, meta, onSelect, disabledReason, onGoLive"
-        note="Disabled is a code addition (rule 7). It stays focusable; hover or focus it to see the tooltip with “Go to live”."
+        note="Disabled is a code addition (rule 7). It stays focusable; hover or focus it to see the tooltip with “Back to live”."
       >
         {(['default', 'hover', 'selected', 'disabled'] as const).map((status) => (
           <Variant key={status} label={status}>
@@ -208,7 +208,7 @@ export function ComponentsPage() {
           <ModeBadge mode="live" />
         </Variant>
         <Variant label="archive · -24h">
-          <ModeBadge mode="archive" offset="-24h" />
+          <ModeBadge mode="archive" offset="−24h" />
         </Variant>
         <Variant label="forecast · +24h">
           <ModeBadge mode="forecast" offset="+24h" />

@@ -10,9 +10,7 @@ import {
   addDays,
   dayWindow,
   fmtOffset,
-  fmtPillTime,
-  fmtReadoutTime,
-  fmtRelative,
+  fmtStamp,
   modeOf,
   NOW,
   shiftHours,
@@ -146,28 +144,28 @@ export function BigSpecimens() {
           <Readout mode="live" location="Rome" coords={COORDS} layer="Hourly rainfall" value={4.2} unit="mm" time="13:00" scale={rain} />
         </Variant>
         <Variant label="archive">
-          <Readout mode="archive" offset="-24h" location="Rome" coords={COORDS} layer="Hourly rainfall" value={1.8} unit="mm" time={fmtReadoutTime(ARCHIVE)} scale={rain} />
+          <Readout mode="archive" offset="−24h" location="Rome" coords={COORDS} layer="Hourly rainfall" value={1.8} unit="mm" time={fmtStamp(ARCHIVE)} scale={rain} />
         </Variant>
         <Variant label="forecast">
-          <Readout mode="forecast" offset="+24h" location="Rome" coords={COORDS} layer="Hourly rainfall" value={6.5} unit="mm" time={fmtReadoutTime(FORECAST)} scale={rain} />
+          <Readout mode="forecast" offset="+24h" location="Rome" coords={COORDS} layer="Hourly rainfall" value={6.5} unit="mm" time={fmtStamp(FORECAST)} scale={rain} />
         </Variant>
         <Variant label="forecast · snow %">
-          <Readout mode="forecast" offset="+24h" location="Rome" coords={COORDS} layer="Snow probability" value={15} unit="%" time={fmtReadoutTime(FORECAST)} scale={snow} />
+          <Readout mode="forecast" offset="+24h" location="Rome" coords={COORDS} layer="Snow probability" value={15} unit="%" time={fmtStamp(FORECAST)} scale={snow} />
         </Variant>
         <Variant label="live · stale">
           <Readout mode="live" location="Rome" coords={COORDS} layer="Hydrometric level" value={182} unit="cm" time="12:20" state="stale" delayMin={40} scale={{ max: 400, ramp: 'rain' }} />
         </Variant>
         <Variant label="archive · noData">
-          <Readout mode="archive" offset="-26h" location="Rome" coords={COORDS} layer="Leaf wetness" value={null} unit="h" time="Wed 14, 11:00" state="noData" scale={{ max: 24, ramp: 'rain' }} />
+          <Readout mode="archive" offset="−26h" location="Rome" coords={COORDS} layer="Leaf wetness" value={null} unit="h" time="Wed 14 Oct, 11:00" state="noData" scale={{ max: 24, ramp: 'rain' }} />
         </Variant>
       </Specimen>
 
       <Specimen name="ModePill" figma="Map Pill · 2024:15692" props="mode, time, relative, onBackToLive" note="Hidden in Live: renders nothing.">
         <Variant label="archive" onMap>
-          <ModePill mode="archive" time={fmtPillTime(ARCHIVE)} relative={fmtRelative(ARCHIVE)} />
+          <ModePill mode="archive" time={fmtStamp(ARCHIVE)} relative={fmtOffset(ARCHIVE)} />
         </Variant>
         <Variant label="forecast" onMap>
-          <ModePill mode="forecast" time={fmtPillTime(FORECAST)} relative={fmtRelative(FORECAST)} />
+          <ModePill mode="forecast" time={fmtStamp(FORECAST)} relative={fmtOffset(FORECAST)} />
         </Variant>
         <Variant label="live → nothing" onMap>
           <ModePill mode="live" time="" relative="" />
@@ -213,7 +211,7 @@ export function BigSpecimens() {
         name="LayerPanel"
         figma="Panel · 2036:19020"
         props="group, selectedLayerId, getDisabledReason, onSelect, onGoLive"
-        note="Single selection. Right: in Forecast, real-time layers are disabled with a tooltip and “Go to live” (rule 7)."
+        note="Single selection. Right: in Forecast, real-time layers are disabled with a tooltip and “Back to live” (rule 7)."
       >
         <Variant label="Water & Storms · live">
           <div style={{ height: 520, display: 'flex' }}>

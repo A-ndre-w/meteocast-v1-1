@@ -64,19 +64,21 @@
   font-size: var(--font-size-display);
   font-weight: 700;
   line-height: 1.15;
-  color: var(--text-tertiary);
+  /* The most important number on screen: primary, not tertiary (UX review U3). */
+  color: var(--text-primary);
   font-variant-numeric: tabular-nums;
 }
 
 .unit {
   font-size: var(--font-size-xl);
   font-weight: 400;
+  color: var(--text-secondary);
 }
 
 .time {
   margin: 0;
-  font-family: var(--font-mono);
   font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
   color: var(--text-secondary);
   white-space: nowrap;
 }

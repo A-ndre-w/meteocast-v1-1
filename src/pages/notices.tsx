@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { ModeWord } from '../components/Toast/Toast'
 import type { Notice, View } from '../state/rules'
-import { fmtDayShort } from '../time'
+import { fmtDayMedium } from '../time'
 import type { Mode } from '../types'
 
 export type ToastContent = {
@@ -40,7 +40,7 @@ export function toastFor(n: Notice): ToastContent {
         undo: n.undo,
         message: (
           <>
-            <strong>{n.layer.name}</strong> forecast starts {fmtDayShort(n.day)}. Moved there.
+            <strong>{n.layer.name}</strong> forecast starts {fmtDayMedium(n.day)}. Moved there.
           </>
         ),
       }
@@ -83,8 +83,8 @@ export function toastFor(n: Notice): ToastContent {
         mode: 'forecast',
         message: (
           <>
-            <strong>{n.layer.name}</strong> has no data for {fmtDayShort(n.day)}.{' '}
-            {n.lastDay > n.day ? `The archive starts ${fmtDayShort(n.lastDay)}.` : `Data reaches ${fmtDayShort(n.lastDay)}.`}
+            <strong>{n.layer.name}</strong> has no data for {fmtDayMedium(n.day)}.{' '}
+            {n.lastDay > n.day ? `The archive starts ${fmtDayMedium(n.lastDay)}.` : `Data reaches ${fmtDayMedium(n.lastDay)}.`}
           </>
         ),
       }

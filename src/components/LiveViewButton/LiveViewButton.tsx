@@ -6,7 +6,7 @@ export type LiveViewButtonProps = {
   onClick?: () => void
 }
 
-/** Figma: Live view button (2008:9544). The "Now" button of the timebar (behaviour rule 4). */
+/** Figma: Live view button (2008:9544). Label unified with ModePill and tooltip: "Back to live" (rule 4). */
 export function LiveViewButton({ status = 'on', onClick }: LiveViewButtonProps) {
   const off = status === 'off'
   return (
@@ -15,10 +15,10 @@ export function LiveViewButton({ status = 'on', onClick }: LiveViewButtonProps) 
       className={styles.root}
       data-status={status}
       disabled={off}
-      aria-label={off ? 'Now — already showing live data' : 'Now — jump to live data'}
+      aria-label={off ? 'Back to live — already showing live data' : 'Back to live'}
       onClick={onClick}
     >
-      Now
+      Back to live
     </button>
   )
 }

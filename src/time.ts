@@ -52,27 +52,16 @@ export const fmtDayLong = (day: string) => {
   const p = parts(day)
   return `${WD_LONG[p.wd]} ${p.date} ${MON_LONG[p.month]}`
 }
-/** "Wed 14, 13:00" (Readout) */
-export const fmtReadoutTime = (sel: TimeSel) => `${fmtDayShort(sel.day)}, ${fmtHour(sel.hour)}`
-/** "Wed 14 Oct, 13:00" (ModePill) */
-export const fmtPillTime = (sel: TimeSel) => `${fmtDayMedium(sel.day)}, ${fmtHour(sel.hour)}`
+/** The one absolute format used everywhere: "Wed 14 Oct, 13:00". */
+export const fmtStamp = (sel: TimeSel) => `${fmtDayMedium(sel.day)}, ${fmtHour(sel.hour)}`
 
-/** Signed distance from now for badges: "-24h", "+5h", "+3d" (days from 48h on). */
+/** The one relative format used everywhere: "−24h", "+5h", "+3d" (days from 48h on). True minus sign. */
 export function fmtOffset(sel: TimeSel, now: TimeSel = NOW): string {
   const h = hoursBetween(sel, now)
   if (h === 0) return ''
-  const sign = h < 0 ? '-' : '+'
+  const sign = h < 0 ? '−' : '+'
   const abs = Math.abs(h)
   return abs < 48 ? `${sign}${abs}h` : `${sign}${Math.round(abs / 24)}d`
-}
-
-/** Human distance for the ModePill: "24h ago", "in 5h", "in 3 days". */
-export function fmtRelative(sel: TimeSel, now: TimeSel = NOW): string {
-  const h = hoursBetween(sel, now)
-  if (h === 0) return 'now'
-  const abs = Math.abs(h)
-  const span = abs < 48 ? `${abs}h` : `${Math.round(abs / 24)} days`
-  return h < 0 ? `${span} ago` : `in ${span}`
 }
 
 export type DayInfo = { day: string; time: 'past' | 'today' | 'future' }

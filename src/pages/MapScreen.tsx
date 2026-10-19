@@ -14,12 +14,9 @@ import { disabledReason } from '../state/rules'
 import { useMeteo } from '../state/useMeteo'
 import {
   dayWindow,
-  fmtDayShort,
-  fmtHour,
+  fmtDayMedium,
   fmtOffset,
-  fmtPillTime,
-  fmtReadoutTime,
-  fmtRelative,
+  fmtStamp,
   modeOf,
   NOW,
   pad2,
@@ -43,7 +40,7 @@ export function MapScreen() {
   const stale = mode === 'live' && value !== null && layer.liveDelayMin !== undefined
   const updatedAt = NOW.hour * 60 - (stale ? layer.liveDelayMin! : 0)
   const readoutTime =
-    mode === 'live' ? `${pad2(Math.floor(updatedAt / 60))}:${pad2(updatedAt % 60)}` : daily ? fmtDayShort(sel.day) : fmtReadoutTime(sel)
+    mode === 'live' ? `${pad2(Math.floor(updatedAt / 60))}:${pad2(updatedAt % 60)}` : daily ? fmtDayMedium(sel.day) : fmtStamp(sel)
 
   // Rule 8: what the stream (layer + twin) can show on the timeline.
   const unavailableHours = Array.from({ length: 24 }, (_, h) => h).filter((h) => !streamInstantAvailable(layer, { day: sel.day, hour: h }))
@@ -56,7 +53,7 @@ export function MapScreen() {
         mode={mode}
         ramp={layer.scale.ramp}
         intensity={value === null ? null : Math.min(1, value / layer.scale.max)}
-        labels={mapPoints.map((p) => ({ pos: p.pos, value: pointValue(layer.id, sel, p.factor), unit: layer.unit === 'mm' ? 'mm/h' : layer.unit }))}
+        labels={mapPoints.map((p) => ({ pos: p.pos, value: pointValue(layer.id, sel, p.factor), unit: layer.unit }))}
         pin={{ pos: location.pin, label: location.name }}
         zoom={state.zoom}
       />
@@ -83,7 +80,7 @@ export function MapScreen() {
 
       {/* Rule 2: the ModePill is one of the three mode signals; hidden in Live. */}
       <div className={styles.pill}>
-        <ModePill mode={mode} time={fmtPillTime(sel)} relative={fmtRelative(sel)} onBackToLive={actions.goNow} />
+        <ModePill mode={mode} time={fmtStamp(sel)} relative={fmtOffset(sel)} onBackToLive={actions.goNow} />
       </div>
 
       {toast && state.notice && (
@@ -163,7 +160,7 @@ export function MapScreen() {
       {/* Announces what the map now shows when layer, time or mode change (not on every Play frame). */}
       <p className="visually-hidden" aria-live="polite">
         {!state.playing &&
-          `${layer.name}, ${fmtDayShort(sel.day)}${daily ? '' : ` ${fmtHour(sel.hour)}`}, ${modeLabel[mode]}`}
+          `${layer.name}, ${daily ? fmtDayMedium(sel.day) : fmtStamp(sel)}, ${modeLabel[mode]}`}
       </p>
     </div>
   )
