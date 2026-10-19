@@ -7,10 +7,12 @@ import {
   groups,
   instantAvailable,
   layerById,
+  modesOfStream,
+  streamById,
   twinOf,
   type Layer,
 } from '../data'
-import { addDays, dayDiff, dayWindow, modeOf, NOW, type TimeSel } from '../time'
+import { addDays, dayDiff, dayWindow, hoursBetween, modeOf, NOW, type TimeSel } from '../time'
 import type { Mode } from '../types'
 
 /** What the user is looking at. Undo restores a whole View. */
@@ -29,6 +31,8 @@ export type Notice =
   | { type: 'blockedModes'; layer: Layer; modes: Mode[] }
   /** Rule 8: beyond the stream's archive or forecast horizon. Time does not move. */
   | { type: 'blockedHorizon'; layer: Layer; day: string; lastDay: string }
+  /** Picking a data stream with nothing at the selected instant: moved to the nearest instant with data. */
+  | { type: 'movedTo'; layer: Layer; mode: Mode; undo: View }
   /** Buttons outside the v1 scope (search, alerts, presets): say so instead of doing nothing. */
   | { type: 'notInPrototype'; feature: string }
 
@@ -88,36 +92,34 @@ const dayMode = (day: string): Mode => {
 }
 
 /**
- * Rule 7: a layer that cannot show data now and has no forecast is disabled (tooltip + Back to live).
- * Forecast-capable layers are never disabled: picking them moves time instead (rule 5).
+ * Picking a data stream in the panel (one entry per quantity; replaces rule 7's disabled layers).
+ * Data at the selected instant → select it, time stays. Otherwise move to the nearest instant that has
+ * data, with a toast and Undo (the previous view, Archive included):
+ * - forecast-only stream from Live/Archive → first forecast instant (rule 5, Screen 02 copy);
+ * - real-time stream while in Forecast, or no archive while in Archive → now (Live).
  */
-export function disabledReason(layer: Layer, view: View): string | null {
-  if (instantAvailable(layer, view.sel) || layer.modes.includes('forecast')) return null
-  const mode = modeOfView(view)
-  if (mode === 'forecast') return 'Real-time data only. Not available as forecast.'
-  if (mode === 'archive') {
-    return layer.modes.includes('archive')
-      ? `Archive goes back ${layer.archiveDays} days.`
-      : 'Live data only. This layer has no archive.'
-  }
-  return 'No data for this hour.'
-}
+export function selectStream(view: View, streamId: string): Result {
+  const stream = streamById(streamId)
+  const here = stream.layers.find((l) => instantAvailable(l, view.sel))
+  if (here) return { view: { groupId: groupIdOf(here), layerId: here.id, sel: view.sel } }
 
-/** Picking a layer in the panel. Rule 5 lives here; rule 7 layers never reach it (disabled). */
-export function selectLayer(view: View, layerId: string): Result {
-  const layer = layerById(layerId)
-  const next: View = { groupId: groupIdOf(layer), layerId, sel: view.sel }
-  if (instantAvailable(layer, view.sel)) return { view: next }
-
-  if (layer.modes.includes('forecast')) {
-    const sel = firstForecastInstant(layer)
-    const mode = modeOfView(view)
-    // Rule 5: from Live (or Archive) a forecast-only layer jumps to its first forecast instant.
-    // Undo restores the PREVIOUS view, Archive included.
-    if (mode !== 'forecast') return { view: { ...next, sel }, notice: { type: 'forecastOnly', layer, undo: view } }
-    return { view: { ...next, sel }, notice: { type: 'forecastStarts', layer, day: sel.day, undo: view } }
+  const candidates: { layer: Layer; sel: TimeSel }[] = []
+  for (const l of stream.layers) {
+    if (instantAvailable(l, NOW)) candidates.push({ layer: l, sel: NOW })
+    if (l.modes.includes('forecast')) candidates.push({ layer: l, sel: firstForecastInstant(l) })
   }
-  return { view } // disabled layer (rule 7): nothing happens
+  if (!candidates.length) return { view }
+  const distance = (sel: TimeSel) => Math.abs(hoursBetween(sel, view.sel))
+  const best = candidates.reduce((a, b) => (distance(b.sel) < distance(a.sel) ? b : a))
+  const next: View = { groupId: groupIdOf(best.layer), layerId: best.layer.id, sel: best.sel }
+  const from = modeOfView(view)
+  const to = modeOf(best.sel)
+
+  if (to === 'forecast' && from !== 'forecast' && modesOfStream(stream).every((m) => m === 'forecast'))
+    return { view: next, notice: { type: 'forecastOnly', layer: best.layer, undo: view } }
+  if (to === 'forecast' && from === 'forecast')
+    return { view: next, notice: { type: 'forecastStarts', layer: best.layer, day: best.sel.day, undo: view } }
+  return { view: next, notice: { type: 'movedTo', layer: best.layer, mode: to, undo: view } }
 }
 
 /** Rule 10: switching group never moves time. Pick the first layer that has data now, else apply rule 5. */
@@ -127,11 +129,11 @@ export function selectGroup(view: View, groupId: string): Result {
   const ready = group.layers.find((l) => instantAvailable(l, view.sel))
   if (ready) return { view: { groupId, layerId: ready.id, sel: view.sel } }
   const forecast = group.layers.find((l) => l.modes.includes('forecast'))
-  if (forecast) return selectLayer({ ...view, groupId }, forecast.id)
+  if (forecast) return selectStream({ ...view, groupId }, forecast.stream)
   return { view: { groupId, layerId: group.layers[0].id, sel: view.sel } }
 }
 
-/** Every "Back to live" (timebar, ModePill, disabled-layer tooltip). Explicit intent: no toast unless the layer changes unexpectedly. */
+/** Every "Back to live" (timebar, ModePill). Explicit intent: no toast unless the layer changes unexpectedly. */
 export function goLive(view: View, layerId = view.layerId): Result {
   const layer = layerById(layerId)
   const sel = NOW

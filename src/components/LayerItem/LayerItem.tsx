@@ -1,5 +1,7 @@
 import { useId, useState } from 'react'
 import { Icon, type IconName } from '../../icons/Icon'
+import type { Mode } from '../../types'
+import { CoverageBar, coverageText } from '../CoverageBar/CoverageBar'
 import styles from './LayerItem.module.css'
 
 export type LayerItemProps = {
@@ -14,6 +16,10 @@ export type LayerItemProps = {
   disabledReason?: string
   /** Action offered in the disabled tooltip. */
   onGoLive?: () => void
+  /** Where this data exists on the timeline (UX review U1). Shows a CoverageBar. */
+  coverage?: { modes: Mode[]; cursor: Mode }
+  /** No data at the selected instant: dimmed but still clickable (picking it moves time). */
+  idle?: boolean
 }
 
 /** Figma: Layer/Item (2007:7454). Single selection inside the layer panel. */
@@ -25,6 +31,8 @@ export function LayerItem({
   onSelect,
   disabledReason = 'Real-time data only. Not available in Forecast.',
   onGoLive,
+  coverage,
+  idle,
 }: LayerItemProps) {
   const tipId = useId()
   const disabled = status === 'disabled'
@@ -46,6 +54,7 @@ export function LayerItem({
         type="button"
         className={styles.root}
         data-status={status}
+        data-idle={idle || undefined}
         aria-pressed={status === 'selected'}
         aria-disabled={disabled || undefined}
         aria-describedby={disabled ? tipId : undefined}
@@ -58,6 +67,12 @@ export function LayerItem({
           <span className={styles.label}>{label}</span>
           {meta && <span className={styles.meta}>{meta}</span>}
         </span>
+        {coverage && (
+          <>
+            <CoverageBar modes={coverage.modes} cursor={coverage.cursor} />
+            <span className="visually-hidden">, data: {coverageText(coverage.modes)}</span>
+          </>
+        )}
         {disabled && <Icon name="lock" size={14} className={styles.lock} />}
       </button>
 

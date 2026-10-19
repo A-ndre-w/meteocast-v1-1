@@ -1,11 +1,12 @@
 import { useState } from 'react'
+import { CoverageBar } from '../components/CoverageBar/CoverageBar'
 import { DayStrip } from '../components/DayStrip/DayStrip'
 import { LayerPanel } from '../components/LayerPanel/LayerPanel'
 import { ModePill } from '../components/ModePill/ModePill'
 import { Readout } from '../components/Readout/Readout'
 import { Timebar, type Speed } from '../components/Timebar/Timebar'
 import { ModeWord, Toast } from '../components/Toast/Toast'
-import { groups, sectionOf } from '../data'
+import { groups } from '../data'
 import {
   addDays,
   dayWindow,
@@ -209,25 +210,45 @@ export function BigSpecimens() {
 
       <Specimen
         name="LayerPanel"
-        figma="Panel · 2036:19020"
-        props="group, selectedLayerId, getDisabledReason, onSelect, onGoLive"
-        note="Single selection. Right: in Forecast, real-time layers are disabled with a tooltip and “Back to live” (rule 7)."
+        figma="Panel · 2036:19020 (redesigned, UX review U1)"
+        props="group, selectedStreamId, cursor, isAvailable, onSelect"
+        note="One entry per data quantity, no Real time / Forecast sections, nothing locked. The coverage bar shows where each one has data; entries without data at the selected instant are quieter and picking them moves time (with Undo)."
       >
         <Variant label="Water & Storms · live">
           <div style={{ height: 520, display: 'flex' }}>
-            <LayerPanel group={water} selectedLayerId="rain-1h" />
+            <LayerPanel group={water} selectedStreamId="water/hourly-rainfall" cursor="live" />
           </div>
         </Variant>
-        <Variant label="Snow · forecast">
+        <Variant label="Snow · forecast (Fri 16)">
           <div style={{ height: 520, display: 'flex' }}>
             <LayerPanel
               group={snowGroup}
-              selectedLayerId="snow-prob"
-              getDisabledReason={(l) => (sectionOf(l) === 'realtime' ? 'Real-time data only. Not available as forecast.' : null)}
-              onGoLive={() => {}}
+              selectedStreamId="snow/snow-probability"
+              cursor="forecast"
+              isAvailable={(st) => st.layers.some((l) => l.modes.includes('forecast'))}
             />
           </div>
         </Variant>
+      </Specimen>
+
+      <Specimen
+        name="CoverageBar"
+        figma="— (code addition, UX review U1)"
+        props="modes: Mode[], cursor: Mode"
+        note="Mini timeline in the Timebar's language: solid = archive, dot = live (hollow if none), dashed = forecast. The tick is the selected instant."
+      >
+        {([
+          [['archive', 'live', 'forecast'], 'live', 'Archive · Live · Forecast'],
+          [['archive', 'live'], 'forecast', 'Archive · Live, cursor in forecast'],
+          [['live', 'forecast'], 'archive', 'Live · Forecast, cursor in archive'],
+          [['forecast'], 'live', 'Forecast only'],
+        ] as const).map(([modes, cursor, label]) => (
+          <Variant key={label} label={label}>
+            <span data-mode={cursor}>
+              <CoverageBar modes={[...modes]} cursor={cursor} />
+            </span>
+          </Variant>
+        ))}
       </Specimen>
     </>
   )

@@ -9,8 +9,7 @@ import { SearchBar } from '../components/SearchBar/SearchBar'
 import { Timebar } from '../components/Timebar/Timebar'
 import { Toast } from '../components/Toast/Toast'
 import { ZoomControl } from '../components/ZoomControl/ZoomControl'
-import { groups, location, mapPoints, pointValue, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
-import { disabledReason } from '../state/rules'
+import { groups, instantAvailable, location, mapPoints, pointValue, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
 import { useMeteo } from '../state/useMeteo'
 import {
   dayWindow,
@@ -76,10 +75,10 @@ export function MapScreen() {
       <div className={styles.panel}>
         <LayerPanel
           group={group}
-          selectedLayerId={view.layerId}
-          getDisabledReason={(l) => disabledReason(l, view)}
-          onSelect={actions.selectLayer}
-          onGoLive={actions.goLiveWith}
+          selectedStreamId={layer.stream}
+          cursor={mode}
+          isAvailable={(s) => s.layers.some((l) => instantAvailable(l, sel))}
+          onSelect={actions.selectStream}
         />
       </div>
 
@@ -154,9 +153,6 @@ export function MapScreen() {
           onSpeedChange={actions.setSpeed}
         />
       </div>
-
-      {/* Figma: Archive and Forecast screens carry a thin frame in the mode colour around the viewport. */}
-      <div className={styles.modeFrame} data-mode={mode} aria-hidden="true" />
 
       <a className={styles.componentsLink} href="#/components">
         Components

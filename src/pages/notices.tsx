@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { ModeWord } from '../components/Toast/Toast'
+import { modesOfStream, streamById } from '../data'
 import type { Notice, View } from '../state/rules'
 import { fmtDayMedium } from '../time'
 import type { Mode } from '../types'
@@ -74,6 +75,18 @@ export function toastFor(n: Notice): ToastContent {
         message: (
           <>
             <strong>{n.layer.name}</strong> is only available as {or(n.modes)} data.
+          </>
+        ),
+      }
+    case 'movedTo':
+      return {
+        tone: 'info',
+        mode: n.mode,
+        undo: n.undo,
+        message: (
+          <>
+            <strong>{n.layer.name}</strong> is only available as {or(modesOfStream(streamById(n.layer.stream)))} data. Switched to{' '}
+            <ModeWord mode={n.mode} />.
           </>
         ),
       }

@@ -1,7 +1,7 @@
 // Named starting states that reproduce the Figma screens: #/?s=archive, #/?s=switch, …
 // Used by the design QA page and handy as deep links in the portfolio.
 import { addDays, NOW, shiftHours } from '../time'
-import { moveExplicit, selectLayer, type Notice, type View } from './rules'
+import { moveExplicit, selectStream, type Notice, type View } from './rules'
 
 const live: View = { groupId: 'water', layerId: 'rain-1h', sel: NOW }
 
@@ -24,7 +24,7 @@ export const scenarios: Scenario[] = [
   { id: 'snow', title: 'Snow group (Screen 02)', figma: 'Screen 02/Screen 02.png', view: { groupId: 'snow', layerId: 'snow-ground', sel: NOW } },
   (() => {
     // Screen 02: picking Snow probability while Live → auto switch to Forecast (rule 5).
-    const r = selectLayer({ groupId: 'snow', layerId: 'snow-ground', sel: NOW }, 'snow-prob')
+    const r = selectStream({ groupId: 'snow', layerId: 'snow-ground', sel: NOW }, 'snow/snow-probability')
     return { id: 'switch', title: 'Auto switch to forecast', figma: 'Screen 02/Auto switch to forecast.png', view: r.view, notice: r.notice }
   })(),
   (() => {

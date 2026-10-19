@@ -109,3 +109,30 @@ export const streamInstantAvailable = (layer: Layer, sel: TimeSel) => {
   const twin = twinOf(layer)
   return instantAvailable(layer, sel) || (twin !== undefined && instantAvailable(twin, sel))
 }
+
+// ---- Streams: what the layer panel lists (one entry per data quantity, UX review U1) ----
+
+export type Stream = { id: string; name: string; meta: string; icon: IconName; layers: Layer[] }
+
+/** Streams of a group, in panel order (first appearance of each stream). */
+export function streamsOf(group: LayerGroup): Stream[] {
+  const out: Stream[] = []
+  for (const l of group.layers) {
+    const s = out.find((x) => x.id === l.stream)
+    if (s) s.layers.push(l)
+    else out.push({ id: l.stream, name: l.name, meta: l.meta, icon: l.icon, layers: [l] })
+  }
+  return out
+}
+
+export const streamById = (id: string): Stream => {
+  for (const g of groups) {
+    const s = streamsOf(g).find((x) => x.id === id)
+    if (s) return s
+  }
+  throw new Error(`Unknown stream ${id}`)
+}
+
+/** Modes the stream has data in, in timeline order. */
+export const modesOfStream = (s: Stream): Mode[] =>
+  (['archive', 'live', 'forecast'] as Mode[]).filter((m) => s.layers.some((l) => l.modes.includes(m)))

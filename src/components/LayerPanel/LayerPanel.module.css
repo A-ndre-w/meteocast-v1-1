@@ -38,47 +38,12 @@
   border-radius: 20px;
 }
 
-.section + .section {
-  margin-top: 14px;
-}
-
 .list {
   display: flex;
   flex-direction: column;
   gap: 11px;
-  margin: 14px 0 0;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
-/* A fully unavailable section collapses to this one line (UX review U1). */
-.disclosure {
-  width: 100%;
-  min-height: var(--size-sm);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 2px 4px;
-  margin: -2px -4px;
-  border-radius: var(--radius-sm);
-  text-align: left;
-}
-
-.disclosure:hover {
-  background: var(--surface-sunken);
-}
-
-.hint {
-  flex: 1;
-  font-size: var(--font-size-xs);
-  color: var(--text-tertiary);
-}
-
-.chevron {
-  color: var(--text-tertiary);
-  rotate: 90deg;
-}
-
-.disclosure[aria-expanded='true'] .chevron {
-  rotate: -90deg;
-}

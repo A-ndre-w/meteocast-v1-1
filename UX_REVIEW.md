@@ -4,16 +4,16 @@ Revisione euristica del sito pubblicato (https://a-ndre-w.github.io/meteocast-v1
 
 ## Stato (20 ottobre 2026)
 
-Il designer ha scelto di correggere tutti i gruppi; per U1 la correzione minima.
+Il designer ha scelto di correggere tutti i gruppi. Per U1 prima la correzione minima, poi, dopo averla provata, il pannello con una voce per dato (variante C, barra di copertura) e nessuna voce bloccata.
 
 | Esito | Punti | Commit |
 |---|---|---|
 | Risolti | U2, U3, U4, U6 | `98aecb0` testi, unità, formati |
 | Risolti | D1–D6, A1 | `c15ae4e` design system |
 | Risolti | U5, U7, U8, U9, U10, U11, U13, U14, A2 | `1ada471` feedback e bug |
-| Risolto (minimo) | U1: la sezione non disponibile si comprime, la selezione resta in vista | `f8b0f9c` |
+| Risolto | U1: una voce per dato con barra di copertura; scegliere un dato senza valori in quell'istante sposta il tempo con Undo (sostituisce i livelli bloccati della regola 7) | commit successivo a `f8b0f9c` |
+| Risolto | D7: rimossa la cornice di modalità attorno allo schermo; restano pill, tag del Readout, striscia + tinta + badge della timebar | idem |
 | Parziale | U12: il Play descrive il suo loop (tooltip e descrizione ARIA); velocità e Play non sono stati raggruppati | `1ada471` |
-| Aperto | D7: sei segnali di modalità, da decidere con il designer. U1 nella versione completa (una voce per dato) | — |
 
 Verifiche dopo le correzioni: nessuna area cliccabile sotto i 24px, nessuna riga della timebar che sborda negli scenari Live, Archive e Switch, `npm run contrast` senza errori.
 

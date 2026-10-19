@@ -149,7 +149,7 @@ export function ComponentsPage() {
       <Specimen
         name="LayerItem"
         figma="Layer/Item · 2007:7454"
-        props="status: 'default' | 'hover' | 'selected' | 'disabled', icon, label, meta, onSelect, disabledReason, onGoLive"
+        props="status: 'default' | 'hover' | 'selected' | 'disabled', icon, label, meta, coverage, idle, onSelect, disabledReason, onGoLive"
         note="Disabled is a code addition (rule 7). It stays focusable; hover or focus it to see the tooltip with “Back to live”."
       >
         {(['default', 'hover', 'selected', 'disabled'] as const).map((status) => (
@@ -162,6 +162,16 @@ export function ComponentsPage() {
         <Variant label="long label">
           <div style={{ width: 213 }}>
             <LayerItem icon="drizzle" label="Accumulated precipitation in 24h" meta="mm - daily" />
+          </div>
+        </Variant>
+        <Variant label="coverage (screen use)">
+          <div style={{ width: 213 }} data-mode="live">
+            <LayerItem icon="drizzle" label="Hourly rainfall" meta="mm - hourly" status="selected" coverage={{ modes: ['archive', 'live', 'forecast'], cursor: 'live' }} />
+          </div>
+        </Variant>
+        <Variant label="coverage · idle (no data now)">
+          <div style={{ width: 213 }} data-mode="forecast">
+            <LayerItem icon="humidity" label="Snow on the ground" meta="cm - hourly" idle coverage={{ modes: ['archive', 'live'], cursor: 'forecast' }} />
           </div>
         </Variant>
       </Specimen>

@@ -159,3 +159,10 @@ Altre scelte: "adesso" simulato = Thu 15 Oct 2026 13:00; i livelli a 5 minuti si
 - **Forme:** pillola per i toggle piccoli (velocità, Back to live) e per la Rail; 10px per card, chip con testo e campi.
 - **Tipografia:** pesi 400 / 500 (controlli) / 600 (titoli) / 700 (solo numeri display e logo). Mono solo per etichette maiuscole e dati tabellari (badge, etichette sulla mappa, intervallo); date e ore in sans.
 - **Un nome, un formato:** l'azione è sempre "Back to live"; date assolute "Wed 14 Oct, 13:00"; distanza da adesso "−24h / +24h".
+
+## Decisioni dopo aver provato il sito (2026-10-20)
+
+- **Pannello livelli:** una voce per dato (stream), senza sezioni Real time / Forecast. Ogni voce ha una CoverageBar (mini-timeline: pieno = archivio, pallino = adesso, tratteggio = previsione, tacca = istante selezionato).
+- **Nessuna voce bloccata:** sostituisce la regola 7 del brief. Se si sceglie un dato senza valori nell'istante selezionato, il tempo va all'istante più vicino che li ha, con Toast e Undo. Per i dati solo previsione il testo è quello di Screen 02 (regola 5).
+- **Segnali di modalità:** rimossa la cornice attorno allo schermo. Restano ModePill, tag del Readout, striscia + tinta + badge della Timebar.
+- SectionLabel resta nel design system ma non è più usato nella schermata.

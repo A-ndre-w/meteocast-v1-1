@@ -81,7 +81,8 @@ Fonte: file Figma *UXChallenge_RadarMeteo*, pagina "🎨 Stile & Componenti". Le
 | Figma | Codice | Props (varianti Figma → props) |
 |---|---|---|
 | Rail Button | `RailButton` | `status: default \| hover \| selected \| add` (Figma: *preset*), `icon`, `label` |
-| Layer/Item | `LayerItem` | `status: default \| hover \| selected \| disabled`, `icon`, `label`, `meta` |
+| Layer/Item | `LayerItem` | `status: default \| hover \| selected \| disabled`, `icon`, `label`, `meta`, `coverage`, `idle` |
+| — | `CoverageBar` | `modes`, `cursor` — mini-timeline delle modalità disponibili per un dato |
 | Menu Section label | `SectionLabel` | `children` |
 | Set header | `PresetHeader` | `icon`, `title`, `preset`, `layerCount` |
 | Live view button | `LiveViewButton` | `status: on \| off` — il pulsante "Now" |
@@ -103,12 +104,12 @@ Per tre componenti il codice usa i nomi del brief (Timebar, Readout, ModePill) i
 Tutte le regole sono funzioni pure in [src/state/rules.ts](src/state/rules.ts): (vista, intenzione) → (nuova vista, avviso).
 
 1. **Modalità dall'istante:** Live solo a "adesso", prima Archive, dopo Forecast, anche dentro la giornata di oggi.
-2. **Modalità sempre con testo, icona e colore:** ModePill in alto (nascosta in Live), tag nel Readout, striscia di 3px e tinta della Timebar, più la cornice dello schermo vista negli export Figma. Rosso, arancione e verde restano agli allarmi.
+2. **Modalità sempre con testo, icona e colore:** ModePill in alto (nascosta in Live), tag nel Readout, striscia di 3px, tinta e badge della Timebar. Rosso, arancione e verde restano agli allarmi.
 3. **Traccia:** piena per il dato osservato, tratteggiata per la previsione, marcatore NOW su oggi. Chip: passati pieni, oggi con puntino, futuri tratteggiati, selezionato nel colore della modalità.
 4. **Now:** disattivato in Live, in evidenza in Archive e Forecast.
 5. **Cambio automatico:** un livello solo previsione scelto in Live o Archive porta al primo istante di previsione. Il Toast offre Undo, che ripristina lo stato precedente anche se era Archive, e sparisce dopo 6 secondi (in pausa con hover o focus).
 6. **Livelli giornalieri:** intervallo "1 DAY", la traccia delle ore si nasconde.
-7. **Cambio inverso:** un livello solo real time in Forecast è Disabled, con tooltip e "Go to live". Il tempo non si sposta.
+7. **Cambio inverso (rivisto dopo la UX review):** nessun livello è bloccato. Il pannello ha una voce per dato, con una barra di copertura che mostra dove esistono dati. Se si sceglie un dato senza valori nell'istante selezionato (per esempio un dato real time in Forecast), il tempo va all'istante più vicino che li ha, con Toast e Undo. La versione originale del brief disattivava il livello.
 8. **Disponibilità:** ogni livello dichiara modalità, intervallo e orizzonte ([src/data/layers.json](src/data/layers.json)). I giorni fuori portata sono "unavailable".
 9. **Readout:** "Updated HH:MM" in Live, "stale" con il ritardo esplicito, "noData" con "—" (mai "0").
 10. **Selezione:** singola; la barra laterale cambia gruppo di livelli senza spostare il tempo.

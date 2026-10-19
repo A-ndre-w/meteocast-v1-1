@@ -151,3 +151,12 @@
   bottom: 0;
   width: 12px;
 }
+
+/* No data at the selected instant: quieter, still clickable (picking it moves time, with Undo). */
+.root[data-idle]:not([data-status='selected']) .label {
+  color: var(--text-secondary);
+}
+
+.root[data-idle]:not([data-status='selected']) .icon {
+  color: var(--text-tertiary);
+}

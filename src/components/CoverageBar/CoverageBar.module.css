@@ -1,0 +1,68 @@
+.root {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 14px;
+}
+
+/* Archive: solid, like observed data on the Timebar track. */
+.archive {
+  position: absolute;
+  left: 0;
+  top: 6px;
+  width: 19px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--text-tertiary);
+}
+
+/* Forecast: dashed, like the Timebar track. */
+.forecast {
+  position: absolute;
+  left: 25px;
+  top: 6px;
+  width: 19px;
+  height: 2px;
+  background-image: linear-gradient(to right, var(--text-tertiary) 0 3px, transparent 3px 5px);
+  background-size: 5px 2px;
+}
+
+/* Now: filled when the stream has live data, hollow when it doesn't. */
+.now {
+  position: absolute;
+  left: 19px;
+  top: 4px;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  border: 1.5px solid var(--text-tertiary);
+  background: var(--surface-raised);
+}
+
+.now[data-on] {
+  border-color: var(--text-primary);
+  background: var(--text-primary);
+}
+
+/* The selected instant, in the colour of its mode (neutral in Live). */
+.cursor {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 14px;
+  border-radius: 1px;
+  translate: -1px 0;
+  background: var(--mode-fill);
+}
+
+.cursor[data-at='archive'] {
+  left: 9px;
+}
+
+.cursor[data-at='live'] {
+  left: 22px;
+}
+
+.cursor[data-at='forecast'] {
+  left: 35px;
+}

@@ -35,7 +35,7 @@ Data: 19 ottobre 2026. Revisione fatta da chi ha scritto il codice, non ancora v
 | 5 | Livello dati | Macchie di pioggia più deboli di Figma; neve molto più intensa (in Figma è un velo) | Curva opacità/raggio rivista, intensità per famiglia di colore (pioggia 1 · neve 0,45) | Vicino. Le forme sono approssimate (vedi intenzionali) |
 | 6 | Readout | Triangolo della scala 3px più in basso | `bottom: 1px` | Allineato |
 | 7 | NotificationBell | Badge 1px più all'interno | `top/right: 5px` | Allineato |
-| 8 | Cornice di modalità | Gli export Archive e Forecast hanno una cornice di 6px nel colore della modalità attorno allo schermo; il codice no | Cornice `inset 6px` in `--mode-color`, assente in Live | Allineato. È un quarto segnale di modalità, in aggiunta ai tre del brief |
+| 8 | Cornice di modalità | Gli export Archive e Forecast hanno una cornice di 6px nel colore della modalità attorno allo schermo; il codice no | Cornice aggiunta, poi **rimossa** dopo la UX review (D7) su decisione del designer | Differenza intenzionale: vedi sotto |
 | 9 | Timebar, livelli giornalieri | "Now" 40px troppo a destra: restava riservato lo spazio dell'ora | `min-width: 118px` solo in modalità giornaliera | 466px (Figma 465) |
 
 Corretti durante lo sviluppo, prima di questa revisione:
@@ -84,6 +84,9 @@ Scostamenti da Figma introdotti di proposito dalle correzioni di [UX_REVIEW.md](
 | Etichette sulla mappa | "mm/h" | Unità del livello ("mm") | Coerenza con il Readout (U2) |
 | Toast di avviso (Screen 03) | Sopra la timebar | Sotto la ModePill, come gli altri | Un solo punto per i messaggi (U7) |
 | Etichette di latitudine | 40°, 35°, 30°, 25°N | Solo 25°N | Le altre finivano sotto la Rail (U14) |
+| Pannello livelli | Sezioni Real time / Forecast, stesso dato due volte (13 voci) | Una voce per dato (7 voci in Water & Storms), con `CoverageBar`; nessuna voce bloccata | U1, decisione del designer: l'utente sceglie il dato, la timeline decide la modalità |
+| Regola 7 | Livello real time in Forecast: Disabled con tooltip | Selezionabile: il tempo va a Live con Toast e Undo | Le voci bloccate scoraggiavano l'utente (decisione del designer) |
+| Cornice di modalità attorno allo schermo | Presente in Archive e Forecast | Rimossa | D7: sei segnali erano troppi, e un bordo attorno allo schermo richiama gli allarmi |
 | Badge LIVE | Testo terziario | Testo secondario, puntino scuro | Si leggeva come "spento" (U8) |
 
 ## Stati e componenti aggiunti (non presenti in Figma)
@@ -95,7 +98,7 @@ Da riportare nel file Figma, così Figma resta la fonte di verità:
 - **Readout:** stati `stale` ("Updated 12:20 · Data 40 min late") e `noData` ("—", mai "0").
 - **Toast:** due toni (info con Undo, warning) con conto alla rovescia visibile di 6 secondi, che si mette in pausa al passaggio del mouse o al focus.
 - **Modello gemelli:** livello real time e livello forecast con lo stesso `stream` sono un unico dato. Il Play non attraversa "adesso"; un gesto manuale sì, con Toast e Undo.
-- **Sezione del pannello compressa** quando nessun livello è disponibile ("Real time · 7 not available now").
+- **CoverageBar** nel LayerItem: mini-timeline (pieno = archivio, pallino = adesso, tratteggio = previsione) con il cursore dell'istante selezionato. Le voci senza dati in quell'istante sono più tenui (`idle`), ma restano cliccabili.
 - **Tooltip della Rail** con il nome del gruppo, anche da tastiera; **data della timebar** come pulsante che porta ai giorni.
 - **Toast "non incluso"** per ricerca, allarmi, localizzazione e preset.
 - **Icone UI disegnate in codice:** termometro, onde, orologio, lucchetto. Quelle meteo vengono dal set Figma 32px.
