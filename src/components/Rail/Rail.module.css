@@ -10,7 +10,8 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-pill);
   box-shadow: var(--shadow-md);
-  backdrop-filter: blur(8px);
+  /* No backdrop-filter: it would become the containing block of the fixed tooltips (shifting them)
+     and a stacking context (hiding them under the layer panel). surface/default is already 92% opaque. */
 }
 
 /* On short windows the group list scrolls; the add button never leaves the rail. */
