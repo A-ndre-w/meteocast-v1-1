@@ -1,1 +1,94 @@
-/* step 1 */
+/* Base styles. Raw values live in tokens.css (generated); this file only maps them. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-sm);
+  line-height: 1.3;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+button:disabled {
+  cursor: default;
+}
+
+/* One focus style for the whole app: visible on keyboard, invisible on mouse. */
+:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+/* Mode semantics. Any element with data-mode exposes the same four variables,
+   so components never branch on mode in CSS beyond reading these.
+   Red / orange / green are reserved for alerts and never used here. */
+[data-mode='live'] {
+  --mode-color: var(--border-default);
+  --mode-fill: var(--icon-default);
+  --mode-tint: var(--surface-raised);
+  --mode-text: var(--text-tertiary);
+}
+
+[data-mode='archive'] {
+  --mode-color: var(--mode-archive);
+  --mode-fill: var(--mode-archive);
+  --mode-tint: var(--bg-deep);
+  --mode-text: var(--mode-archive);
+}
+
+[data-mode='forecast'] {
+  --mode-color: var(--mode-forecast);
+  --mode-fill: var(--mode-forecast-strong);
+  --mode-tint: var(--bg-forecast);
+  --mode-text: var(--mode-forecast-strong);
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

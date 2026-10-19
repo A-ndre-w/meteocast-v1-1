@@ -1,0 +1,121 @@
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 24px 96px;
+}
+
+.header {
+  margin-bottom: 40px;
+}
+
+.back {
+  color: var(--accent-strong);
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+}
+
+.back:hover {
+  text-decoration: underline;
+}
+
+.title {
+  margin: 12px 0 4px;
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+}
+
+.lede {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--font-size-md);
+}
+
+.section {
+  margin-bottom: 48px;
+}
+
+.h2 {
+  margin: 0 0 16px;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.swatch {
+  margin: 0;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.chip {
+  display: block;
+  height: 56px;
+  border-bottom: 1px solid var(--border-default);
+  /* checkerboard shows alpha tokens honestly */
+  background-image: conic-gradient(#0000000d 25%, transparent 0 50%, #0000000d 0 75%, transparent 0);
+  background-size: 12px 12px;
+}
+
+.swatch figcaption,
+.shape figcaption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+}
+
+.name {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--text-primary);
+}
+
+.value {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+}
+
+.typeList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.typeRow {
+  display: grid;
+  grid-template-columns: 120px 1fr 1fr;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.shapes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.shape {
+  margin: 0;
+  width: 140px;
+  height: 96px;
+  display: flex;
+  align-items: flex-end;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-strong);
+}
