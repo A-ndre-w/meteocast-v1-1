@@ -15,14 +15,15 @@
 .row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  /* Tighter than Figma (20/16) to fit the longer "Back to live" label (UX review U4). */
+  gap: 12px;
   min-width: 0;
 }
 
 .controls {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 /* Figma: chevron 4px · 12 · play 30 · 12 · chevron 4px (62px). The chevrons keep a 24px hit area

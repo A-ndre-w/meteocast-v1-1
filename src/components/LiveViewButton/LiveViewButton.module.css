@@ -1,4 +1,6 @@
 .root {
+  flex: none;
+  white-space: nowrap;
   height: var(--size-sm);
   padding: 0 10px;
   border-radius: var(--radius-lg);
