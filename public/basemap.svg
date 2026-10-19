@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 840" width="1440" height="840">
+  <!-- MeteoCast base map. Redrawn from assets/map.png WITHOUT the rain blobs, so data layers stay separate (rule 11). -->
+  <defs>
+    <radialGradient id="land" cx="50%" cy="45%" r="62%">
+      <stop offset="0" stop-color="#EEECE8"/>
+      <stop offset="0.72" stop-color="#ECEAE6"/>
+      <stop offset="1" stop-color="#D6D4D0"/>
+    </radialGradient>
+    <radialGradient id="vignette" cx="50%" cy="48%" r="70%">
+      <stop offset="0.62" stop-color="#C9C7C3" stop-opacity="0"/>
+      <stop offset="1" stop-color="#B9B7B3" stop-opacity="0.75"/>
+    </radialGradient>
+    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#DEE6EC"/>
+      <stop offset="1" stop-color="#D3DCE3"/>
+    </linearGradient>
+    <pattern id="grid" width="72" height="72" patternUnits="userSpaceOnUse" x="0" y="-14">
+      <path d="M72 0H0V72" fill="none" stroke="#1A1512" stroke-opacity="0.06" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1440" height="840" fill="url(#land)"/>
+
+  <!-- Inland lake (top left) -->
+  <ellipse cx="252" cy="131" rx="107" ry="54" fill="#DEE6EC" opacity="0.75"/>
+
+  <!-- River basin / gulf (top right) -->
+  <path d="M990 0H1092C1150 70 1218 170 1220 290C1222 390 1188 430 1132 432C1066 434 1022 390 1024 320C1026 250 1046 190 1020 120C1004 74 990 40 990 0Z" fill="#DEE6EC" opacity="0.85"/>
+
+  <!-- Sea (bottom) -->
+  <path d="M0 614C120 600 300 596 440 626C520 644 570 656 640 656C740 656 820 636 900 600C980 590 1120 588 1260 596C1340 600 1400 610 1440 618V840H0Z" fill="url(#sea)"/>
+  <path d="M0 592C200 572 420 588 640 632C760 650 860 626 900 574C1000 562 1200 564 1440 586" fill="none" stroke="#1A1512" stroke-opacity="0.06"/>
+  <path d="M0 576C220 556 440 572 640 612C760 630 860 606 900 556C1000 546 1200 548 1440 570" fill="none" stroke="#1A1512" stroke-opacity="0.04"/>
+
+  <!-- Elevation contours -->
+  <g fill="none" stroke="#1A1512" stroke-opacity="0.05">
+    <ellipse cx="400" cy="320" rx="270" ry="150" transform="rotate(-12 400 320)"/>
+    <ellipse cx="380" cy="310" rx="200" ry="110" transform="rotate(-12 380 310)"/>
+    <ellipse cx="365" cy="300" rx="130" ry="70" transform="rotate(-12 365 300)"/>
+    <ellipse cx="355" cy="295" rx="65" ry="35" transform="rotate(-12 355 295)"/>
+    <ellipse cx="805" cy="190" rx="130" ry="120"/>
+    <ellipse cx="800" cy="180" rx="85" ry="80"/>
+    <ellipse cx="795" cy="170" rx="45" ry="40"/>
+    <ellipse cx="1120" cy="460" rx="190" ry="110"/>
+    <ellipse cx="1125" cy="458" rx="120" ry="70"/>
+    <ellipse cx="1130" cy="456" rx="60" ry="34"/>
+  </g>
+
+  <rect width="1440" height="840" fill="url(#grid)"/>
+  <rect width="1440" height="840" fill="url(#vignette)"/>
+
+  <!-- Latitude labels are HTML in MapView (an <img> SVG cannot use the page fonts). -->
+</svg>
