@@ -67,6 +67,25 @@ Corretti durante lo sviluppo, prima di questa revisione:
 | Raggi | 10 e 20 | 10 e 20 (`radius/md`, `radius/lg`) | Valori di Figma, non quelli di riserva del brief (14/22) |
 | Chip velocità | Nessuno stato selezionato | Quello attivo è evidenziato (`aria-pressed`) | Lo stato deve essere visibile e annunciato |
 
+## Modifiche dopo la UX review (20 ottobre 2026)
+
+Scostamenti da Figma introdotti di proposito dalle correzioni di [UX_REVIEW.md](UX_REVIEW.md):
+
+| Elemento | Figma | Codice | Motivo |
+|---|---|---|---|
+| Pulsante della timebar | "Now" (46px) | "Back to live" | Un solo nome per l'azione (U4) |
+| Gap della timebar | 20 / 16px | 12px | Spazio per "Back to live" |
+| Padding dei DayChip | 12px | 11px | Spazio per "Back to live"; il chip selezionato non cambia più altezza |
+| Altezze dei controlli | 23 · 26 · 30 · 38 · 45 | Scala 24 · 32 · 40 · 44 () | Coerenza e WCAG 2.5.8 (D1, A1) |
+| Rail | 45px, pulsanti 38 | 50px, pulsanti 40 | Scala delle altezze |
+| Chip velocità selezionato | Nessuno stato | Fondo , bordo accent, come LayerItem | Un solo stile per le scelte (D2) |
+| Ombra della ModePill | Nera al 25% |  | Tre livelli di elevazione (D3) |
+| Valore del Readout |  |  | È il dato più importante (U3) |
+| Etichette sulla mappa | "mm/h" | Unità del livello ("mm") | Coerenza con il Readout (U2) |
+| Toast di avviso (Screen 03) | Sopra la timebar | Sotto la ModePill, come gli altri | Un solo punto per i messaggi (U7) |
+| Etichette di latitudine | 40°, 35°, 30°, 25°N | Solo 25°N | Le altre finivano sotto la Rail (U14) |
+| Badge LIVE | Testo terziario | Testo secondario, puntino scuro | Si leggeva come "spento" (U8) |
+
 ## Stati e componenti aggiunti (non presenti in Figma)
 
 Da riportare nel file Figma, così Figma resta la fonte di verità:
@@ -76,6 +95,9 @@ Da riportare nel file Figma, così Figma resta la fonte di verità:
 - **Readout:** stati `stale` ("Updated 12:20 · Data 40 min late") e `noData` ("—", mai "0").
 - **Toast:** due toni (info con Undo, warning) con conto alla rovescia visibile di 6 secondi, che si mette in pausa al passaggio del mouse o al focus.
 - **Modello gemelli:** livello real time e livello forecast con lo stesso `stream` sono un unico dato. Il Play non attraversa "adesso"; un gesto manuale sì, con Toast e Undo.
+- **Sezione del pannello compressa** quando nessun livello è disponibile ("Real time · 7 not available now").
+- **Tooltip della Rail** con il nome del gruppo, anche da tastiera; **data della timebar** come pulsante che porta ai giorni.
+- **Toast "non incluso"** per ricerca, allarmi, localizzazione e preset.
 - **Icone UI disegnate in codice:** termometro, onde, orologio, lucchetto. Quelle meteo vengono dal set Figma 32px.
 
 ## Limiti noti
