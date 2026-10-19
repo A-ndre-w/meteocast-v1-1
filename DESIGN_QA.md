@@ -76,11 +76,11 @@ Scostamenti da Figma introdotti di proposito dalle correzioni di [UX_REVIEW.md](
 | Pulsante della timebar | "Now" (46px) | "Back to live" | Un solo nome per l'azione (U4) |
 | Gap della timebar | 20 / 16px | 12px | Spazio per "Back to live" |
 | Padding dei DayChip | 12px | 11px | Spazio per "Back to live"; il chip selezionato non cambia più altezza |
-| Altezze dei controlli | 23 · 26 · 30 · 38 · 45 | Scala 24 · 32 · 40 · 44 () | Coerenza e WCAG 2.5.8 (D1, A1) |
+| Altezze dei controlli | 23 · 26 · 30 · 38 · 45 | Scala 24 · 32 · 40 · 44 (`size/*`) | Coerenza e WCAG 2.5.8 (D1, A1) |
 | Rail | 45px, pulsanti 38 | 50px, pulsanti 40 | Scala delle altezze |
-| Chip velocità selezionato | Nessuno stato | Fondo , bordo accent, come LayerItem | Un solo stile per le scelte (D2) |
-| Ombra della ModePill | Nera al 25% |  | Tre livelli di elevazione (D3) |
-| Valore del Readout |  |  | È il dato più importante (U3) |
+| Chip velocità selezionato | Nessuno stato | Fondo `accent/soft`, bordo accent, come LayerItem | Un solo stile per le scelte (D2) |
+| Ombra della ModePill | Nera al 25% | `shadow/md` | Tre livelli di elevazione (D3) |
+| Valore del Readout | `text/tertiary` | `text/primary` | È il dato più importante (U3) |
 | Etichette sulla mappa | "mm/h" | Unità del livello ("mm") | Coerenza con il Readout (U2) |
 | Toast di avviso (Screen 03) | Sopra la timebar | Sotto la ModePill, come gli altri | Un solo punto per i messaggi (U7) |
 | Etichette di latitudine | 40°, 35°, 30°, 25°N | Solo 25°N | Le altre finivano sotto la Rail (U14) |
