@@ -2,9 +2,32 @@
   display: flex;
   align-items: center;
   gap: 4px;
+  min-width: 0;
+}
+
+/* Scrolls only when the timebar is too narrow for 8 chips; no visible scrollbar (arrows and keyboard move days). */
+.scroller {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  overflow-x: auto;
+  /* Room for the selected chip's outline and the focus ring. */
+  padding: 3px;
+  margin: -3px;
+  scrollbar-width: none;
+}
+
+.scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.scroller > * {
+  flex: none;
 }
 
 .arrow {
+  flex: none;
   width: var(--size-sm);
   height: var(--size-md);
   display: grid;

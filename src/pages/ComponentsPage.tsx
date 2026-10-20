@@ -150,10 +150,10 @@ export function ComponentsPage() {
         name="LayerItem"
         figma="Layer/Item · 2007:7454"
         props="status: 'default' | 'hover' | 'selected' | 'disabled', icon, label, meta, coverage, idle, onSelect, disabledReason, onGoLive"
-        note="Disabled is a code addition (rule 7). It stays focusable; hover or focus it to see the tooltip with “Back to live”."
+        note="Disabled is a code addition for the original rule 7: focusable, with a tooltip and “Back to live”. The screen no longer locks layers (picking one moves time with Undo), so this variant is kept but unused."
       >
         {(['default', 'hover', 'selected', 'disabled'] as const).map((status) => (
-          <Variant key={status} label={status}>
+          <Variant key={status} label={status} unused={status === 'disabled'}>
             <div style={{ width: 213 }}>
               <LayerItem status={status} icon="drizzle" label="Hourly rainfall" meta="mm - hourly" onGoLive={() => {}} />
             </div>
@@ -176,7 +176,12 @@ export function ComponentsPage() {
         </Variant>
       </Specimen>
 
-      <Specimen name="SectionLabel" figma="Menu Section label · 2008:9345" props="children">
+      <Specimen
+        name="SectionLabel"
+        figma="Menu Section label · 2008:9345"
+        props="children"
+        unused="Kept for parity with Figma. Since the panel lists one entry per data stream (UX review U1) there are no Real time / Forecast sections on the screen."
+      >
         <Variant label="real time">
           <SectionLabel>Real time</SectionLabel>
         </Variant>

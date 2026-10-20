@@ -166,7 +166,7 @@ export function Timebar({
 
         <span className={styles.divider} aria-hidden="true" />
 
-        <div data-daystrip>
+        <div data-daystrip className={styles.strip}>
           <DayStrip days={days} selectedDay={selectedDay} mode={mode} onSelect={onSelectDay} />
         </div>
       </div>

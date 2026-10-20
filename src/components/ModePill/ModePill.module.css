@@ -50,3 +50,10 @@
 .back:hover {
   text-decoration: underline;
 }
+
+/* Narrow windows: the timebar already shows the full date, the pill keeps mode, offset and the action. */
+@media (max-width: 1279px) {
+  .time {
+    display: none;
+  }
+}

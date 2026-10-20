@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { Icon } from '../../icons/Icon'
 import { fmtDayLong, fmtDayShort, type DayInfo } from '../../time'
 import type { Mode } from '../../types'
@@ -13,27 +14,41 @@ export type DayStripProps = {
   onSelect?: (day: string) => void
 }
 
-/** Figma: Daystrip (2010:10400). ‹ 8 DayChips ›. Arrows move the selection by one day. */
+/**
+ * Figma: Daystrip (2010:10400). ‹ 8 DayChips ›. Arrows move the selection by one day.
+ * When the timebar is narrower than the chips (windows under ~1280px, UX audit H11) the chips scroll
+ * between the arrows, and the selected day is kept in view.
+ */
 export function DayStrip({ days, selectedDay, mode, onSelect }: DayStripProps) {
+  const scrollerRef = useRef<HTMLDivElement>(null)
   const index = days.findIndex((d) => d.day === selectedDay)
   const go = (i: number) => days[i] && onSelect?.(days[i].day)
+
+  useEffect(() => {
+    const el = scrollerRef.current?.querySelector<HTMLElement>('[aria-pressed="true"]')
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    el?.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduce ? 'auto' : 'smooth' })
+  }, [selectedDay])
+
   return (
     <div className={styles.root} role="group" aria-label="Day">
       <button type="button" className={styles.arrow} aria-label="Previous day" disabled={index <= 0} onClick={() => go(index - 1)}>
         <Icon name="chevron-left" size={16} />
       </button>
-      {days.map((d) => (
-        <DayChip
-          key={d.day}
-          time={d.time}
-          label={fmtDayShort(d.day)}
-          fullLabel={fmtDayLong(d.day)}
-          selected={d.day === selectedDay}
-          unavailable={d.unavailable}
-          mode={mode}
-          onClick={() => onSelect?.(d.day)}
-        />
-      ))}
+      <div className={styles.scroller} ref={scrollerRef}>
+        {days.map((d) => (
+          <DayChip
+            key={d.day}
+            time={d.time}
+            label={fmtDayShort(d.day)}
+            fullLabel={fmtDayLong(d.day)}
+            selected={d.day === selectedDay}
+            unavailable={d.unavailable}
+            mode={mode}
+            onClick={() => onSelect?.(d.day)}
+          />
+        ))}
+      </div>
       <button
         type="button"
         className={styles.arrow}

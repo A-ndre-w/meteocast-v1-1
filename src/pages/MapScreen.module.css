@@ -3,7 +3,8 @@
   position: fixed;
   inset: 0;
   overflow: hidden;
-  min-width: 1100px;
+  /* Designed down to 1024 x 700 (UX audit H11); narrower is out of scope for v1. */
+  min-width: 1024px;
 }
 
 .logo {
@@ -62,7 +63,8 @@
   position: absolute;
   left: 81px;
   bottom: 12px;
-  width: min(1127px, calc(100% - 81px - 90px));
+  /* Leaves the bottom-right corner to the zoom control and the components link. */
+  width: min(1127px, calc(100% - 81px - 120px));
 }
 
 /* Small portfolio affordance, out of the design's way. */
@@ -125,4 +127,12 @@
   font-size: var(--font-size-sm);
   font-weight: 500;
   box-shadow: var(--shadow-md);
+}
+
+/* Under 1280px the centred pill would run into the search bar: it moves next to the layer panel. */
+@media (max-width: 1279px) {
+  .pill {
+    left: 344px;
+    translate: none;
+  }
 }

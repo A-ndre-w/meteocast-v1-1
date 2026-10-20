@@ -261,3 +261,22 @@
   width: 100%;
   overflow-x: auto;
 }
+
+/* Library pieces kept for Figma parity but not used on the v1.1 screen (UX audit H15). */
+.unusedBadge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+  color: var(--text-tertiary);
+  vertical-align: middle;
+}
+
+.specimen[data-unused] .variants,
+.variant[data-unused] .stage {
+  opacity: 0.6;
+}

@@ -82,8 +82,9 @@ export function useMeteo() {
     stepHour: (d: number) => apply((v) => moveExplicit(v, shiftHours(v.sel, d))),
     stepDay: (d: number) => apply((v) => moveExplicit(v, stepDayTarget(v.sel, d))),
     goNow: () => apply((v) => goLive(v)),
-    selectStream: (streamId: string) => apply((v) => selectStream(v, streamId), { stopPlay: false }),
-    selectGroup: (groupId: string) => apply((v) => selectGroup(v, groupId), { stopPlay: false }),
+    // Changing the data pauses Play: the loop would silently change scope, e.g. hours → days (UX audit H14).
+    selectStream: (streamId: string) => apply((v) => selectStream(v, streamId)),
+    selectGroup: (groupId: string) => apply((v) => selectGroup(v, groupId)),
     undo: (view: View) => setState((s) => ({ ...s, view, notice: undefined, playing: false })),
     dismissNotice: () => setState((s) => ({ ...s, notice: undefined })),
     notInPrototype: (feature: string) =>

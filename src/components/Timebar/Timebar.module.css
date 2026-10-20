@@ -21,6 +21,7 @@
 }
 
 .controls {
+  flex: none;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -296,4 +297,10 @@
   position: absolute;
   inset: -6px;
   border-radius: var(--radius-pill);
+}
+
+/* The day strip takes the remaining width and scrolls inside it when narrow (UX audit H11). */
+.strip {
+  flex: 1 1 auto;
+  min-width: 0;
 }
