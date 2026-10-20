@@ -43,7 +43,7 @@ Corretti durante lo sviluppo, prima di questa revisione:
 | Dove | Problema | Correzione |
 |---|---|---|
 | Rail (segnalato dal designer) | Con finestre basse (circa 650px) il "+" usciva dalla barra | La lista dei gruppi scorre; il "+" resta sempre dentro. Alta 486px alla misura Figma |
-| Toast del gemello (segnalato dal designer) | Andando in Archive diceva "switched to the Real time layer" | Nomina la modalità di arrivo ("switched to Archive data") e si chiude quando la modalità cambia di nuovo |
+| Toast del gemello (segnalato dal designer) | Andando in Archive diceva "switched to the Real time layer" | Prima corretto ("switched to Archive data"), poi rimosso con il pannello a voce unica (UX audit H1) |
 | Mappa in Archive | Con il filtro di desaturazione le latitudini saltavano in alto | Il contenitore ha le dimensioni del frame |
 | SearchBar | Placeholder troncato ("…coordina") | Spaziature ridotte: il testo entra in 292px |
 | LayerItem disabled | Tooltip tagliato dallo scroll del pannello; "Go to live" saltato dal Tab | Tooltip `position: fixed` con ponte per il mouse; nascosto solo con opacità, quindi resta nell'ordine del Tab |

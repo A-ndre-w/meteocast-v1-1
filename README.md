@@ -23,7 +23,7 @@ Un percorso di prova:
 2. Clicca **Snow probability**: il tempo salta a venerdì, compare il Toast. Prova **Undo**.
 3. Clicca **Mon 19**: oltre l'orizzonte della previsione, il tempo non si sposta e compare un avviso.
 4. Torna con **Now**, apri **Water & Storms** (resta selezionato *Hourly rainfall*) e premi **▶**: il loop si ferma ad "adesso".
-5. Con il focus sulla traccia: **←/→** sposta di un'ora (oltrepassando "adesso" si passa al livello gemello, con un Toast), **Shift + ←/→** di un giorno.
+5. Da tastiera: il primo **Tab** mostra "Skip to timeline". Con **Invio** il focus va sulla traccia: **←/→** sposta di un'ora, **Shift + ←/→** di un giorno.
 
 ## Avvio in locale
 
@@ -116,13 +116,17 @@ Tutte le regole sono funzioni pure in [src/state/rules.ts](src/state/rules.ts): 
 11. **Mappa:** base e livello dati separati, nessun filtro sui dati. In Archive si desatura solo la base.
 
 In più, decisi con il designer durante lo sviluppo:
-- **Livelli gemelli:** real time e forecast con lo stesso `stream` sono un unico dato. Un gesto manuale può attraversare "adesso", e il passaggio al gemello è sempre annunciato con un Toast e Undo. Il Play invece gira in loop dentro il giorno visibile e non supera mai "adesso".
+- **Livelli gemelli:** real time e forecast con lo stesso `stream` sono un unico dato e una sola voce del pannello. Un gesto manuale può attraversare "adesso" senza avvisi: la modalità è già indicata da pill, Readout e timebar. Il Play invece gira in loop dentro il giorno visibile e non supera mai "adesso".
+- **Toast e Undo:** ogni nuova azione chiude il Toast precedente, quindi l'Undo è disponibile solo finché non è successo altro e non può cancellare navigazione fatta dopo.
 - **Screen 03:** se né il livello né il gemello hanno dati, il tempo non si sposta e compare un avviso.
 
 ## Accessibilità
 
-- Tastiera: Tab su tutti i controlli. Sulla traccia (slider ARIA) **←/→** = ore, **Shift + ←/→** o **PagUp/PagDown** = giorni, **Home/End** = 00/23. Le frecce funzionano anche sui chip dei giorni.
-- Focus visibile ovunque, con un unico stile. Il tooltip dei livelli disattivati si apre anche da tastiera.
+- Tastiera: gli skip link "Skip to timeline" e "Skip to layers" sono i primi due tab stop, quindi la timeline è a 2 Tab + Invio. Sulla traccia (slider ARIA) **←/→** = ore, **Shift + ←/→** o **PagUp/PagDown** = giorni, **Home/End** = 00/23. Le frecce funzionano anche sui chip dei giorni. Niente scorciatoie da una sola lettera (WCAG 2.1.4).
+- Focus visibile ovunque, con un unico stile. I tooltip della Rail compaiono anche al focus.
+- Controllo vocale: ogni nome accessibile inizia con il testo visibile (WCAG 2.5.3), per esempio il chip "Tue 13" si chiama "Tue 13, Tuesday 13 October".
+- Aree cliccabili di almeno 24px, compresa la traccia della timeline (disegnata a 2px, cliccabile su 24px).
+- axe-core 4.14 senza violazioni (WCAG 2.2 AA e best practice) negli stati Live, Archive, cambio automatico e dato mancante.
 - `aria-label` su tutti i pulsanti con sola icona. Gli stati sono esposti con `aria-pressed`, `aria-disabled` e `aria-valuetext` ("Thursday 15 October, 13:00 — Live"). Una regione `aria-live` annuncia livello, ora e modalità.
 - Contrasto WCAG AA verificato da script. Due token aggiunti per il testo (`accent/strong`, `mode/forecast-strong`).
 - Nessun testo sotto gli 11px. `prefers-reduced-motion` è rispettato.

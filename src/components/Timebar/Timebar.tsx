@@ -60,6 +60,7 @@ export function Timebar({
 }: TimebarProps) {
   const rootRef = useRef<HTMLElement>(null)
   const playHintId = useId()
+  const dateHintId = useId()
   const trackRef = useRef<HTMLDivElement>(null)
   const daily = interval === 'day'
   const selected = days.find((d) => d.day === selectedDay)
@@ -149,13 +150,16 @@ export function Timebar({
             type="button"
             className={styles.datetime}
             data-daily={daily || undefined}
-            aria-label={`Choose a day. Showing ${valueText}`}
+            aria-describedby={dateHintId}
             onClick={() => rootRef.current?.querySelector<HTMLElement>('[data-daystrip] [aria-pressed="true"]')?.focus()}
           >
             <Icon name="calendar" size={18} className={styles.calendar} />
             <span className={styles.date}>{fmtDayMedium(selectedDay)}</span>
             {!daily && <span className={styles.hour}>{fmtHour(selectedHour)}</span>}
           </button>
+          <span id={dateHintId} className="visually-hidden">
+            {valueText}. Moves focus to the day chips.
+          </span>
 
           <LiveViewButton status={mode === 'live' ? 'off' : 'on'} onClick={onNow} />
         </div>

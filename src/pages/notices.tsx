@@ -45,18 +45,6 @@ export function toastFor(n: Notice): ToastContent {
           </>
         ),
       }
-    case 'twin':
-      return {
-        tone: 'info',
-        mode: n.mode,
-        undo: n.undo,
-        // Names the mode the user landed in. The hook closes this toast once the mode changes again.
-        message: (
-          <>
-            <strong>{n.layer.name}</strong>: switched to <ModeWord mode={n.mode} /> data.
-          </>
-        ),
-      }
     case 'noLive':
       return {
         tone: 'info',

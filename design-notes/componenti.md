@@ -143,7 +143,7 @@ Altre scelte: "adesso" simulato = Thu 15 Oct 2026 13:00; i livelli a 5 minuti si
 **Modello A + proposta del designer.**
 - I livelli con lo stesso `stream` (campo esplicito in layers.json) sono un unico dato sulla timeline: per esempio Hourly rainfall in Real time e in Forecast. Disponibilità dei giorni e delle ore = unione dei gemelli.
 - **Play (movimento automatico):** non attraversa mai "adesso". Gira in loop sulle ore disponibili del giorno visibile per il livello selezionato (oggi in Live/Archive: 00→13, poi di nuovo 00; in Forecast oggi: 14→23).
-- **Gesti manuali = azione esplicita:** clic su giorno, clic o trascinamento sulla traccia, frecce, Shift+frecce, pulsanti ‹ ›. Possono attraversare "adesso". Se il livello non ha dati lì ma il gemello sì, la selezione passa al gemello e compare un Toast con Undo: il cambio non è mai silenzioso.
+- **Gesti manuali = azione esplicita:** clic su giorno, clic o trascinamento sulla traccia, frecce, Shift+frecce, pulsanti ‹ ›. Possono attraversare "adesso". Se il livello non ha dati lì ma il gemello sì, la selezione passa al gemello. Aggiornamento del 2026-10-20: senza Toast, perché con il pannello a voce unica nulla salta e la modalità è già indicata (UX audit H1).
 - Se né il livello né il gemello hanno dati (orizzonte superato, livello senza archivio): il tempo non si sposta e compare il Toast warning (Screen 03).
 - "Now" e "Back to live" tornano a Live e, se serve, al gemello real time, senza Toast: l'intenzione è esplicita.
 

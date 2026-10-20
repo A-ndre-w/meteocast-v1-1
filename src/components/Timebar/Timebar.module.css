@@ -283,3 +283,17 @@
   font-size: var(--font-size-xs);
   color: var(--text-tertiary);
 }
+
+/* WCAG 2.5.8: 24px pointer targets without changing the drawing (UX audit H7). */
+.track::before {
+  content: '';
+  position: absolute;
+  inset: -7px 0;
+}
+
+.thumb::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: var(--radius-pill);
+}

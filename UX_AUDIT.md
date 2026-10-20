@@ -10,7 +10,24 @@ Expert review plus instrumented checks. **No users were involved**: the task met
 - Interaction processing times on the production build (5 runs each).
 - Flow walkthroughs, with step counts and Keystroke-Level Model (KLM) time estimates.
 
-## 1. Scorecard
+## 0. Status after the first fixes (same day)
+
+Priorities 1 and 2 are done and re-measured on the dev build:
+
+| Finding | Fix | Re-test |
+|---|---|---|
+| H4: timeline at Tab stop 39 | "Skip to timeline" and "Skip to layers" are the first two Tab stops, visible on focus | Timeline in 2 Tabs + Enter (was 39); layers in 3 (was 11). No single-letter shortcuts, because of WCAG 2.1.4 |
+| H5: Label in Name (9 nodes) | Day chips: the name starts with the visible text ("Tue 13, Tuesday 13 October"). Date button: visible text as the name, the rest in `aria-describedby` | axe `label-content-name-mismatch`: 0 |
+| H6: content outside landmarks | Screen wrapped in `<main>` | axe `region`: 0 |
+| H7: slider pointer target 10 px | Invisible 24 px hit area on track and thumb; the drawing is unchanged | Pointer hits 7 px above and below the 10 px track, misses at 9 px |
+| H1: toast fatigue | No toast when crossing "now" onto the twin layer | Fri 16 from Live: no toast. Rule 5 toast still shown |
+| H2: Undo could discard later work | Any new action closes the previous toast and its Undo | Auto switch → Sat 17: toast gone. Undo right after the switch still restores Live |
+
+**axe-core: 0 violations in all four states** (Live, Archive, auto switch, missing data). The tests ran with CSS transitions disabled, to avoid the background-tab artefact described below.
+
+Still open: H3, H8–H15 and the 1024 px layout (H11).
+
+## 1. Scorecard (before the fixes)
 
 | Area | Metric | Result | Benchmark | Verdict |
 |---|---|---|---|---|

@@ -23,8 +23,6 @@ export type Notice =
   | { type: 'forecastOnly'; layer: Layer; undo: View }
   /** Forecast layer picked in Forecast, but its data starts later (e.g. daily layers start tomorrow). */
   | { type: 'forecastStarts'; layer: Layer; day: string; undo: View }
-  /** Explicit move across "now": the stream continues on its twin layer. Never silent. */
-  | { type: 'twin'; layer: Layer; mode: Mode; undo: View }
   /** Now / Back to live with a layer that has no live data: fell back to a live layer of the group. */
   | { type: 'noLive'; from: Layer; to: Layer; undo: View }
   /** Screen 03 (block and warn): neither the layer nor its twin has data in that mode. Time does not move. */
@@ -52,7 +50,8 @@ export const modeOfView = (view: View) => modeOf(view.sel)
 
 /**
  * Manual gesture (click day, click/drag track, arrows, ‹ ›): may cross "now".
- * Layer has data → move. Twin has data → move + switch to twin (toast, Undo). Neither → block + warn.
+ * Layer has data → move. Twin has data → move on the twin layer: the panel shows one entry per stream,
+ * so nothing jumps and the mode cues already say where we are (no toast, UX audit H1). Neither → block + warn.
  */
 /** Daily layers hide the hour: on today their instant is always "now". */
 const normalize = (layer: Layer, sel: TimeSel): TimeSel =>
@@ -68,7 +67,6 @@ export function moveExplicit(view: View, rawTarget: TimeSel): Result {
   if (twin && instantAvailable(twin, target)) {
     return {
       view: { groupId: groupIdOf(twin), layerId: twin.id, sel: target },
-      notice: { type: 'twin', layer: twin, mode: modeOf(target), undo: view },
     }
   }
   return { view, notice: blockNotice(layer, target) }

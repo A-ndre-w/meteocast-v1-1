@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Speed } from '../components/Timebar/Timebar'
 import { layerById } from '../data'
-import { modeOf, NOW, shiftHours } from '../time'
+import { NOW, shiftHours } from '../time'
 import {
   goLive,
   moveExplicit,
@@ -40,17 +40,6 @@ function initialState(): State {
 const FRAME_MS = 900
 
 let noticeKey = 0
-const isWarning = (n: Notice) => n.type === 'blockedModes' || n.type === 'blockedHorizon'
-
-/**
- * After a plain move (no new notice): keep an info toast so its Undo stays useful, but close it once it
- * is no longer true — a warning about an attempt the user moved past, or a 'switched to X' after leaving X.
- */
-function keepNotice(n: State['notice'], view: View): State['notice'] {
-  if (!n || isWarning(n)) return undefined
-  if (n.type === 'twin' && modeOf(view.sel) !== n.mode) return undefined
-  return n
-}
 
 /** App state. All behaviour rules live in ./rules.ts; this hook only applies their results. */
 export function useMeteo() {
@@ -63,7 +52,9 @@ export function useMeteo() {
         ...s,
         view,
         playing: opts.stopPlay ? false : s.playing,
-        notice: notice ? { ...notice, key: ++noticeKey } : keepNotice(s.notice, view),
+        // Any new action closes the previous toast: Undo is offered only while nothing else has happened,
+        // so it can never throw away navigation done after the switch (UX audit H2). Play frames don't count.
+        notice: notice ? { ...notice, key: ++noticeKey } : undefined,
       }
     })
 
@@ -85,7 +76,7 @@ export function useMeteo() {
   }, [])
 
   const actions = {
-    // Manual gestures = explicit intent: may cross "now" (twin switch with toast) or be blocked with a warning.
+    // Manual gestures = explicit intent: may cross "now" (on the twin layer) or be blocked with a warning.
     selectDay: (day: string) => apply((v) => moveExplicit(v, { ...v.sel, day })),
     selectHour: (hour: number) => apply((v) => moveExplicit(v, { ...v.sel, hour })),
     stepHour: (d: number) => apply((v) => moveExplicit(v, shiftHours(v.sel, d))),

@@ -96,3 +96,33 @@
   top: 78px;
 }
 
+
+/* Skip links: invisible until focused with the keyboard, then a pill at the top left. */
+.skip {
+  position: absolute;
+  left: 13px;
+  top: 8px;
+  z-index: 100;
+  display: flex;
+  gap: 8px;
+}
+
+.skipLink:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skipLink:focus {
+  height: var(--size-md);
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  background: var(--text-primary);
+  color: var(--surface-raised);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  box-shadow: var(--shadow-md);
+}

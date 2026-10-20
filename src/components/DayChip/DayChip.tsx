@@ -20,9 +20,8 @@ export type DayChipProps = {
 
 /** Figma: DayChip (2009:9943). */
 export function DayChip({ time, selected = false, unavailable = false, mode = 'live', label, fullLabel, hover, onClick }: DayChipProps) {
-  const name = [fullLabel ?? label, time === 'today' && 'today', unavailable && 'no data for this layer']
-    .filter(Boolean)
-    .join(', ')
+  // WCAG 2.5.3 Label in Name: the accessible name starts with the visible text ("Tue 13"), details follow.
+  const extra = [fullLabel, time === 'today' && 'today', unavailable && 'no data for this layer'].filter(Boolean).join(', ')
   return (
     <button
       type="button"
@@ -34,11 +33,11 @@ export function DayChip({ time, selected = false, unavailable = false, mode = 'l
       data-mode={mode}
       aria-pressed={selected}
       aria-disabled={unavailable || undefined}
-      aria-label={name}
       onClick={onClick}
     >
       {time === 'today' && <span className={styles.dot} aria-hidden="true" />}
       {label}
+      {extra && <span className="visually-hidden">, {extra}</span>}
     </button>
   )
 }

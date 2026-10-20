@@ -26,6 +26,14 @@ import { toastFor } from './notices'
 
 const days = dayWindow()
 
+/** Focus the first element that exists among the selectors (skip links). */
+function focusFirst(...selectors: string[]) {
+  for (const sel of selectors) {
+    const el = document.querySelector<HTMLElement>(sel)
+    if (el) return el.focus()
+  }
+}
+
 /** The prototype screen (Figma: Screens 01–03). */
 export function MapScreen() {
   const { state, view, layer, actions } = useMeteo()
@@ -47,7 +55,17 @@ export function MapScreen() {
   const toast = state.notice && toastFor(state.notice)
 
   return (
-    <div className={styles.screen}>
+    <main className={styles.screen}>
+      {/* WCAG 2.4.1: the timeline is the last block in the tab order (stop 39 of 40). UX audit H4. */}
+      <div className={styles.skip}>
+        <button type="button" className={styles.skipLink} onClick={() => focusFirst('[aria-label="Timeline"] [role="slider"]', '[aria-label="Timeline"] [data-daystrip] [aria-pressed="true"]')}>
+          Skip to timeline
+        </button>
+        <button type="button" className={styles.skipLink} onClick={() => focusFirst('nav[aria-label$=" layers"] [aria-pressed="true"]', 'nav[aria-label$=" layers"] button')}>
+          Skip to layers
+        </button>
+      </div>
+
       <MapView
         mode={mode}
         ramp={layer.scale.ramp}
@@ -163,6 +181,6 @@ export function MapScreen() {
         {!state.playing &&
           `${layer.name}, ${daily ? fmtDayMedium(sel.day) : fmtStamp(sel)}, ${modeLabel[mode]}`}
       </p>
-    </div>
+    </main>
   )
 }
