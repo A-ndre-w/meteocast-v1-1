@@ -1,0 +1,33 @@
+.root {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.slot {
+  width: 16px;
+  height: 16px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  /* Missing mode: faint, so the three slots always line up across the list. */
+  color: var(--border-strong);
+}
+
+.slot[data-has] {
+  color: var(--text-secondary);
+}
+
+/* The mode of the selected instant, when the data has it: the mode's own colour (never green). */
+.slot[data-current] {
+  color: var(--icon-selected);
+  background: var(--mode-fill);
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: currentColor;
+}

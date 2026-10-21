@@ -22,7 +22,7 @@ Un percorso di prova:
 1. In Live, apri il gruppo **Snow** dalla barra laterale.
 2. Clicca **Snow probability**: il tempo salta a venerdì, compare il Toast. Prova **Undo**.
 3. Clicca **Mon 19**: oltre l'orizzonte della previsione, il tempo non si sposta e compare un avviso.
-4. Torna con **Now**, apri **Water & Storms** (resta selezionato *Hourly rainfall*) e premi **▶**: il loop si ferma ad "adesso".
+4. Torna con **Back to live**, apri **Water & Storms** (resta selezionato *Hourly rainfall*) e premi **▶**: l'animazione parte da adesso, mostra le 24 ore successive di previsione e ricomincia.
 5. Da tastiera: il primo **Tab** mostra "Skip to timeline". Con **Invio** il focus va sulla traccia: **←/→** sposta di un'ora, **Shift + ←/→** di un giorno.
 
 ## Avvio in locale
@@ -81,8 +81,8 @@ Fonte: file Figma *UXChallenge_RadarMeteo*, pagina "🎨 Stile & Componenti". Le
 | Figma | Codice | Props (varianti Figma → props) |
 |---|---|---|
 | Rail Button | `RailButton` | `status: default \| hover \| selected \| add` (Figma: *preset*), `icon`, `label` |
-| Layer/Item | `LayerItem` | `status: default \| hover \| selected \| disabled`, `icon`, `label`, `meta`, `coverage`, `idle` |
-| — | `CoverageBar` | `modes`, `cursor` — mini-timeline delle modalità disponibili per un dato |
+| Layer/Item | `LayerItem` | `status: default \| hover \| selected \| disabled`, `icon`, `label`, `meta`, `availability`, `idle` |
+| — | `ModeAvailability` | `modes`, `current` — icone Archive · Live · Forecast di un dato, la modalità corrente evidenziata |
 | Menu Section label | `SectionLabel` | `children` |
 | Set header | `PresetHeader` | `icon`, `title`, `preset`, `layerCount` |
 | Live view button | `LiveViewButton` | `status: on \| off` — il pulsante "Now" |
@@ -109,21 +109,21 @@ Tutte le regole sono funzioni pure in [src/state/rules.ts](src/state/rules.ts): 
 4. **Now:** disattivato in Live, in evidenza in Archive e Forecast.
 5. **Cambio automatico:** un livello solo previsione scelto in Live o Archive porta al primo istante di previsione. Il Toast offre Undo, che ripristina lo stato precedente anche se era Archive, e sparisce dopo 6 secondi (in pausa con hover o focus).
 6. **Livelli giornalieri:** intervallo "1 DAY", la traccia delle ore si nasconde.
-7. **Cambio inverso (rivisto dopo la UX review):** nessun livello è bloccato. Il pannello ha una voce per dato, con una barra di copertura che mostra dove esistono dati. Se si sceglie un dato senza valori nell'istante selezionato (per esempio un dato real time in Forecast), il tempo va all'istante più vicino che li ha, con Toast e Undo. La versione originale del brief disattivava il livello.
+7. **Cambio inverso (rivisto dopo la UX review):** nessun livello è bloccato. Il pannello ha una voce per dato, con le icone delle modalità in cui esistono dati. Se si sceglie un dato senza valori nell'istante selezionato (per esempio un dato real time in Forecast), il tempo va all'istante più vicino che li ha, con Toast e Undo. La versione originale del brief disattivava il livello.
 8. **Disponibilità:** ogni livello dichiara modalità, intervallo e orizzonte ([src/data/layers.json](src/data/layers.json)). I giorni fuori portata sono "unavailable".
 9. **Readout:** "Updated HH:MM" in Live, "stale" con il ritardo esplicito, "noData" con "—" (mai "0").
 10. **Selezione:** singola; la barra laterale cambia gruppo di livelli senza spostare il tempo.
 11. **Mappa:** base e livello dati separati, nessun filtro sui dati. In Archive si desatura solo la base.
 
 In più, decisi con il designer durante lo sviluppo:
-- **Livelli gemelli:** real time e forecast con lo stesso `stream` sono un unico dato e una sola voce del pannello. Un gesto manuale può attraversare "adesso" senza avvisi: la modalità è già indicata da pill, Readout e timebar. Il Play invece gira in loop dentro il giorno visibile e non supera mai "adesso".
+- **Livelli gemelli:** real time e forecast con lo stesso `stream` sono un unico dato e una sola voce del pannello. Un gesto manuale può attraversare "adesso" senza avvisi: la modalità è già indicata da pill, Readout e timebar. Il Play parte dal punto selezionato e avanza per 24 ore (anche oltre "adesso", nella previsione), poi torna al punto di partenza.
 - **Toast e Undo:** ogni nuova azione chiude il Toast precedente, quindi l'Undo è disponibile solo finché non è successo altro e non può cancellare navigazione fatta dopo.
 - **Screen 03:** se né il livello né il gemello hanno dati, il tempo non si sposta e compare un avviso.
 
 ## Accessibilità
 
 - Tastiera: gli skip link "Skip to timeline" e "Skip to layers" sono i primi due tab stop, quindi la timeline è a 2 Tab + Invio. Sulla traccia (slider ARIA) **←/→** = ore, **Shift + ←/→** o **PagUp/PagDown** = giorni, **Home/End** = 00/23. Le frecce funzionano anche sui chip dei giorni. Niente scorciatoie da una sola lettera (WCAG 2.1.4).
-- Focus visibile ovunque, con un unico stile. I tooltip della Rail compaiono anche al focus.
+- Focus visibile ovunque, con un unico stile. Sulla Rail, hover o focus su un gruppo mostra l'anteprima dei suoi dati: **→** entra nell'elenco, **↑/↓** scorre, **Invio** sceglie, **←/Esc** torna al gruppo.
 - Controllo vocale: ogni nome accessibile inizia con il testo visibile (WCAG 2.5.3), per esempio il chip "Tue 13" si chiama "Tue 13, Tuesday 13 October".
 - Aree cliccabili di almeno 24px, compresa la traccia della timeline (disegnata a 2px, cliccabile su 24px).
 - axe-core 4.14 senza violazioni (WCAG 2.2 AA e best practice) negli stati Live, Archive, cambio automatico e dato mancante.

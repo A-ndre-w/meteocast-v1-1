@@ -1,7 +1,7 @@
 import { useId, useState } from 'react'
 import { Icon, type IconName } from '../../icons/Icon'
 import type { Mode } from '../../types'
-import { CoverageBar, coverageText } from '../CoverageBar/CoverageBar'
+import { availabilityText, ModeAvailability } from '../ModeAvailability/ModeAvailability'
 import styles from './LayerItem.module.css'
 
 export type LayerItemProps = {
@@ -16,8 +16,8 @@ export type LayerItemProps = {
   disabledReason?: string
   /** Action offered in the disabled tooltip. */
   onGoLive?: () => void
-  /** Where this data exists on the timeline (UX review U1). Shows a CoverageBar. */
-  coverage?: { modes: Mode[]; cursor: Mode }
+  /** Which modes this data has (UX review H12): mode icons on the meta line, the current mode highlighted. */
+  availability?: { modes: Mode[]; current: Mode }
   /** No data at the selected instant: dimmed but still clickable (picking it moves time). */
   idle?: boolean
 }
@@ -31,7 +31,7 @@ export function LayerItem({
   onSelect,
   disabledReason = 'Real-time data only. Not available in Forecast.',
   onGoLive,
-  coverage,
+  availability,
   idle,
 }: LayerItemProps) {
   const tipId = useId()
@@ -65,14 +65,18 @@ export function LayerItem({
         </span>
         <span className={styles.text}>
           <span className={styles.label}>{label}</span>
-          {meta && <span className={styles.meta}>{meta}</span>}
+          {(meta || availability) && (
+            <span className={styles.metaRow}>
+              {meta && <span className={styles.meta}>{meta}</span>}
+              {availability && (
+                <>
+                  <ModeAvailability modes={availability.modes} current={availability.current} />
+                  <span className="visually-hidden">, data: {availabilityText(availability.modes)}</span>
+                </>
+              )}
+            </span>
+          )}
         </span>
-        {coverage && (
-          <>
-            <CoverageBar modes={coverage.modes} cursor={coverage.cursor} />
-            <span className="visually-hidden">, data: {coverageText(coverage.modes)}</span>
-          </>
-        )}
         {disabled && <Icon name="lock" size={14} className={styles.lock} />}
       </button>
 

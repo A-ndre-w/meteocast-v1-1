@@ -149,7 +149,7 @@ export function ComponentsPage() {
       <Specimen
         name="LayerItem"
         figma="Layer/Item · 2007:7454"
-        props="status: 'default' | 'hover' | 'selected' | 'disabled', icon, label, meta, coverage, idle, onSelect, disabledReason, onGoLive"
+        props="status: 'default' | 'hover' | 'selected' | 'disabled', icon, label, meta, availability, idle, onSelect, disabledReason, onGoLive"
         note="Disabled is a code addition for the original rule 7: focusable, with a tooltip and “Back to live”. The screen no longer locks layers (picking one moves time with Undo), so this variant is kept but unused."
       >
         {(['default', 'hover', 'selected', 'disabled'] as const).map((status) => (
@@ -164,14 +164,14 @@ export function ComponentsPage() {
             <LayerItem icon="drizzle" label="Accumulated precipitation in 24h" meta="mm - daily" />
           </div>
         </Variant>
-        <Variant label="coverage (screen use)">
+        <Variant label="availability (screen use)">
           <div style={{ width: 213 }} data-mode="live">
-            <LayerItem icon="drizzle" label="Hourly rainfall" meta="mm - hourly" status="selected" coverage={{ modes: ['archive', 'live', 'forecast'], cursor: 'live' }} />
+            <LayerItem icon="drizzle" label="Hourly rainfall" meta="mm - hourly" status="selected" availability={{ modes: ['archive', 'live', 'forecast'], current: 'live' }} />
           </div>
         </Variant>
-        <Variant label="coverage · idle (no data now)">
+        <Variant label="availability · idle (no data now)">
           <div style={{ width: 213 }} data-mode="forecast">
-            <LayerItem icon="humidity" label="Snow on the ground" meta="cm - hourly" idle coverage={{ modes: ['archive', 'live'], cursor: 'forecast' }} />
+            <LayerItem icon="humidity" label="Snow on the ground" meta="cm - hourly" idle availability={{ modes: ['archive', 'live'], current: 'forecast' }} />
           </div>
         </Variant>
       </Specimen>

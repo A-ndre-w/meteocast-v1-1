@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Speed } from '../components/Timebar/Timebar'
 import { layerById } from '../data'
-import { NOW, shiftHours } from '../time'
+import { NOW, shiftHours, type TimeSel } from '../time'
 import {
   goLive,
   moveExplicit,
@@ -19,6 +19,8 @@ type State = {
   view: View
   zoom: number
   playing: boolean
+  /** Where Play was pressed: the loop runs 24 h forward from here and comes back. */
+  playOrigin?: TimeSel
   speed: Speed
   /** One toast at a time; `key` remounts it so its 6 s timer restarts. */
   notice?: Notice & { key: number }
@@ -58,10 +60,13 @@ export function useMeteo() {
       }
     })
 
-  // Play: automatic movement loops inside the visible day and never crosses "now".
+  // Play: from the instant where it was pressed, 24 h forward, then back to that instant.
   useEffect(() => {
     if (!state.playing) return
-    const t = setInterval(() => setState((s) => ({ ...s, view: playStep(s.view) })), FRAME_MS / state.speed)
+    const t = setInterval(
+      () => setState((s) => ({ ...s, view: playStep(s.view, s.playOrigin ?? s.view.sel) })),
+      FRAME_MS / state.speed,
+    )
     return () => clearInterval(t)
   }, [state.playing, state.speed])
 
@@ -90,7 +95,7 @@ export function useMeteo() {
     notInPrototype: (feature: string) =>
       setState((s) => ({ ...s, notice: { type: 'notInPrototype', feature, key: ++noticeKey } })),
     zoomBy: (d: number) => setState((s) => ({ ...s, zoom: Math.min(2, Math.max(1, +(s.zoom + d).toFixed(2))) })),
-    togglePlay: () => setState((s) => ({ ...s, playing: !s.playing })),
+    togglePlay: () => setState((s) => ({ ...s, playing: !s.playing, playOrigin: s.playing ? undefined : s.view.sel })),
     setSpeed: (speed: Speed) => setState((s) => ({ ...s, speed })),
   }
 

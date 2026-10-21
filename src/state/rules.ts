@@ -12,7 +12,7 @@ import {
   twinOf,
   type Layer,
 } from '../data'
-import { addDays, dayDiff, dayWindow, hoursBetween, modeOf, NOW, type TimeSel } from '../time'
+import { addDays, dayDiff, dayWindow, hoursBetween, modeOf, NOW, shiftHours, type TimeSel } from '../time'
 import type { Mode } from '../types'
 
 /** What the user is looking at. Undo restores a whole View. */
@@ -147,21 +147,24 @@ export function goLive(view: View, layerId = view.layerId): Result {
 }
 
 /**
- * Play (automatic): never crosses "now". Loops over the instants of the visible day that the selected
- * layer itself has (today in Live/Archive: 00→13; today in Forecast: 14→23). Daily layers loop over days.
+ * Play (automatic): starts where the cursor is and moves forward, never back to midnight.
+ * `origin` is the instant where Play was pressed; the loop returns there.
  */
-export function playStep(view: View): View {
+export function playStep(view: View, origin: TimeSel): View {
   const layer = layerById(view.layerId)
-  if (layer.interval === 'day') {
-    const days = windowDays.filter((d) => dayAvailable(layer, d))
-    if (!days.length) return view
-    const i = days.indexOf(view.sel.day)
-    return { ...view, sel: normalize(layer, { ...view.sel, day: days[(i + 1) % days.length] }) }
+  const stream = [layer, twinOf(layer)].filter((l): l is Layer => l !== undefined)
+  // Loop span (designer decision, 2026-10-21): from where Play was pressed, the next 24 hours —
+  // across "now" into the forecast when the stream has it — then back to the start. Daily data: one frame
+  // per day for as long as the stream has days, then back to the start day.
+  const next = layer.interval === 'day' ? { ...view.sel, day: addDays(view.sel.day, 1) } : shiftHours(view.sel, 1)
+  const span = layer.interval === 'day' ? windowDays.length * 24 : 24
+  const carrier = stream.find((l) => instantAvailable(l, normalize(l, next)))
+  if (!inWindow(next) || hoursBetween(next, origin) >= span || !carrier) {
+    const back = stream.find((l) => instantAvailable(l, origin)) ?? layer
+    return { groupId: groupIdOf(back), layerId: back.id, sel: origin }
   }
-  const hours = Array.from({ length: 24 }, (_, h) => h).filter((h) => instantAvailable(layer, { day: view.sel.day, hour: h }))
-  if (!hours.length) return view
-  const nextHour = hours.find((h) => h > view.sel.hour) ?? hours[0]
-  return { ...view, sel: { ...view.sel, hour: nextHour } }
+  // Crossing "now" hands over to the twin layer, as a manual move does (no toast).
+  return { groupId: groupIdOf(carrier), layerId: carrier.id, sel: normalize(carrier, next) }
 }
 
 export const stepDayTarget = (sel: TimeSel, d: number): TimeSel => ({ ...sel, day: addDays(sel.day, d) })

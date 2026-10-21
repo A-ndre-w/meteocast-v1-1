@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CoverageBar } from '../components/CoverageBar/CoverageBar'
+import { ModeAvailability } from '../components/ModeAvailability/ModeAvailability'
 import { DayStrip } from '../components/DayStrip/DayStrip'
 import { LayerPanel } from '../components/LayerPanel/LayerPanel'
 import { ModePill } from '../components/ModePill/ModePill'
@@ -212,7 +212,7 @@ export function BigSpecimens() {
         name="LayerPanel"
         figma="Panel · 2036:19020 (redesigned, UX review U1)"
         props="group, selectedStreamId, cursor, isAvailable, onSelect"
-        note="One entry per data quantity, no Real time / Forecast sections, nothing locked. The coverage bar shows where each one has data; entries without data at the selected instant are quieter and picking them moves time (with Undo)."
+        note="One entry per data quantity, no Real time / Forecast sections, nothing locked. The mode icons show which modes each one has; entries without data at the selected instant are quieter and picking them moves time (with Undo)."
       >
         <Variant label="Water & Storms · live">
           <div style={{ height: 520, display: 'flex' }}>
@@ -232,20 +232,21 @@ export function BigSpecimens() {
       </Specimen>
 
       <Specimen
-        name="CoverageBar"
-        figma="— (code addition, UX review U1)"
-        props="modes: Mode[], cursor: Mode"
-        note="Mini timeline in the Timebar's language: solid = archive, dot = live (hollow if none), dashed = forecast. The tick is the selected instant."
+        name="ModeAvailability"
+        figma="— (code addition, UX review H12)"
+        props="modes: Mode[], current: Mode"
+        note="The ModeBadge icons in timeline order: present = secondary, missing = faint, the selected instant's mode filled with its colour."
       >
         {([
-          [['archive', 'live', 'forecast'], 'live', 'Archive · Live · Forecast'],
-          [['archive', 'live'], 'forecast', 'Archive · Live, cursor in forecast'],
-          [['live', 'forecast'], 'archive', 'Live · Forecast, cursor in archive'],
-          [['forecast'], 'live', 'Forecast only'],
-        ] as const).map(([modes, cursor, label]) => (
+          [['archive', 'live', 'forecast'], 'live', 'all modes · now'],
+          [['archive', 'live', 'forecast'], 'forecast', 'all modes · forecast'],
+          [['archive', 'live'], 'forecast', 'no forecast · forecast'],
+          [['live', 'forecast'], 'archive', 'no archive · archive'],
+          [['forecast'], 'forecast', 'forecast only'],
+        ] as const).map(([modes, current, label]) => (
           <Variant key={label} label={label}>
-            <span data-mode={cursor}>
-              <CoverageBar modes={[...modes]} cursor={cursor} />
+            <span data-mode={current}>
+              <ModeAvailability modes={[...modes]} current={current} />
             </span>
           </Variant>
         ))}

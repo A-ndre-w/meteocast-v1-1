@@ -25,7 +25,20 @@ Priorities 1 and 2 are done and re-measured on the dev build:
 
 **axe-core: 0 violations in all four states** (Live, Archive, auto switch, missing data). The tests ran with CSS transitions disabled, to avoid the background-tab artefact described below.
 
-Still open: H3, H8–H15 and the 1024 px layout (H11).
+Still open after that round: H3, H8–H15.
+
+**Second round (21 October 2026)**, designer decisions:
+
+| Finding | Fix | Re-test |
+|---|---|---|
+| Play restarted at midnight (designer report) | Play starts at the cursor and runs 24 h forward, crossing "now" into the forecast, then returns to the start | From Thu 13:00: 13:00 Live → 14:00 … Fri 12:00 Forecast → back to 13:00 |
+| H9: finding data across groups | Group preview on the rail (concept B): hover or focus lists the group's data; → ↑ ↓ Enter ← Esc from the keyboard | Wind → ↓ → Enter picks "Wind gusts" directly, focus returns to the rail |
+| H11: layout under 1280 px | Day chips scroll between the arrows; pill next to the panel without the date; min width 1024 | 0 overlaps and 0 off-screen elements at 1024×700, 1280×720, 1440×840 |
+| H12: coverage bar not intuitive | Replaced by the mode icons used by the badges (concept B), on the meta line | Present / missing / current shown for every entry |
+| H14: Play continued on data change | Changing data or group pauses Play | — |
+| H15: unused library pieces | Kept, badged "Not used in the screen" on /#/components | — |
+
+axe-core after the second round: 0 violations. Still open: H3, H8, H10, H13.
 
 ## 1. Scorecard (before the fixes)
 

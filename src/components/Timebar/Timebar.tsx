@@ -128,13 +128,13 @@ export function Timebar({
               aria-label={playing ? 'Pause animation' : 'Play animation'}
               aria-pressed={playing}
               aria-describedby={playHintId}
-              title="Loops the hours of this day that have data, never past now"
+              title="Plays the next 24 hours from the selected time, then starts again"
               onClick={onTogglePlay}
             >
               <Icon name={playing ? 'pause' : 'play'} size={18} />
             </button>
             <span id={playHintId} className="visually-hidden">
-              Loops the hours of this day that have data, never past now.
+              Plays the next 24 hours from the selected time, then starts again.
             </span>
             <button type="button" className={styles.stepBtn} aria-label={daily ? 'Next day' : 'Next hour'} onClick={() => step(1)}>
               <Icon name="chevron-right" size={16} />

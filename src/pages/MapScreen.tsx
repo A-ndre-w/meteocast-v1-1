@@ -87,6 +87,8 @@ export function MapScreen() {
           selectedGroupId={view.groupId}
           onSelect={actions.selectGroup}
           onAdd={() => actions.notInPrototype('Creating presets')}
+          currentStreamId={layer.stream}
+          onPickStream={actions.selectStream}
         />
       </div>
 

@@ -162,7 +162,15 @@ Altre scelte: "adesso" simulato = Thu 15 Oct 2026 13:00; i livelli a 5 minuti si
 
 ## Decisioni dopo aver provato il sito (2026-10-20)
 
-- **Pannello livelli:** una voce per dato (stream), senza sezioni Real time / Forecast. Ogni voce ha una CoverageBar (mini-timeline: pieno = archivio, pallino = adesso, tratteggio = previsione, tacca = istante selezionato).
+- **Pannello livelli:** una voce per dato (stream), senza sezioni Real time / Forecast. Ogni voce mostra le icone delle modalità disponibili (ModeAvailability). Aggiornamento del 2026-10-21: sostituisce la CoverageBar, poco intuitiva (UX audit H12, scelta B).
 - **Nessuna voce bloccata:** sostituisce la regola 7 del brief. Se si sceglie un dato senza valori nell'istante selezionato, il tempo va all'istante più vicino che li ha, con Toast e Undo. Per i dati solo previsione il testo è quello di Screen 02 (regola 5).
 - **Segnali di modalità:** rimossa la cornice attorno allo schermo. Restano ModePill, tag del Readout, striscia + tinta + badge della Timebar.
 - SectionLabel resta nel design system ma non è più usato nella schermata.
+
+## Decisioni del 2026-10-21
+
+- **Play:** parte dal pallino (non più da mezzanotte) e avanza ora per ora per 24 ore, anche oltre "adesso" nella previsione; poi torna al punto di partenza. Per i dati giornalieri, un fotogramma al giorno finché ci sono dati. Cambiare dato o gruppo mette in pausa (H14).
+- **H9, anteprima dei gruppi nella Rail:** al passaggio del mouse o al focus, l'elenco dei dati del gruppo; il clic sceglie direttamente. Tastiera: → nell'elenco, ↑/↓, Invio, ←/Esc.
+- **H12, icone di modalità:** archivio, live e previsione sulla riga dei metadati di ogni voce; mancanti tenui, corrente piena nel colore della modalità.
+- **H11:** layout fino a 1024 × 700 (giorni scorrevoli nella timebar, pill accanto al pannello sotto i 1280px).
+- **H15:** SectionLabel e LayerItem "disabled" restano nella libreria con il badge "Not used in the screen".

@@ -84,7 +84,7 @@ Scostamenti da Figma introdotti di proposito dalle correzioni di [UX_REVIEW.md](
 | Etichette sulla mappa | "mm/h" | Unità del livello ("mm") | Coerenza con il Readout (U2) |
 | Toast di avviso (Screen 03) | Sopra la timebar | Sotto la ModePill, come gli altri | Un solo punto per i messaggi (U7) |
 | Etichette di latitudine | 40°, 35°, 30°, 25°N | Solo 25°N | Le altre finivano sotto la Rail (U14) |
-| Pannello livelli | Sezioni Real time / Forecast, stesso dato due volte (13 voci) | Una voce per dato (7 voci in Water & Storms), con `CoverageBar`; nessuna voce bloccata | U1, decisione del designer: l'utente sceglie il dato, la timeline decide la modalità |
+| Pannello livelli | Sezioni Real time / Forecast, stesso dato due volte (13 voci) | Una voce per dato (7 voci in Water & Storms), con le icone delle modalità (`ModeAvailability`); nessuna voce bloccata | U1, decisione del designer: l'utente sceglie il dato, la timeline decide la modalità |
 | Regola 7 | Livello real time in Forecast: Disabled con tooltip | Selezionabile: il tempo va a Live con Toast e Undo | Le voci bloccate scoraggiavano l'utente (decisione del designer) |
 | Cornice di modalità attorno allo schermo | Presente in Archive e Forecast | Rimossa | D7: sei segnali erano troppi, e un bordo attorno allo schermo richiama gli allarmi |
 | Badge LIVE | Testo terziario | Testo secondario, puntino scuro | Si leggeva come "spento" (U8) |
@@ -98,7 +98,8 @@ Da riportare nel file Figma, così Figma resta la fonte di verità:
 - **Readout:** stati `stale` ("Updated 12:20 · Data 40 min late") e `noData` ("—", mai "0").
 - **Toast:** due toni (info con Undo, warning) con conto alla rovescia visibile di 6 secondi, che si mette in pausa al passaggio del mouse o al focus.
 - **Modello gemelli:** livello real time e livello forecast con lo stesso `stream` sono un unico dato. Il Play non attraversa "adesso"; un gesto manuale sì, con Toast e Undo.
-- **CoverageBar** nel LayerItem: mini-timeline (pieno = archivio, pallino = adesso, tratteggio = previsione) con il cursore dell'istante selezionato. Le voci senza dati in quell'istante sono più tenui (`idle`), ma restano cliccabili.
+- **ModeAvailability** nel LayerItem: le icone di ModeBadge (archivio, live, previsione) sulla riga dei metadati; mancanti tenui, quella dell'istante selezionato piena nel colore della modalità. Ha sostituito una prima CoverageBar (mini-timeline), giudicata poco intuitiva (UX audit H12).
+- **Anteprima dei gruppi nella Rail** (UX audit H9): elenco dei dati del gruppo al passaggio del mouse o al focus, scelta diretta, navigabile con le frecce.
 - **Tooltip della Rail** con il nome del gruppo, anche da tastiera; **data della timebar** come pulsante che porta ai giorni.
 - **Toast "non incluso"** per ricerca, allarmi, localizzazione e preset.
 - **Icone UI disegnate in codice:** termometro, onde, orologio, lucchetto. Quelle meteo vengono dal set Figma 32px.
