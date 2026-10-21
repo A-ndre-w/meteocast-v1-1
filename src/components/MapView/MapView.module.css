@@ -38,24 +38,69 @@
   filter: saturate(0.4) sepia(0.12);
 }
 
-.data {
+/* Data field, interpolated from the stations: a coarse grid stretched (and smoothed) like the base image. */
+.field {
   position: absolute;
-  inset: 0;
-  width: 100%;
+  top: 0;
+  right: 0;
+  width: calc(100% * (1 + var(--bleed)));
   height: 100%;
-  overflow: visible;
-  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
-.blob {
-  transition: r 0.3s ease;
+/* Smooth quantities (temperature, wind…) cover the whole map: kept lighter so the map stays readable. */
+.field[data-patchy='false'] {
+  opacity: 0.55;
 }
 
-/* Labels and pin keep their size when zooming. A label sits at the centre of its field. */
-.label {
+/* Dots, labels, tooltip and pin keep their size when zooming. */
+/* One dot per station: a 6px mark, hoverable on 16px. */
+.dot {
   position: absolute;
+  width: 16px;
+  height: 16px;
   translate: -50% -50%;
   scale: calc(1 / var(--zoom, 1));
+}
+
+.dot::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--text-secondary);
+  box-shadow: 0 0 0 1.5px var(--surface-raised);
+}
+
+/* Value label just above its dot. */
+.label {
+  position: absolute;
+  translate: -50% calc(-100% - 5px);
+  scale: calc(1 / var(--zoom, 1));
+  transform-origin: 50% 100%;
+}
+
+.tip {
+  position: absolute;
+  z-index: 1;
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  background: var(--text-primary);
+  color: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  pointer-events: none;
+  translate: -50% calc(-100% - 5px);
+  scale: calc(1 / var(--zoom, 1));
+  transform-origin: 50% 100%;
+}
+
+.tipValue {
+  font-family: var(--font-mono);
 }
 
 /* Anchored at the pin tip. */

@@ -102,12 +102,14 @@ Per tre componenti il codice usa i nomi del brief (Timebar, Readout, ModePill) i
 
 ## Mappa di base
 
-La mappa è quella reale dell'area del prodotto originale (Trentino – Veneto, da Trento a Treviso), così nel portfolio il prima / dopo mostra lo stesso luogo. La località selezionata è **Trento**; le etichette sulla mappa sono su Bolzano, Belluno e Bassano del Grappa.
+La mappa è quella reale dell'area del prodotto originale (Trentino – Veneto, da Trento a Treviso), così nel portfolio il prima / dopo mostra lo stesso luogo. La località selezionata è **Trento**, dentro una rete di 88 stazioni in comuni reali.
 
 - **Fonte:** tile OpenStreetMap a zoom 9, unite una sola volta in un'immagine statica (`public/basemap.webp`) da `scripts/build-basemap.mjs`. Inquadratura ricavata dallo screenshot originale (centro 46,02° N, 12,01° E).
 - **Stile:** desaturata e schiarita (`--muted`) per non competere con il livello dati, che resta separato e mai filtrato (regola 11).
 - **Attribuzione:** "© OpenStreetMap contributors" in basso a destra, con link alla pagina del copyright (licenza ODbL).
 - **Finestre strette:** l'immagine ha 240px di mappa in più a ovest. Quando Trento finirebbe sotto il pannello livelli, la mappa scorre verso destra e il pin resta a 398px dal bordo, come nel frame Figma.
+- **Stazioni, in tre livelli di lettura:** un puntino per ogni stazione; il valore solo dove piove (sopra 0), dal più alto, saltando le etichette che si sovrapporrebbero (zoomando ne compaiono altre); al passaggio del mouse nome e valore di qualunque stazione, zero compreso. Per i lettori di schermo c'è l'elenco delle stazioni con un valore.
+- **Campo dei dati:** interpolato dalle stazioni (media pesata sulla distanza) e colorato con la scala del Readout, quindi colore e numeri coincidono ovunque. I valori vengono da celle di pioggia che si spostano ora per ora, scalate perché a Trento il valore sia quello del Readout. Temperatura, vento e simili variano invece in modo continuo e hanno un valore in ogni stazione.
 - **Per Figma:** `design-notes/basemap-1440x840.png` è la stessa mappa nel frame 1440×840, da usare come sfondo delle schermate. Le posizioni in px delle città sono in `src/data/geo.json`.
 
 ## Regole di comportamento

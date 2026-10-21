@@ -66,13 +66,11 @@ import seriesFile from './series.json'
 type SeriesFile = {
   start: string
   location: { name: string; coords: string; pin: [number, number] }
-  mapPoints: { name?: string; pos: [number, number]; factor: number }[]
   series: Record<string, { decimals: number; values: (number | null)[] }>
 }
 const data = seriesFile as unknown as SeriesFile
 
 export const location = data.location
-export const mapPoints = data.mapPoints
 
 /** Value at the selected location, or null when the layer has no data at that instant. */
 export function valueAt(layerId: string, sel: TimeSel): number | null {
@@ -82,12 +80,75 @@ export function valueAt(layerId: string, sel: TimeSel): number | null {
   return s.values[d * 24 + sel.hour]
 }
 
-/** Value at another map point (derived from the location value). */
-export function pointValue(layerId: string, sel: TimeSel, factor: number): number | null {
-  const v = valueAt(layerId, sel)
-  if (v === null) return null
-  const dec = data.series[layerId].decimals
-  return Number((v * factor).toFixed(dec))
+// ---- Stations: the network around the selected location (src/data/geo.json, real towns) ----
+import geo from './geo.json'
+
+type Point = [number, number]
+export type Station = { name: string; pos: Point }
+
+/** Every station except the selected location, which the pin and the Readout already show. */
+export const stations: Station[] = geo.stations.filter((s) => s.name !== location.name).map((s) => ({ name: s.name, pos: s.px as Point }))
+
+/** Precipitation comes in patches: stations outside them read 0. Other quantities vary smoothly across the map. */
+export const isPatchy = (layer: Layer) => /^(water|snow|storms)\//.test(layer.stream) && !/hydrometric|leaf-wetness/.test(layer.stream)
+
+// Weather cells in frame px: c = centre, r = spread, a = strength. They drift a little hour by hour.
+// Rain echoes the original product screenshot: heavy over Belluno and Garda – Verona, showers over Trento,
+// rain on the plain and in Friuli. Snow sits on the high ground. The smooth field is a gentle north–south gradient.
+type Cell = { c: Point; r: number; a: number }
+const cells: Record<'rain' | 'snow' | 'smooth', Cell[]> = {
+  rain: [
+    { c: [398, 395], r: 80, a: 1 },
+    { c: [797, 357], r: 85, a: 2 },
+    { c: [300, 640], r: 100, a: 1.6 },
+    { c: [600, 650], r: 80, a: 0.9 },
+    { c: [1180, 330], r: 95, a: 1.1 },
+    { c: [483, 169], r: 60, a: 0.5 },
+    { c: [900, 180], r: 70, a: 0.7 },
+  ],
+  snow: [
+    { c: [398, 395], r: 70, a: 0.9 },
+    { c: [470, 110], r: 110, a: 1.5 },
+    { c: [700, 170], r: 120, a: 1.6 },
+    { c: [900, 140], r: 90, a: 1.3 },
+    { c: [130, 330], r: 100, a: 1.4 },
+    { c: [1100, 200], r: 90, a: 1.1 },
+  ],
+  smooth: [
+    { c: [700, 760], r: 420, a: 0.45 },
+    { c: [600, 80], r: 380, a: -0.3 },
+    { c: [1250, 450], r: 260, a: 0.15 },
+  ],
+}
+
+const seedOf = (s: string) => ([...s].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261) % 628) / 100
+
+/** Field strength at p, hour h (hours since the window start). Patchy fields are 0 outside the cells. */
+function field(kind: keyof typeof cells, [x, y]: Point, h: number, seed: number): number {
+  let f = 0
+  cells[kind].forEach(({ c, r, a }, k) => {
+    const cx = c[0] + 45 * Math.sin(h / 9 + k * 1.7 + seed)
+    const cy = c[1] + 30 * Math.cos(h / 13 + k * 2.3 + seed)
+    const amp = a * (0.75 + 0.25 * Math.sin(h / 7 + k + seed))
+    f += amp * Math.exp(-((x - cx) ** 2 + (y - cy) ** 2) / (2 * r * r))
+  })
+  return kind === 'smooth' ? Math.max(0.1, 0.7 + f) : Math.max(0, f - 0.4)
+}
+
+/**
+ * Values at every station (same order as `stations`), or null when the layer has no data at that instant.
+ * Scaled so the field equals Trento's value at Trento: the network and the Readout always agree.
+ */
+export function stationValues(layer: Layer, sel: TimeSel): (number | null)[] {
+  const v0 = valueAt(layer.id, sel)
+  if (v0 === null) return stations.map(() => null)
+  const kind = !isPatchy(layer) ? 'smooth' : layer.stream.startsWith('snow/') ? 'snow' : 'rain'
+  const h = dayDiff(sel.day, data.start) * 24 + (layer.interval === 'day' ? 12 : sel.hour)
+  const seed = seedOf(layer.stream)
+  const ratio = v0 / field(kind, location.pin, h, seed)
+  const dec = data.series[layer.id].decimals
+  const cap = layer.unit === '%' ? 100 : Infinity
+  return stations.map((s) => Number(Math.min(cap, field(kind, s.pos, h, seed) * ratio).toFixed(dec)))
 }
 
 // ---- Twins: the same quantity split into a Real time and a Forecast layer ----

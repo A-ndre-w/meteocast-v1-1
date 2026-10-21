@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { LayerPanel } from '../components/LayerPanel/LayerPanel'
 import { Logo } from '../components/Logo/Logo'
 import { MapView } from '../components/MapView/MapView'
@@ -9,7 +10,7 @@ import { SearchBar } from '../components/SearchBar/SearchBar'
 import { Timebar } from '../components/Timebar/Timebar'
 import { Toast } from '../components/Toast/Toast'
 import { ZoomControl } from '../components/ZoomControl/ZoomControl'
-import { groups, instantAvailable, location, mapPoints, pointValue, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
+import { groups, instantAvailable, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
 import { useMeteo } from '../state/useMeteo'
 import {
   dayWindow,
@@ -44,6 +45,12 @@ export function MapScreen() {
 
   // Rule 9: Live shows "Updated HH:MM"; late data is "stale" with its delay; missing data is "—".
   const value = valueAt(layer.id, sel)
+  // Memoised: the map redraws its field only when the data or the instant change.
+  const network = useMemo(() => {
+    const values = stationValues(layer, sel)
+    return stations.map((s, i) => ({ ...s, value: values[i] }))
+  }, [layer, sel])
+  const pin = useMemo(() => ({ pos: location.pin, label: location.name, value }), [value])
   const stale = mode === 'live' && value !== null && layer.liveDelayMin !== undefined
   const updatedAt = NOW.hour * 60 - (stale ? layer.liveDelayMin! : 0)
   const readoutTime =
@@ -70,8 +77,11 @@ export function MapScreen() {
         mode={mode}
         ramp={layer.scale.ramp}
         max={layer.scale.max}
-        labels={mapPoints.map((p) => ({ pos: p.pos, value: pointValue(layer.id, sel, p.factor), unit: layer.unit }))}
-        pin={{ pos: location.pin, label: location.name, value }}
+        unit={layer.unit}
+        patchy={isPatchy(layer)}
+        layerName={layer.name}
+        stations={network}
+        pin={pin}
         zoom={state.zoom}
       />
 
