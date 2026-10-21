@@ -98,7 +98,7 @@ Decisione del designer: per il prima / dopo del portfolio la mappa deve mostrare
 | Mappa di base | SVG disegnata a mano | Tile OpenStreetMap, zoom 9, desaturate e schiarite | Inquadratura ricavata dallo screenshot originale: centro 46,02° N, 12,01° E |
 | Località | Rome, 41.90° N, 12.50° E | Trento, 46.07° N, 11.12° E | Stessi valori di Figma (4,2 mm adesso, 1,8 ieri, 6,5 domani) |
 | Etichette sulla mappa | Tre punti senza nome | Bolzano, Belluno, Bassano del Grappa | Stessi valori di Figma (2,1 / 9,1 / 4,8 mm); la cella più forte è su Belluno, come nell'originale |
-| Macchie di pioggia, neve, temperatura | Posizioni libere | Su città reali | Pioggia su Trento, Belluno e pianura veneta; neve su Bolzano e Cortina |
+| Macchie di pioggia, neve, temperatura | Posizioni libere, colori fissi | Una zona per ogni valore (Trento e le tre etichette), centrata sotto l'etichetta | Il colore al centro è quello del valore sulla scala del Readout, la dimensione cresce con il valore: l'etichetta e il colore dicono la stessa cosa (segnalato dal designer: etichette spostate rispetto alle zone) |
 | Etichette di latitudine | Solo 25°N | Rimosse | Su una mappa reale sono superflue |
 | Attribuzione | — | "© OpenStreetMap contributors", in basso a destra, su due righe | Obbligatoria (ODbL). Su due righe entra nei 120px che la timebar lascia liberi sotto i 1328px |
 | Finestre strette | La mappa restava centrata | Scorre a destra quanto serve perché il pin resti a 398px | Trento è vicina al bordo sinistro: sotto i 1440px finiva sotto il pannello. L'immagine ha 240px di margine a ovest |

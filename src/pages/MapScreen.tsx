@@ -69,9 +69,9 @@ export function MapScreen() {
       <MapView
         mode={mode}
         ramp={layer.scale.ramp}
-        intensity={value === null ? null : Math.min(1, value / layer.scale.max)}
+        max={layer.scale.max}
         labels={mapPoints.map((p) => ({ pos: p.pos, value: pointValue(layer.id, sel, p.factor), unit: layer.unit }))}
-        pin={{ pos: location.pin, label: location.name }}
+        pin={{ pos: location.pin, label: location.name, value }}
         zoom={state.zoom}
       />
 

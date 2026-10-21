@@ -51,11 +51,11 @@
   transition: r 0.3s ease;
 }
 
-/* Labels and pin keep their size when zooming. Labels are anchored top-left, like the Figma frames. */
+/* Labels and pin keep their size when zooming. A label sits at the centre of its field. */
 .label {
   position: absolute;
+  translate: -50% -50%;
   scale: calc(1 / var(--zoom, 1));
-  transform-origin: left top;
 }
 
 /* Anchored at the pin tip. */

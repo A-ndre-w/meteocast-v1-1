@@ -12,10 +12,11 @@ export type MapViewProps = {
   mode: Mode
   /** Colour family of the data layer. */
   ramp: Ramp
-  /** 0–1: how strong the data layer is at this instant. null = no data → data layer hidden. */
-  intensity: number | null
+  /** Top of the Readout scale: a value's colour on the map is its colour on that scale. */
+  max: number
   labels: { pos: Point; value: number | null; unit: string }[]
-  pin: { pos: Point; label: string }
+  /** The selected location; its value draws a field too. */
+  pin: { pos: Point; label: string; value: number | null }
   zoom?: number
 }
 
@@ -25,42 +26,25 @@ const at = ([x, y]: Point): CSSProperties => ({ left: `${(x / W) * 100}%`, top: 
 // The frame pans to keep the pin clear of the layer panel; the base image carries geo.bleed px of map on the left.
 const frameStyle = (zoom: number, [x]: Point) => ({ '--zoom': zoom, '--focus-x': x / W, '--bleed': geo.bleed / W }) as CSSProperties
 
-// Real places on the base map (scripts/build-basemap.mjs), in frame pixels.
-const place = (name: keyof typeof geo.places, dx = 0, dy = 0): Point => [geo.places[name].px[0] + dx, geo.places[name].px[1] + dy]
-
-// Blob fields per colour family, placed on real places. Rain echoes the original product screenshot:
-// heavy cell over Belluno, showers over Trento, rain toward the plain (Vicenza, Pordenone).
-const blobs: Record<Ramp, { c: Point; r: number; color: string }[]> = {
-  rain: [
-    { c: place('Trento', 30, -10), r: 120, color: '#5F9FD3' },
-    { c: place('Belluno', 0, -10), r: 120, color: '#4C82D4' },
-    { c: place('Treviso', 170, -90), r: 160, color: '#6FB9CD' },
-    { c: place('Vicenza', -20, -10), r: 110, color: '#7FC2CC' },
-  ],
-  snow: [
-    { c: place('Bolzano', 30, 10), r: 170, color: '#47DAFF' },
-    { c: place('Cortina', 0, 20), r: 130, color: '#47DAFF' },
-    { c: place('Trento', -90, -130), r: 110, color: '#7FE4FF' },
-  ],
-  temp: [
-    { c: place('Feltre', -60, 30), r: 300, color: '#C9A273' },
-    { c: place('Treviso', 240, -250), r: 240, color: '#B98B5A' },
-  ],
-  neutral: [
-    { c: place('Feltre', -40, -120), r: 260, color: '#8E8A86' },
-    { c: place('Treviso', 300, -80), r: 200, color: '#7D7975' },
-  ],
+// Readout scale per colour family (Readout.module.css .bar): from the low end to the top.
+const scaleEnds: Record<Ramp, [string, string]> = {
+  rain: ['var(--data-rain-soft)', 'var(--data-rain)'],
+  snow: ['var(--data-snow-soft)', 'var(--data-snow)'],
+  temp: ['var(--data-temp-soft)', 'var(--data-temp)'],
+  neutral: ['var(--surface-sunken)', 'var(--text-tertiary)'],
 }
 
-// Snow reads as a faint veil in the Figma screens; rain is the strongest field.
-const strength: Record<Ramp, number> = { rain: 1, snow: 0.45, temp: 0.6, neutral: 0.5 }
+/** Colour of a value on the Readout scale (t = value / max, 0–1). */
+const scaleColor = (ramp: Ramp, t: number) => `color-mix(in srgb, ${scaleEnds[ramp][1]} ${Math.round(t * 100)}%, ${scaleEnds[ramp][0]})`
 
 /**
  * Map = base image + separate data layer (rule 11). No filter ever touches the data;
  * in Archive only the base map is slightly desaturated.
+ * One field per value on the map (the pin and each label), centred on it, coloured like the value on the
+ * Readout scale and larger when stronger: what the label says is what the colour shows.
  */
-export function MapView({ mode, ramp, intensity, labels, pin, zoom = 1 }: MapViewProps) {
-  const k = intensity ?? 0
+export function MapView({ mode, ramp, max, labels, pin, zoom = 1 }: MapViewProps) {
+  const fields = [pin, ...labels].flatMap((p) => (p.value === null ? [] : [{ c: p.pos, t: Math.min(1, Math.max(0, p.value / max)) }]))
   return (
     <div className={styles.viewport} data-mode={mode}>
       <a className={styles.attribution} href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
@@ -71,18 +55,18 @@ export function MapView({ mode, ramp, intensity, labels, pin, zoom = 1 }: MapVie
       <div className={styles.frame} style={frameStyle(zoom, pin.pos)}>
         {/* Real map (OpenStreetMap, muted) of the original product's area: Trentino – Veneto, zoom 9. */}
         <img className={styles.base} src={`${import.meta.env.BASE_URL}basemap.webp`} alt="" draggable={false} />
-        <svg className={styles.data} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true" style={{ opacity: intensity === null ? 0 : Math.min(1, 0.65 + 0.5 * k) }}>
+        <svg className={styles.data} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true">
           <defs>
-            {blobs[ramp].map((b, i) => (
-              <radialGradient key={i} id={`blob-${ramp}-${i}`}>
-                <stop offset="0" stopColor={b.color} stopOpacity={0.85 * strength[ramp]} />
-                <stop offset="0.55" stopColor={b.color} stopOpacity={0.38 * strength[ramp]} />
-                <stop offset="1" stopColor={b.color} stopOpacity="0" />
+            {fields.map((b, i) => (
+              <radialGradient key={i} id={`field-${i}`}>
+                <stop offset="0" style={{ stopColor: scaleColor(ramp, b.t) }} />
+                <stop offset="0.5" style={{ stopColor: scaleColor(ramp, b.t), stopOpacity: 0.6 }} />
+                <stop offset="1" style={{ stopColor: scaleColor(ramp, b.t), stopOpacity: 0 }} />
               </radialGradient>
             ))}
           </defs>
-          {blobs[ramp].map((b, i) => (
-            <circle key={i} className={styles.blob} cx={b.c[0]} cy={b.c[1]} r={b.r * (0.9 + 0.5 * k)} fill={`url(#blob-${ramp}-${i})`} />
+          {fields.map((b, i) => (
+            <circle key={i} className={styles.blob} cx={b.c[0]} cy={b.c[1]} r={80 + 90 * Math.sqrt(b.t)} fill={`url(#field-${i})`} />
           ))}
         </svg>
 

@@ -8,8 +8,8 @@ const { groups } = JSON.parse(readFileSync('src/data/layers.json', 'utf8'))
 // Real places on the base map (scripts/build-basemap.mjs): frame pixels of Trento and the labelled towns.
 const { places } = JSON.parse(readFileSync('src/data/geo.json', 'utf8'))
 const coords = ({ lon, lat }) => `${lat.toFixed(2)}° N, ${lon.toFixed(2)}° E`
-// Value labels are anchored top-left: place them just up-right of the town.
-const labelAt = ({ px: [x, y] }) => [x + 10, y - 24]
+// Value labels are centred on the town (and on its field on the map).
+const labelAt = ({ px }) => px
 const NOW_DAY = 2 // index of Thu 15 in the window
 const NOW_HOUR = 13
 const DAYS = 8
