@@ -3,81 +3,45 @@
   inset: 0;
   overflow: hidden;
   background: var(--map-edge);
-  container-type: size;
 }
 
-/* The map keeps the 1440×840 design frame and covers the viewport (like background-size: cover).
-   Centred, except that it pans right when the selected location (--focus-x, share of the frame width)
-   would land further left than in the design (398px), i.e. under the layer panel on narrow windows.
-   The base image has extra map on the left (--bleed) for that pan. */
-.frame {
-  --w: max(100cqw, calc(100cqh * 1440 / 840));
+/* MapLibre fills the viewport; the base style and the data field are drawn in its canvas. */
+.map {
   position: absolute;
-  left: max(calc((100cqw - var(--w)) / 2), calc(398px - var(--w) * var(--focus-x)));
-  top: 50%;
-  width: var(--w);
-  aspect-ratio: 1440 / 840;
-  translate: 0 -50%;
-  scale: var(--zoom, 1);
-  transition: scale 0.25s ease;
+  inset: 0;
 }
 
-.base {
+/* Stations, labels and tooltip, positioned in screen px by the map on every frame. Only the marks catch the
+   pointer, so the map can be dragged everywhere else. */
+.overlay {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: calc(100% * (1 + var(--bleed)));
-  height: 100%;
-  max-width: none;
-  user-select: none;
-  transition: filter 0.3s ease;
-}
-
-/* Archive: only the base map is desaturated. The data layer is never filtered. */
-.viewport[data-mode='archive'] .base {
-  filter: saturate(0.4) sepia(0.12);
-}
-
-/* Data field, interpolated from the stations: a coarse grid stretched (and smoothed) like the base image. */
-.field {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: calc(100% * (1 + var(--bleed)));
-  height: 100%;
+  inset: 0;
   pointer-events: none;
 }
 
-/* Smooth quantities (temperature, wind…) cover the whole map: kept lighter so the map stays readable. */
-.field[data-patchy='false'] {
-  opacity: 0.55;
-}
-
-/* Dots, labels, tooltip and pin keep their size when zooming. */
-/* One dot per station: a 6px mark, hoverable on 16px. */
+/* One mark per station, hoverable on 16px: a white ring, so it never reads as one of the base map's town dots. */
 .dot {
   position: absolute;
   width: 16px;
   height: 16px;
   translate: -50% -50%;
-  scale: calc(1 / var(--zoom, 1));
+  pointer-events: auto;
 }
 
 .dot::before {
   content: '';
   position: absolute;
-  inset: 5px;
+  inset: 4px;
+  border: 2px solid var(--text-secondary);
   border-radius: 50%;
-  background: var(--text-secondary);
-  box-shadow: 0 0 0 1.5px var(--surface-raised);
+  background: var(--surface-raised);
 }
 
 /* Value label just above its dot. */
 .label {
   position: absolute;
   translate: -50% calc(-100% - 5px);
-  scale: calc(1 / var(--zoom, 1));
-  transform-origin: 50% 100%;
+  pointer-events: auto;
 }
 
 .tip {
@@ -93,10 +57,7 @@
   box-shadow: var(--shadow-sm);
   font-size: var(--font-size-xs);
   white-space: nowrap;
-  pointer-events: none;
   translate: -50% calc(-100% - 5px);
-  scale: calc(1 / var(--zoom, 1));
-  transform-origin: 50% 100%;
 }
 
 .tipValue {
@@ -107,18 +68,17 @@
 .pin {
   position: absolute;
   translate: -50% -100%;
-  scale: calc(1 / var(--zoom, 1));
-  transform-origin: 50% 100%;
+  pointer-events: none;
 }
 
-/* Map data licence (ODbL): required credit, between the zoom control and the components link.
-   Two lines, hugging the screen edge like map credits do (12px, as the timebar's bottom gap):
-   it fits the 120px corner the timebar leaves free below 1328px. */
+/* Map data licences (ODbL, OpenMapTiles): required credits, between the zoom control and the components link.
+   One short line each, hugging the screen edge like map credits do (12px, as the timebar's bottom gap):
+   they fit the 120px corner the timebar leaves free below 1328px. */
 .attribution {
   position: absolute;
   right: 12px;
   bottom: 46px;
-  z-index: 1;
+  margin: 0;
   padding: 2px 4px;
   line-height: 1.3;
   border-radius: var(--radius-xs);
@@ -126,14 +86,15 @@
   color: var(--text-secondary);
   font-size: var(--font-size-xs);
   text-align: right;
+}
+
+.attribution a {
+  display: block;
+  color: inherit;
+  white-space: nowrap;
   text-decoration: none;
 }
 
-.attribution span {
-  display: block;
-  white-space: nowrap;
-}
-
-.attribution:hover {
+.attribution a:hover {
   text-decoration: underline;
 }

@@ -17,7 +17,6 @@ import { scenarioFromUrl } from './scenarios'
 
 type State = {
   view: View
-  zoom: number
   playing: boolean
   /** Where Play was pressed: the loop runs 24 h forward from here and comes back. */
   playOrigin?: TimeSel
@@ -30,7 +29,6 @@ function initialState(): State {
   const scenario = scenarioFromUrl()
   return {
     view: scenario?.view ?? { groupId: 'water', layerId: 'rain-1h', sel: NOW },
-    zoom: 1,
     playing: false,
     speed: 1,
     // Scenario toasts stay open (no timer) so the screen can be compared with Figma.
@@ -94,7 +92,6 @@ export function useMeteo() {
     dismissNotice: () => setState((s) => ({ ...s, notice: undefined })),
     notInPrototype: (feature: string) =>
       setState((s) => ({ ...s, notice: { type: 'notInPrototype', feature, key: ++noticeKey } })),
-    zoomBy: (d: number) => setState((s) => ({ ...s, zoom: Math.min(2, Math.max(1, +(s.zoom + d).toFixed(2))) })),
     togglePlay: () => setState((s) => ({ ...s, playing: !s.playing, playOrigin: s.playing ? undefined : s.view.sel })),
     setSpeed: (speed: Speed) => setState((s) => ({ ...s, speed })),
   }

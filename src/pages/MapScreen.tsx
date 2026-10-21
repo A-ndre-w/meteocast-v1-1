@@ -1,7 +1,7 @@
-import { useMemo } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { LayerPanel } from '../components/LayerPanel/LayerPanel'
 import { Logo } from '../components/Logo/Logo'
-import { MapView } from '../components/MapView/MapView'
+import { MapView, type MapViewHandle } from '../components/MapView/MapView'
 import { ModePill } from '../components/ModePill/ModePill'
 import { NotificationBell } from '../components/NotificationBell/NotificationBell'
 import { Rail } from '../components/Rail/Rail'
@@ -50,6 +50,8 @@ export function MapScreen() {
     const values = stationValues(layer, sel)
     return stations.map((s, i) => ({ ...s, value: values[i] }))
   }, [layer, sel])
+  const mapRef = useRef<MapViewHandle>(null)
+  const [zoomRange, setZoomRange] = useState({ canIn: true, canOut: true })
   const pin = useMemo(() => ({ pos: location.pin, label: location.name, value }), [value])
   const stale = mode === 'live' && value !== null && layer.liveDelayMin !== undefined
   const updatedAt = NOW.hour * 60 - (stale ? layer.liveDelayMin! : 0)
@@ -82,7 +84,8 @@ export function MapScreen() {
         layerName={layer.name}
         stations={network}
         pin={pin}
-        zoom={state.zoom}
+        onZoomRange={(canIn, canOut) => setZoomRange({ canIn, canOut })}
+        ref={mapRef}
       />
 
       <h1 className="visually-hidden">MeteoCast</h1>
@@ -153,10 +156,10 @@ export function MapScreen() {
 
       <div className={styles.zoom}>
         <ZoomControl
-          onZoomIn={() => actions.zoomBy(0.25)}
-          onZoomOut={() => actions.zoomBy(-0.25)}
-          canZoomIn={state.zoom < 2}
-          canZoomOut={state.zoom > 1}
+          onZoomIn={() => mapRef.current?.zoomIn()}
+          onZoomOut={() => mapRef.current?.zoomOut()}
+          canZoomIn={zoomRange.canIn}
+          canZoomOut={zoomRange.canOut}
         />
       </div>
 

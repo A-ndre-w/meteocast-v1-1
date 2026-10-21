@@ -59,7 +59,7 @@ Corretti durante lo sviluppo, prima di questa revisione:
 | Puntino LIVE | Verde | Grigio scuro, con pulsazione | Il verde è riservato agli allarmi. La pulsazione si ferma con `prefers-reduced-motion` |
 | Striscia superiore della Timebar | 5px | 3px | Il brief indica 3px |
 | Scala del Readout | Testo a 8px | 11px | Nessun testo sotto 11px |
-| Mappa di base | `map.png` con le macchie di pioggia nell'immagine, centrata su Roma | Mappa reale OpenStreetMap del Trentino – Veneto (`basemap.webp`), senza dati, e livello dati separato | Regola 11: base e dati separati, nessun filtro sui dati. Area del prodotto originale per il prima / dopo del portfolio (vedi sotto). Le macchie sono approssimate e cambiano con il valore |
+| Mappa di base | `map.png` con le macchie di pioggia nell'immagine, centrata su Roma | Mappa vettoriale vera (MapLibre + OpenFreeMap) del Trentino – Veneto, senza dati, e livello dati separato | Regola 11: base e dati separati, nessun filtro sui dati. Area del prodotto originale per il prima / dopo del portfolio (vedi sotto). Le macchie sono approssimate e cambiano con il valore |
 | Etichette dei giorni | "Wed 13, Wed 14, Thu 15…" | "Tue 13, Wed 14, Thu 15…" | Il 13 ottobre 2026 è un martedì: refuso in Figma |
 | Intestazione Water & Storms | "16 LAYERS" (13 voci visibili) | "13 LAYERS" | Il conteggio riflette i livelli realmente presenti |
 | Lightning | ".ast 60 min - 5min" | "last 60 min - 5min" | Refuso |
@@ -95,15 +95,19 @@ Decisione del designer: per il prima / dopo del portfolio la mappa deve mostrare
 
 | Elemento | Prima (Roma) | Ora (Trento) | Nota |
 |---|---|---|---|
-| Mappa di base | SVG disegnata a mano | Tile OpenStreetMap, zoom 9, desaturate e schiarite | Inquadratura ricavata dallo screenshot originale: centro 46,02° N, 12,01° E |
+| Mappa di base | SVG disegnata a mano | MapLibre con tile vettoriali OpenFreeMap (stile Positron), pan e zoom reali | Inquadratura ricavata dallo screenshot originale: centro 46,02° N, 12,01° E. Prima versione (stesso giorno): un'immagine statica di tile OpenStreetMap attenuate, scartata perché sembrava uno screenshot di OSM e lo zoom era solo un ingrandimento |
 | Località | Rome, 41.90° N, 12.50° E | Trento, 46.07° N, 11.12° E | Stessi valori di Figma (4,2 mm adesso, 1,8 ieri, 6,5 domani) |
 | Stazioni ed etichette | Tre punti senza nome | 88 stazioni reali, in tre livelli: puntino per tutte; valore solo dove piove, senza sovrapposizioni; nome e valore al passaggio del mouse | Nel prima / dopo il prodotto originale mostrava ~150 valori, il prototipo 3: sembrava avere meno dati. Ora ha la stessa rete ma con una gerarchia, al posto della griglia di "0" dell'originale (decisione del designer) |
 | Campo di pioggia, neve, temperatura | Macchie disegnate a mano | Interpolato dalle stazioni (media pesata sulla distanza, potenza 3) e colorato con la scala del Readout | Colore e numeri coincidono ovunque. Prima versione: una macchia per etichetta, scartata perché etichette e zone non corrispondevano |
 | Valori delle stazioni | — | Celle di pioggia che si spostano ora per ora, scalate sul valore di Trento | La rete e il Readout sono sempre coerenti. Precipitazioni a chiazze (stazioni a 0); temperatura, vento e simili continui |
 | Accessibilità delle stazioni | — | Puntini ed etichette nascosti ai lettori di schermo; elenco nascosto "… at nearby stations" con le stazioni che hanno un valore, dal più alto | Il valore al passaggio del mouse non è raggiungibile da tastiera: è un dettaglio in più, il dato principale resta nel Readout |
 | Etichette di latitudine | Solo 25°N | Rimosse | Su una mappa reale sono superflue |
-| Attribuzione | — | "© OpenStreetMap contributors", in basso a destra, su due righe | Obbligatoria (ODbL). Su due righe entra nei 120px che la timebar lascia liberi sotto i 1328px |
-| Finestre strette | La mappa restava centrata | Scorre a destra quanto serve perché il pin resti a 398px | Trento è vicina al bordo sinistro: sotto i 1440px finiva sotto il pannello. L'immagine ha 240px di margine a ovest |
+| Attribuzione | — | OpenFreeMap, © OpenMapTiles, © OpenStreetMap, in basso a destra, una riga ciascuno | Obbligatoria (ODbL e licenza OpenMapTiles). Su righe brevi entra nei 120px che la timebar lascia liberi sotto i 1328px |
+| Finestre strette | La mappa restava centrata | Scorre a destra quanto serve perché il pin resti a 398px, finché l'utente non sposta la mappa | Trento è vicina al bordo sinistro: sotto i 1440px finiva sotto il pannello |
+| Puntini delle stazioni | — | Anelli bianchi con bordo scuro | La base Positron ha già puntini neri per le città: le stazioni non devono confondersi con quelli |
+| Campo dei dati | — | Sotto le etichette della mappa | I nomi dei luoghi restano leggibili sopra la pioggia |
+| Zoom | Scala visiva 1×–2× | Zoom reale da 6,5 a 11 (la vista di partenza è 8); i pulsanti ingrandiscono attorno a Trento | Oltre l'11 la rete di stazioni è troppo rada per il campo |
+| Mappa in Archive | Base desaturata | Nessun filtro | Base e dati sono nello stesso canvas e Positron è già quasi neutra; la modalità resta indicata da ModePill, Readout e Timebar |
 
 Verifica: pin a 398px e attribuzione libera da timebar, zoom e link Components a 1440×840, 1280×720, 1024×700 e 1100×1000; axe senza violazioni in Live, Archive e cambio automatico.
 
@@ -126,7 +130,8 @@ Da riportare nel file Figma, così Figma resta la fonte di verità:
 
 - **Stati hover non verificati:** RailButton e LayerItem in hover non sono stati letti da Figma (limite di chiamate del piano Starter). Sono ricavati dagli screenshot e da stimare con il designer.
 - **Larghezza minima 1100px:** il layout è progettato sul frame 1440×840; sotto i 1100px di larghezza non è progettato. Sulle finestre basse il pannello e la Rail scorrono.
-- **Zoom della mappa:** è solo una scala visiva (1×–2×), senza tile né panning.
+- **Mappa online:** stile e tile arrivano da OpenFreeMap: senza rete la mappa resta vuota (il resto funziona).
+- **Peso:** MapLibre porta il bundle a circa 390 kB compressi.
 - **Ricerca, campanella, creazione preset:** solo pulsanti, come da brief.
 - **Dati:** finti e deterministici (`scripts/build-data.mjs`). "Adesso" è fissato a giovedì 15 ottobre 2026, 13:00.
 - **Pagina `/#/qa`:** funziona solo in sviluppo, perché gli export Figma (25 MB) non vengono pubblicati.

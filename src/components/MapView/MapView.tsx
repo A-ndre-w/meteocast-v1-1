@@ -1,13 +1,16 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { Map as MlMap, type ImageSource } from 'maplibre-gl'
+import 'maplibre-gl/dist/maplibre-gl.css'
+import { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type Ref } from 'react'
 import type { Ramp } from '../../data'
-import geo from '../../data/geo.json'
+import { HOME, lngLat, STYLE, type Point } from '../../map/geo'
 import type { Mode } from '../../types'
 import { MapPin } from '../MapPin/MapPin'
 import { ValueLabel } from '../ValueLabel/ValueLabel'
 import styles from './MapView.module.css'
 
-type Point = [number, number]
 type StationValue = { name: string; pos: Point; value: number | null }
+
+export type MapViewHandle = { zoomIn: () => void; zoomOut: () => void }
 
 export type MapViewProps = {
   mode: Mode
@@ -20,26 +23,27 @@ export type MapViewProps = {
   patchy: boolean
   /** Name of the data shown, for the screen-reader list of station values. */
   layerName: string
-  /** The station network around the selected location. */
+  /** The station network around the selected location. Positions in design-frame px (src/map/geo.ts). */
   stations: StationValue[]
   /** The selected location; its value feeds the field too. */
   pin: { pos: Point; label: string; value: number | null }
-  zoom?: number
+  /** Tells the zoom control whether it can still zoom in / out. */
+  onZoomRange?: (canIn: boolean, canOut: boolean) => void
+  ref?: Ref<MapViewHandle>
 }
 
-const W = 1440
-const H = 840
-const at = ([x, y]: Point): CSSProperties => ({ left: `${(x / W) * 100}%`, top: `${(y / H) * 100}%` })
-// The frame pans to keep the pin clear of the layer panel; the base image carries geo.bleed px of map on the left.
-const frameStyle = (zoom: number, [x]: Point) => ({ '--zoom': zoom, '--focus-x': x / W, '--bleed': geo.bleed / W }) as CSSProperties
+// The selected location never lands further left than in the design frame: there it is clear of the layer panel.
+const PIN_MIN_X = 398
 
 // ---- Field: interpolated from the stations (inverse distance weighting) on a coarse grid ----
-// The grid covers the frame plus the bleed; the browser smooths it when stretching the canvas.
-const CELL = 12
-const GX = (W + geo.bleed) / CELL
-const GY = H / CELL
+// The grid is an image draped on the map between these design-frame px corners; MapLibre smooths it.
+const AREA: [Point, Point] = [[-640, -420], [2080, 1260]]
+const CELL = 16
+const GX = (AREA[1][0] - AREA[0][0]) / CELL
+const GY = (AREA[1][1] - AREA[0][1]) / CELL
+const CORNERS = [AREA[0], [AREA[1][0], AREA[0][1]], AREA[1], [AREA[0][0], AREA[1][1]]].map((p) => lngLat(p as Point)) as [Point, Point, Point, Point]
 const REACH = 220 // stations further than this from a grid point don't count
-const FADE: [number, number] = [90, 170] // the field fades out this far from the nearest station
+const FADE: Point = [90, 170] // the field fades out this far from the nearest station
 
 // Readout scale per colour family (Readout.module.css .bar): from the low end to the top.
 const scaleEnds: Record<Ramp, [string, string]> = {
@@ -59,14 +63,13 @@ function rgbaOf(token: string): [number, number, number, number] {
   return [r, g, b, a]
 }
 
-function drawField(canvas: HTMLCanvasElement, points: { pos: Point; value: number }[], ramp: Ramp, max: number, patchy: boolean) {
-  const ctx = canvas.getContext('2d')!
-  const img = ctx.createImageData(GX, GY)
+function fieldImage(points: { pos: Point; value: number }[], ramp: Ramp, max: number, patchy: boolean): ImageData {
+  const img = new ImageData(GX, GY)
   const [lo, hi] = scaleEnds[ramp].map(rgbaOf)
   for (let j = 0; j < GY; j++) {
     for (let i = 0; i < GX; i++) {
-      const x = -geo.bleed + (i + 0.5) * CELL
-      const y = (j + 0.5) * CELL
+      const x = AREA[0][0] + (i + 0.5) * CELL
+      const y = AREA[0][1] + (j + 0.5) * CELL
       let sw = 0
       let sv = 0
       let nearest = Infinity
@@ -88,7 +91,7 @@ function drawField(canvas: HTMLCanvasElement, points: { pos: Point; value: numbe
       img.data[o + 3] = (lo[3] + (hi[3] - lo[3]) * t) * fade
     }
   }
-  ctx.putImageData(img, 0, 0)
+  return img
 }
 
 // ---- Labels: one per station with a value, strongest first, skipped when it would overlap ----
@@ -100,10 +103,10 @@ const DOT_GAP = 5 // label bottom above the dot
 type Rect = [number, number, number, number]
 const overlaps = (a: Rect, b: Rect) => a[0] < b[2] + GAP && b[0] < a[2] + GAP && a[1] < b[3] + GAP && b[1] < a[3] + GAP
 
-/** Indices of the stations whose label fits, at k screen px per frame px. */
-function placeLabels(stations: StationValue[], unit: string, patchy: boolean, pin: Point, k: number): Set<number> {
+/** Indices of the stations whose label fits, given their screen positions. */
+function placeLabels(stations: StationValue[], screen: Point[], unit: string, patchy: boolean, pin: Point): Set<number> {
   // The pin (about 60 × 70 px, tip at the location) is never covered.
-  const taken: Rect[] = [[pin[0] * k - 32, pin[1] * k - 72, pin[0] * k + 32, pin[1] * k]]
+  const taken: Rect[] = [[pin[0] - 32, pin[1] - 72, pin[0] + 32, pin[1]]]
   const shown = new Set<number>()
   const order = stations
     .map((s, i) => ({ i, v: s.value }))
@@ -111,8 +114,8 @@ function placeLabels(stations: StationValue[], unit: string, patchy: boolean, pi
     .sort((a, b) => b.v - a.v)
   for (const { i, v } of order) {
     const w = `${v} ${unit}`.length * CHAR_W + 14
-    const [x, y] = stations[i].pos
-    const r: Rect = [x * k - w / 2, y * k - DOT_GAP - LABEL_H, x * k + w / 2, y * k - DOT_GAP]
+    const [x, y] = screen[i]
+    const r: Rect = [x - w / 2, y - DOT_GAP - LABEL_H, x + w / 2, y - DOT_GAP]
     if (taken.some((t) => overlaps(t, r))) continue
     taken.push(r)
     shown.add(i)
@@ -120,73 +123,149 @@ function placeLabels(stations: StationValue[], unit: string, patchy: boolean, pi
   return shown
 }
 
+const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
 /**
- * Map = base image + separate data layer (rule 11). No filter ever touches the data;
- * in Archive only the base map is slightly desaturated.
+ * Map = base map + separate data layer (rule 11). No filter ever touches the data.
+ * The base is a real vector map (MapLibre + OpenFreeMap), with real pan and zoom.
  * Data layer, in three levels of reading: the field interpolated from all stations (coloured like the Readout
- * scale), a dot for every station, and a value label where it rains, decluttered. Hovering a dot or a label
- * shows the station's name and value, zero included.
+ * scale, drawn under the place names), a dot for every station, and a value label where it rains, decluttered
+ * (zooming in reveals more). Hovering a dot or a label shows the station's name and value, zero included.
  */
-export function MapView({ mode, ramp, max, unit, patchy, layerName, stations, pin, zoom = 1 }: MapViewProps) {
-  const frameRef = useRef<HTMLDivElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const [frameW, setFrameW] = useState(W)
+export function MapView({ mode, ramp, max, unit, patchy, layerName, stations, pin, onZoomRange, ref }: MapViewProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const mapRef = useRef<MlMap | null>(null)
+  const [ready, setReady] = useState(false)
+  const [, setFrame] = useState(0) // re-render the overlay on every map move
+  const [settled, setSettled] = useState(0) // re-run label placement when the map stops
   const [hover, setHover] = useState<number | null>(null)
+  const onZoomRangeRef = useRef(onZoomRange)
+  onZoomRangeRef.current = onZoomRange
+  const pinPos = useRef(pin.pos)
+  pinPos.current = pin.pos
 
   useLayoutEffect(() => {
-    const el = frameRef.current!
-    const ro = new ResizeObserver(() => setFrameW(el.offsetWidth))
-    ro.observe(el)
-    return () => ro.disconnect()
+    const map = new MlMap({
+      container: containerRef.current!,
+      style: STYLE,
+      center: HOME.center,
+      zoom: HOME.zoom,
+      minZoom: HOME.zoom - 1.5,
+      maxZoom: HOME.zoom + 3, // beyond this the station network is too sparse for the field
+      // South-west and north-east corners: a margin of the design frame around the station network.
+      maxBounds: [lngLat([-1100, 1540]), lngLat([2540, -700])],
+      attributionControl: false,
+      dragRotate: false,
+      pitchWithRotate: false,
+      touchPitch: false,
+    })
+    map.touchZoomRotate.disableRotation()
+    mapRef.current = map
+
+    // Until the user moves the map, keep the design framing: pan right if the pin would sit under the panel.
+    let userMoved = false
+    const frame = () => {
+      if (userMoved) return
+      map.jumpTo({ center: HOME.center, zoom: HOME.zoom })
+      const x = map.project(lngLat(pinPos.current)).x
+      if (x < PIN_MIN_X) map.panBy([x - PIN_MIN_X, 0], { animate: false })
+    }
+    const report = () => onZoomRangeRef.current?.(map.getZoom() < map.getMaxZoom() - 0.01, map.getZoom() > map.getMinZoom() + 0.01)
+    map.on('dragstart', () => (userMoved = true))
+    map.on('zoomstart', (e) => {
+      if (e.originalEvent) userMoved = true
+    })
+    map.on('resize', frame)
+    map.on('move', () => setFrame((n) => n + 1))
+    map.on('moveend', () => setSettled((n) => n + 1))
+    map.on('zoomend', report)
+    map.on('load', () => {
+      frame()
+      report()
+      // The field goes under the first label layer, so place names stay readable on top of the data.
+      const firstSymbol = map.getStyle().layers.find((l) => l.type === 'symbol')?.id
+      map.addSource('field', { type: 'image', coordinates: CORNERS })
+      map.addLayer({ id: 'field', type: 'raster', source: 'field', paint: { 'raster-fade-duration': 0, 'raster-resampling': 'linear' } }, firstSymbol)
+      setReady(true)
+    })
+    return () => {
+      map.remove()
+      mapRef.current = null
+    }
   }, [])
+
+  // The zoom buttons zoom around the selected location, which stays where it is (the wheel zooms around the pointer).
+  const zoomBy = (d: number) => {
+    const map = mapRef.current
+    if (!map) return
+    const z = Math.min(map.getMaxZoom(), Math.max(map.getMinZoom(), Math.round(map.getZoom()) + d))
+    map.zoomTo(z, { around: lngLat(pinPos.current), animate: !reducedMotion() })
+  }
+  useImperativeHandle(ref, () => ({ zoomIn: () => zoomBy(1), zoomOut: () => zoomBy(-1) }))
 
   const points = useMemo(
     () => [pin, ...stations].flatMap((s) => (s.value === null ? [] : [{ pos: s.pos, value: s.value }])),
     [pin, stations],
   )
-  useEffect(() => drawField(canvasRef.current!, points, ramp, max, patchy), [points, ramp, max, patchy])
+  useEffect(() => {
+    const map = mapRef.current
+    if (!ready || !map) return
+    ;(map.getSource('field') as ImageSource).updateImage({ image: fieldImage(points, ramp, max, patchy) })
+    map.setPaintProperty('field', 'raster-opacity', patchy ? 0.9 : 0.55)
+  }, [ready, points, ramp, max, patchy])
 
-  const k = (frameW / W) * zoom
-  const labelled = useMemo(() => placeLabels(stations, unit, patchy, pin.pos, k), [stations, unit, patchy, pin.pos, k])
+  // Overlay positions follow the map on every frame; label placement is redone when the map settles.
+  const map = mapRef.current
+  const project = (p: Point): Point => {
+    if (!map) return [-100, -100]
+    const { x, y } = map.project(lngLat(p))
+    return [x, y]
+  }
+  const screen = stations.map((s) => project(s.pos))
+  const pinAt = project(pin.pos)
+  // Recomputed when the map settles (settled) or the data change, not on every frame.
+  const labelled = useMemo(() => (ready ? placeLabels(stations, screen, unit, patchy, pinAt) : new Set<number>()), [ready, settled, stations, unit, patchy])
   const listed = stations.filter((s) => s.value !== null && (!patchy || s.value > 0)).sort((a, b) => b.value! - a.value!)
   const tip = hover === null ? null : stations[hover]
+  const at = ([x, y]: Point) => ({ left: x, top: y })
 
   return (
     <div className={styles.viewport} data-mode={mode}>
-      <a className={styles.attribution} href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
-        {/* "© OpenStreetMap" / "contributors" */}
-        <span>{geo.attribution.split(' ').slice(0, -1).join(' ')}</span>
-        <span>{geo.attribution.split(' ').at(-1)}</span>
-      </a>
-      <div ref={frameRef} className={styles.frame} style={frameStyle(zoom, pin.pos)}>
-        {/* Real map (OpenStreetMap, muted) of the original product's area: Trentino – Veneto, zoom 9. */}
-        <img className={styles.base} src={`${import.meta.env.BASE_URL}basemap.webp`} alt="" draggable={false} />
-        <canvas ref={canvasRef} className={styles.field} data-patchy={patchy} width={GX} height={GY} aria-hidden="true" />
+      <div ref={containerRef} className={styles.map} />
 
-        <div aria-hidden="true" onPointerLeave={() => setHover(null)}>
+      {ready && (
+        <div className={styles.overlay} aria-hidden="true" onPointerLeave={() => setHover(null)}>
           {stations.map((s, i) => (
-            <span key={s.name} className={styles.dot} style={at(s.pos)} onPointerEnter={() => setHover(i)} />
+            <span key={s.name} className={styles.dot} style={at(screen[i])} onPointerEnter={() => setHover(i)} />
           ))}
           {stations.map((s, i) =>
             labelled.has(i) ? (
-              <span key={s.name} className={styles.label} style={at(s.pos)} onPointerEnter={() => setHover(i)}>
+              <span key={s.name} className={styles.label} style={at(screen[i])} onPointerEnter={() => setHover(i)}>
                 <ValueLabel value={s.value} unit={unit} />
               </span>
             ) : null,
           )}
+          {tip && (
+            <span className={styles.tip} style={at(screen[hover!])}>
+              <span className={styles.tipName}>{tip.name}</span>
+              <span className={styles.tipValue}>{tip.value === null ? 'No data' : `${tip.value} ${unit}`}</span>
+            </span>
+          )}
         </div>
+      )}
 
-        <span className={styles.pin} style={at(pin.pos)}>
+      {ready && (
+        <span className={styles.pin} style={at(pinAt)}>
           <MapPin label={pin.label} />
         </span>
+      )}
 
-        {tip && (
-          <span className={styles.tip} style={at(tip.pos)} aria-hidden="true">
-            <span className={styles.tipName}>{tip.name}</span>
-            <span className={styles.tipValue}>{tip.value === null ? 'No data' : `${tip.value} ${unit}`}</span>
-          </span>
-        )}
-      </div>
+      {/* Map data credits (ODbL and OpenMapTiles licences), required, one short line each. */}
+      <p className={styles.attribution}>
+        <a href="https://openfreemap.org" target="_blank" rel="noreferrer">OpenFreeMap</a>
+        <a href="https://www.openmaptiles.org/" target="_blank" rel="noreferrer">© OpenMapTiles</a>
+        <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap</a>
+      </p>
 
       {/* The same values for screen readers: stations with data, strongest first. */}
       <ul className="visually-hidden" aria-label={`${layerName} at nearby stations`}>

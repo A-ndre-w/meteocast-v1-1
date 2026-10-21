@@ -6,4 +6,6 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   base: './',
   plugins: [react()],
+  // MapLibre's map worker is an ES module (MapView imports it with ?worker&url).
+  worker: { format: 'es' },
 })

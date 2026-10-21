@@ -48,7 +48,8 @@ Poi apri http://localhost:5173. In sviluppo c'è anche `/#/qa`, il confronto con
 | `npm run contrast` | Verifica WCAG AA di ogni coppia testo/sfondo usata; fallisce sotto soglia |
 | `npm run data` | Rigenera i dati finti (`src/data/series.json`) |
 | `npm run icons` | Estrae le icone meteo dagli export Figma (`assets/32`) |
-| `node scripts/build-basemap.mjs osm --muted` | Rigenera la mappa di base da OpenStreetMap (una volta sola, tile in cache in `.cache/`) |
+| `node scripts/build-geo.mjs` | Rigenera le stazioni (`src/data/geo.json`) |
+| `node scripts/export-basemap.mjs` | Con `npm run dev` attivo: esporta la mappa di base per Figma (`design-notes/basemap-1440x840.png`) con Chrome o Edge headless |
 
 ## Pubblicazione su GitHub Pages
 
@@ -104,13 +105,13 @@ Per tre componenti il codice usa i nomi del brief (Timebar, Readout, ModePill) i
 
 La mappa è quella reale dell'area del prodotto originale (Trentino – Veneto, da Trento a Treviso), così nel portfolio il prima / dopo mostra lo stesso luogo. La località selezionata è **Trento**, dentro una rete di 88 stazioni in comuni reali.
 
-- **Fonte:** tile OpenStreetMap a zoom 9, unite una sola volta in un'immagine statica (`public/basemap.webp`) da `scripts/build-basemap.mjs`. Inquadratura ricavata dallo screenshot originale (centro 46,02° N, 12,01° E).
-- **Stile:** desaturata e schiarita (`--muted`) per non competere con il livello dati, che resta separato e mai filtrato (regola 11).
-- **Attribuzione:** "© OpenStreetMap contributors" in basso a destra, con link alla pagina del copyright (licenza ODbL).
-- **Finestre strette:** l'immagine ha 240px di mappa in più a ovest. Quando Trento finirebbe sotto il pannello livelli, la mappa scorre verso destra e il pin resta a 398px dal bordo, come nel frame Figma.
+- **Mappa vera:** [MapLibre GL](https://maplibre.org/) con le tile vettoriali di [OpenFreeMap](https://openfreemap.org/) (stile Positron: chiaro, senza chiavi né account). Pan e zoom reali, dalla vista d'insieme alla valle; i pulsanti di zoom ingrandiscono attorno a Trento. Inquadratura iniziale ricavata dallo screenshot originale (centro 46,02° N, 12,01° E).
+- **Dato sotto i nomi:** il campo dei dati è disegnato sotto le etichette della mappa, così i nomi dei luoghi restano leggibili. Base e dati restano separati e nessun filtro tocca i dati (regola 11).
+- **Attribuzione:** OpenFreeMap, © OpenMapTiles, © OpenStreetMap in basso a destra, con i link alle licenze.
+- **Finestre strette:** finché l'utente non sposta la mappa, se Trento finirebbe sotto il pannello livelli la mappa scorre verso destra e il pin resta a 398px dal bordo, come nel frame Figma.
 - **Stazioni, in tre livelli di lettura:** un puntino per ogni stazione; il valore solo dove piove (sopra 0), dal più alto, saltando le etichette che si sovrapporrebbero (zoomando ne compaiono altre); al passaggio del mouse nome e valore di qualunque stazione, zero compreso. Per i lettori di schermo c'è l'elenco delle stazioni con un valore.
 - **Campo dei dati:** interpolato dalle stazioni (media pesata sulla distanza) e colorato con la scala del Readout, quindi colore e numeri coincidono ovunque. I valori vengono da celle di pioggia che si spostano ora per ora, scalate perché a Trento il valore sia quello del Readout. Temperatura, vento e simili variano invece in modo continuo e hanno un valore in ogni stazione.
-- **Per Figma:** `design-notes/basemap-1440x840.png` è la stessa mappa nel frame 1440×840, da usare come sfondo delle schermate. Le posizioni in px delle città sono in `src/data/geo.json`.
+- **Per Figma:** `design-notes/basemap-1440x840.png` è la stessa mappa nel frame 1440×840 (esportata dalla pagina di sviluppo `/#/basemap`), da usare come sfondo delle schermate. Le posizioni in px delle stazioni nel frame sono in `src/data/geo.json`.
 
 ## Regole di comportamento
 
@@ -149,10 +150,10 @@ In più, decisi con il designer durante lo sviluppo:
 ```
 design-notes/        token.json, componenti.md (lettura Figma + decisioni)
 assets/              export Figma (schermate 4×, icone 32px, map.png originale)
-public/basemap.webp  mappa di base senza dati (OpenStreetMap, Trentino – Veneto)
 scripts/             token, icone, mappa di base, dati finti, controllo contrasto
 src/components/      un componente per cartella (TSX + CSS Module)
-src/data/            layers.json, series.json, accesso ai dati
+src/data/            layers.json, series.json, geo.json (stazioni), accesso ai dati
+src/map/             geo.ts: coordinate, vista iniziale, stile della mappa
 src/state/           rules.ts (regole), useMeteo.ts (stato), scenarios.ts (deep link)
 src/pages/           MapScreen, ComponentsPage, QaPage (solo dev)
 src/styles/          tokens.css (generato), global.css

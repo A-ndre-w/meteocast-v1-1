@@ -5,7 +5,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 
 const { groups } = JSON.parse(readFileSync('src/data/layers.json', 'utf8'))
-// Stations on the base map (scripts/build-basemap.mjs). The other stations' values are derived at runtime
+// Stations on the map (scripts/build-geo.mjs). The other stations' values are derived at runtime
 // from Trento's (src/data/index.ts, stationValues).
 const trento = JSON.parse(readFileSync('src/data/geo.json', 'utf8')).stations.find((s) => s.name === 'Trento')
 const coords = ({ lon, lat }) => `${lat.toFixed(2)}° N, ${lon.toFixed(2)}° E`
