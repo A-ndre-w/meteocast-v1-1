@@ -6,8 +6,8 @@
 }
 
 .slot {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   display: grid;
   place-items: center;
   border-radius: var(--radius-pill);

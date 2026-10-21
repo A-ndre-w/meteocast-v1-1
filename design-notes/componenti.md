@@ -170,7 +170,8 @@ Altre scelte: "adesso" simulato = Thu 15 Oct 2026 13:00; i livelli a 5 minuti si
 ## Decisioni del 2026-10-21
 
 - **Play:** parte dal pallino (non più da mezzanotte) e avanza ora per ora per 24 ore, anche oltre "adesso" nella previsione; poi torna al punto di partenza. Per i dati giornalieri, un fotogramma al giorno finché ci sono dati. Cambiare dato o gruppo mette in pausa (H14).
-- **H9, anteprima dei gruppi nella Rail:** al passaggio del mouse o al focus, l'elenco dei dati del gruppo; il clic sceglie direttamente. Tastiera: → nell'elenco, ↑/↓, Invio, ←/Esc.
+- **H9, anteprima dei gruppi nella Rail:** provata e scartata lo stesso giorno: ingombrante e ridondante con il pannello livelli. Resta il tooltip col nome del gruppo (hover e focus).
+- **Icone di modalità:** archive e forecast ridisegnate con geometria esatta (vedi DESIGN_QA).
 - **H12, icone di modalità:** archivio, live e previsione sulla riga dei metadati di ogni voce; mancanti tenui, corrente piena nel colore della modalità.
 - **H11:** layout fino a 1024 × 700 (giorni scorrevoli nella timebar, pill accanto al pannello sotto i 1280px).
 - **H15:** SectionLabel e LayerItem "disabled" restano nella libreria con il badge "Not used in the screen".

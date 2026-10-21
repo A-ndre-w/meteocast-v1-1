@@ -123,7 +123,7 @@ In più, decisi con il designer durante lo sviluppo:
 ## Accessibilità
 
 - Tastiera: gli skip link "Skip to timeline" e "Skip to layers" sono i primi due tab stop, quindi la timeline è a 2 Tab + Invio. Sulla traccia (slider ARIA) **←/→** = ore, **Shift + ←/→** o **PagUp/PagDown** = giorni, **Home/End** = 00/23. Le frecce funzionano anche sui chip dei giorni. Niente scorciatoie da una sola lettera (WCAG 2.1.4).
-- Focus visibile ovunque, con un unico stile. Sulla Rail, hover o focus su un gruppo mostra l'anteprima dei suoi dati: **→** entra nell'elenco, **↑/↓** scorre, **Invio** sceglie, **←/Esc** torna al gruppo.
+- Focus visibile ovunque, con un unico stile. I tooltip con il nome dei gruppi della Rail compaiono anche al focus.
 - Controllo vocale: ogni nome accessibile inizia con il testo visibile (WCAG 2.5.3), per esempio il chip "Tue 13" si chiama "Tue 13, Tuesday 13 October".
 - Aree cliccabili di almeno 24px, compresa la traccia della timeline (disegnata a 2px, cliccabile su 24px).
 - axe-core 4.14 senza violazioni (WCAG 2.2 AA e best practice) negli stati Live, Archive, cambio automatico e dato mancante.

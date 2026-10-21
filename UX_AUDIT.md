@@ -32,13 +32,15 @@ Still open after that round: H3, H8–H15.
 | Finding | Fix | Re-test |
 |---|---|---|
 | Play restarted at midnight (designer report) | Play starts at the cursor and runs 24 h forward, crossing "now" into the forecast, then returns to the start | From Thu 13:00: 13:00 Live → 14:00 … Fri 12:00 Forecast → back to 13:00 |
-| H9: finding data across groups | Group preview on the rail (concept B): hover or focus lists the group's data; → ↑ ↓ Enter ← Esc from the keyboard | Wind → ↓ → Enter picks "Wind gusts" directly, focus returns to the rail |
+| H9: finding data across groups | Group preview on the rail (concept B) built, then **dropped** by the designer: bulky and redundant with the layer panel. The group name tooltip (hover and focus) stays | Open: search for data in the search bar (concept C) is the remaining option |
 | H11: layout under 1280 px | Day chips scroll between the arrows; pill next to the panel without the date; min width 1024 | 0 overlaps and 0 off-screen elements at 1024×700, 1280×720, 1440×840 |
 | H12: coverage bar not intuitive | Replaced by the mode icons used by the badges (concept B), on the meta line | Present / missing / current shown for every entry |
 | H14: Play continued on data change | Changing data or group pauses Play | — |
 | H15: unused library pieces | Kept, badged "Not used in the screen" on /#/components | — |
 
-axe-core after the second round: 0 violations. Still open: H3, H8, H10, H13.
+Archive and forecast icons redrawn with exact geometry after designer feedback (they were hand-drawn and crooked); verified numerically (centred r = 8 arc, mirrored arrows, identical hands).
+
+axe-core after the second round: 0 violations. Still open: H3, H8, H9 (search), H10, H13.
 
 ## 1. Scorecard (before the fixes)
 

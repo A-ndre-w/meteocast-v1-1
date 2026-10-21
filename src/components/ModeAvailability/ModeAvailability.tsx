@@ -31,7 +31,12 @@ export function ModeAvailability({ modes, current }: ModeAvailabilityProps) {
           data-has={modes.includes(m) || undefined}
           data-current={(m === current && modes.includes(m)) || undefined}
         >
-          {m === 'live' ? <span className={styles.dot} /> : <Icon name={m === 'archive' ? 'archive' : 'forecast'} size={14} strokeWidth={2} />}
+          {m === 'live' ? (
+            <span className={styles.dot} />
+          ) : (
+            // Inside the filled disc the glyph shrinks so it keeps 3px of air on each side.
+            <Icon name={m} size={m === current && modes.includes(m) ? 12 : 14} strokeWidth={2} />
+          )}
         </span>
       ))}
     </span>

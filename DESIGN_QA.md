@@ -99,7 +99,7 @@ Da riportare nel file Figma, così Figma resta la fonte di verità:
 - **Toast:** due toni (info con Undo, warning) con conto alla rovescia visibile di 6 secondi, che si mette in pausa al passaggio del mouse o al focus.
 - **Modello gemelli:** livello real time e livello forecast con lo stesso `stream` sono un unico dato. Il Play non attraversa "adesso"; un gesto manuale sì, con Toast e Undo.
 - **ModeAvailability** nel LayerItem: le icone di ModeBadge (archivio, live, previsione) sulla riga dei metadati; mancanti tenui, quella dell'istante selezionato piena nel colore della modalità. Ha sostituito una prima CoverageBar (mini-timeline), giudicata poco intuitiva (UX audit H12).
-- **Anteprima dei gruppi nella Rail** (UX audit H9): elenco dei dati del gruppo al passaggio del mouse o al focus, scelta diretta, navigabile con le frecce.
+- **Icone archive e forecast ridisegnate** (2026-10-21): arco di raggio 8 centrato, apertura di 45°, punta della freccia sull'estremo dell'arco; forecast è lo specchio esatto di archive, con le stesse lancette. Valgono per ModeBadge, ModePill e ModeAvailability.
 - **Tooltip della Rail** con il nome del gruppo, anche da tastiera; **data della timebar** come pulsante che porta ai giorni.
 - **Toast "non incluso"** per ricerca, allarmi, localizzazione e preset.
 - **Icone UI disegnate in codice:** termometro, onde, orologio, lucchetto. Quelle meteo vengono dal set Figma 32px.

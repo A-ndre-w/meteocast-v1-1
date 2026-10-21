@@ -27,19 +27,20 @@ const uiIcons = {
   pause: <path d="M9 7.5v9M15 7.5v9" strokeWidth="2.25" />,
   'chevron-left': <path d="m14.5 6.5-5.5 5.5 5.5 5.5" />,
   'chevron-right': <path d="m9.5 6.5 5.5 5.5-5.5 5.5" />,
-  // Archive: clock turning back. Forecast: clock turning forward. Mirror images on purpose.
+  // Archive: clock turning back. Forecast: its exact mirror (x → 24 − x), same clock hands.
+  // Arc r = 8 around (12, 12), 315° long, open between 9 and 10:30; the arrow's corner sits on the arc's end.
   archive: (
     <>
-      <path d="M4 12a8 8 0 1 0 2.4-5.7" />
-      <path d="M4 4.5v3.8h3.8" />
-      <path d="M12 8v4l2.6 1.6" />
+      <path d="M4 12A8 8 0 1 0 6.343 6.343" />
+      <path d="M10.343 6.343H6.343V2.343" />
+      <path d="M12 8v4l3 1.5" />
     </>
   ),
   forecast: (
     <>
-      <path d="M20 12a8 8 0 1 1-2.4-5.7" />
-      <path d="M20 4.5v3.8h-3.8" />
-      <path d="M12 8v4l2.6 1.6" />
+      <path d="M20 12A8 8 0 1 1 17.657 6.343" />
+      <path d="M13.657 6.343H17.657V2.343" />
+      <path d="M12 8v4l3 1.5" />
     </>
   ),
   pin: (
