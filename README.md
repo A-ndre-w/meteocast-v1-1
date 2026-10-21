@@ -48,6 +48,7 @@ Poi apri http://localhost:5173. In sviluppo c'è anche `/#/qa`, il confronto con
 | `npm run contrast` | Verifica WCAG AA di ogni coppia testo/sfondo usata; fallisce sotto soglia |
 | `npm run data` | Rigenera i dati finti (`src/data/series.json`) |
 | `npm run icons` | Estrae le icone meteo dagli export Figma (`assets/32`) |
+| `node scripts/build-basemap.mjs osm --muted` | Rigenera la mappa di base da OpenStreetMap (una volta sola, tile in cache in `.cache/`) |
 
 ## Pubblicazione su GitHub Pages
 
@@ -99,6 +100,16 @@ Fonte: file Figma *UXChallenge_RadarMeteo*, pagina "🎨 Stile & Componenti". Le
 
 Per tre componenti il codice usa i nomi del brief (Timebar, Readout, ModePill) invece di quelli di Figma (Timeline, Layer Card, Map Pill). La corrispondenza è indicata nella pagina `/#/components`.
 
+## Mappa di base
+
+La mappa è quella reale dell'area del prodotto originale (Trentino – Veneto, da Trento a Treviso), così nel portfolio il prima / dopo mostra lo stesso luogo. La località selezionata è **Trento**; le etichette sulla mappa sono su Bolzano, Belluno e Bassano del Grappa.
+
+- **Fonte:** tile OpenStreetMap a zoom 9, unite una sola volta in un'immagine statica (`public/basemap.webp`) da `scripts/build-basemap.mjs`. Inquadratura ricavata dallo screenshot originale (centro 46,02° N, 12,01° E).
+- **Stile:** desaturata e schiarita (`--muted`) per non competere con il livello dati, che resta separato e mai filtrato (regola 11).
+- **Attribuzione:** "© OpenStreetMap contributors" in basso a destra, con link alla pagina del copyright (licenza ODbL).
+- **Finestre strette:** l'immagine ha 240px di mappa in più a ovest. Quando Trento finirebbe sotto il pannello livelli, la mappa scorre verso destra e il pin resta a 398px dal bordo, come nel frame Figma.
+- **Per Figma:** `design-notes/basemap-1440x840.png` è la stessa mappa nel frame 1440×840, da usare come sfondo delle schermate. Le posizioni in px delle città sono in `src/data/geo.json`.
+
 ## Regole di comportamento
 
 Tutte le regole sono funzioni pure in [src/state/rules.ts](src/state/rules.ts): (vista, intenzione) → (nuova vista, avviso).
@@ -136,8 +147,8 @@ In più, decisi con il designer durante lo sviluppo:
 ```
 design-notes/        token.json, componenti.md (lettura Figma + decisioni)
 assets/              export Figma (schermate 4×, icone 32px, map.png originale)
-public/basemap.svg   mappa di base senza dati
-scripts/             token, icone, dati finti, controllo contrasto
+public/basemap.webp  mappa di base senza dati (OpenStreetMap, Trentino – Veneto)
+scripts/             token, icone, mappa di base, dati finti, controllo contrasto
 src/components/      un componente per cartella (TSX + CSS Module)
 src/data/            layers.json, series.json, accesso ai dati
 src/state/           rules.ts (regole), useMeteo.ts (stato), scenarios.ts (deep link)

@@ -44,7 +44,7 @@ Corretti durante lo sviluppo, prima di questa revisione:
 |---|---|---|
 | Rail (segnalato dal designer) | Con finestre basse (circa 650px) il "+" usciva dalla barra | La lista dei gruppi scorre; il "+" resta sempre dentro. Alta 486px alla misura Figma |
 | Toast del gemello (segnalato dal designer) | Andando in Archive diceva "switched to the Real time layer" | Prima corretto ("switched to Archive data"), poi rimosso con il pannello a voce unica (UX audit H1) |
-| Mappa in Archive | Con il filtro di desaturazione le latitudini saltavano in alto | Il contenitore ha le dimensioni del frame |
+| Mappa in Archive | Con il filtro di desaturazione le latitudini saltavano in alto | Il contenitore ha le dimensioni del frame (latitudini poi rimosse con la mappa di Trento) |
 | SearchBar | Placeholder troncato ("…coordina") | Spaziature ridotte: il testo entra in 292px |
 | LayerItem disabled | Tooltip tagliato dallo scroll del pannello; "Go to live" saltato dal Tab | Tooltip `position: fixed` con ponte per il mouse; nascosto solo con opacità, quindi resta nell'ordine del Tab |
 | Livelli giornalieri | Un giornaliero solo real time era selezionabile in Forecast nella giornata di oggi | Oggi richiede anche la modalità; spostandosi su oggi l'ora va ad "adesso" |
@@ -59,7 +59,7 @@ Corretti durante lo sviluppo, prima di questa revisione:
 | Puntino LIVE | Verde | Grigio scuro, con pulsazione | Il verde è riservato agli allarmi. La pulsazione si ferma con `prefers-reduced-motion` |
 | Striscia superiore della Timebar | 5px | 3px | Il brief indica 3px |
 | Scala del Readout | Testo a 8px | 11px | Nessun testo sotto 11px |
-| Mappa di base | `map.png` con le macchie di pioggia nell'immagine | `basemap.svg` ridisegnata senza dati e livello dati separato | Regola 11: base e dati separati, nessun filtro sui dati. Le forme delle macchie sono approssimate e cambiano con il valore |
+| Mappa di base | `map.png` con le macchie di pioggia nell'immagine, centrata su Roma | Mappa reale OpenStreetMap del Trentino – Veneto (`basemap.webp`), senza dati, e livello dati separato | Regola 11: base e dati separati, nessun filtro sui dati. Area del prodotto originale per il prima / dopo del portfolio (vedi sotto). Le macchie sono approssimate e cambiano con il valore |
 | Etichette dei giorni | "Wed 13, Wed 14, Thu 15…" | "Tue 13, Wed 14, Thu 15…" | Il 13 ottobre 2026 è un martedì: refuso in Figma |
 | Intestazione Water & Storms | "16 LAYERS" (13 voci visibili) | "13 LAYERS" | Il conteggio riflette i livelli realmente presenti |
 | Lightning | ".ast 60 min - 5min" | "last 60 min - 5min" | Refuso |
@@ -88,6 +88,22 @@ Scostamenti da Figma introdotti di proposito dalle correzioni di [UX_REVIEW.md](
 | Regola 7 | Livello real time in Forecast: Disabled con tooltip | Selezionabile: il tempo va a Live con Toast e Undo | Le voci bloccate scoraggiavano l'utente (decisione del designer) |
 | Cornice di modalità attorno allo schermo | Presente in Archive e Forecast | Rimossa | D7: sei segnali erano troppi, e un bordo attorno allo schermo richiama gli allarmi |
 | Badge LIVE | Testo terziario | Testo secondario, puntino scuro | Si leggeva come "spento" (U8) |
+
+## Mappa di Trento (21 ottobre 2026)
+
+Decisione del designer: per il prima / dopo del portfolio la mappa deve mostrare la stessa zona del prodotto MeteoCast originale. Roma è sostituita da Trento. **Le schermate Figma vanno aggiornate** con `design-notes/basemap-1440x840.png`; finché non lo sono, la pagina `/#/qa` confronta con gli export su Roma.
+
+| Elemento | Prima (Roma) | Ora (Trento) | Nota |
+|---|---|---|---|
+| Mappa di base | SVG disegnata a mano | Tile OpenStreetMap, zoom 9, desaturate e schiarite | Inquadratura ricavata dallo screenshot originale: centro 46,02° N, 12,01° E |
+| Località | Rome, 41.90° N, 12.50° E | Trento, 46.07° N, 11.12° E | Stessi valori di Figma (4,2 mm adesso, 1,8 ieri, 6,5 domani) |
+| Etichette sulla mappa | Tre punti senza nome | Bolzano, Belluno, Bassano del Grappa | Stessi valori di Figma (2,1 / 9,1 / 4,8 mm); la cella più forte è su Belluno, come nell'originale |
+| Macchie di pioggia, neve, temperatura | Posizioni libere | Su città reali | Pioggia su Trento, Belluno e pianura veneta; neve su Bolzano e Cortina |
+| Etichette di latitudine | Solo 25°N | Rimosse | Su una mappa reale sono superflue |
+| Attribuzione | — | "© OpenStreetMap contributors", in basso a destra, su due righe | Obbligatoria (ODbL). Su due righe entra nei 120px che la timebar lascia liberi sotto i 1328px |
+| Finestre strette | La mappa restava centrata | Scorre a destra quanto serve perché il pin resti a 398px | Trento è vicina al bordo sinistro: sotto i 1440px finiva sotto il pannello. L'immagine ha 240px di margine a ovest |
+
+Verifica: pin a 398px e attribuzione libera da timebar, zoom e link Components a 1440×840, 1280×720, 1024×700 e 1100×1000; axe senza violazioni in Live, Archive e cambio automatico.
 
 ## Stati e componenti aggiunti (non presenti in Figma)
 

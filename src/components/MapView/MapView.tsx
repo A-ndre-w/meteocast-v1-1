@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react'
 import type { Ramp } from '../../data'
+import geo from '../../data/geo.json'
 import type { Mode } from '../../types'
 import { MapPin } from '../MapPin/MapPin'
 import { ValueLabel } from '../ValueLabel/ValueLabel'
@@ -21,27 +22,33 @@ export type MapViewProps = {
 const W = 1440
 const H = 840
 const at = ([x, y]: Point): CSSProperties => ({ left: `${(x / W) * 100}%`, top: `${(y / H) * 100}%` })
+// The frame pans to keep the pin clear of the layer panel; the base image carries geo.bleed px of map on the left.
+const frameStyle = (zoom: number, [x]: Point) => ({ '--zoom': zoom, '--focus-x': x / W, '--bleed': geo.bleed / W }) as CSSProperties
 
-// Blob fields per colour family, in the 1440×840 frame. Rain matches the blobs of assets/map.png.
+// Real places on the base map (scripts/build-basemap.mjs), in frame pixels.
+const place = (name: keyof typeof geo.places, dx = 0, dy = 0): Point => [geo.places[name].px[0] + dx, geo.places[name].px[1] + dy]
+
+// Blob fields per colour family, placed on real places. Rain echoes the original product screenshot:
+// heavy cell over Belluno, showers over Trento, rain toward the plain (Vicenza, Pordenone).
 const blobs: Record<Ramp, { c: Point; r: number; color: string }[]> = {
   rain: [
-    { c: [461, 310], r: 150, color: '#5F9FD3' },
-    { c: [835, 223], r: 112, color: '#4C82D4' },
-    { c: [1109, 461], r: 160, color: '#6FB9CD' },
-    { c: [245, 533], r: 90, color: '#7FC2CC' },
+    { c: place('Trento', 30, -10), r: 120, color: '#5F9FD3' },
+    { c: place('Belluno', 0, -10), r: 120, color: '#4C82D4' },
+    { c: place('Treviso', 170, -90), r: 160, color: '#6FB9CD' },
+    { c: place('Vicenza', -20, -10), r: 110, color: '#7FC2CC' },
   ],
   snow: [
-    { c: [1111, 348], r: 170, color: '#47DAFF' },
-    { c: [922, 641], r: 130, color: '#47DAFF' },
-    { c: [330, 220], r: 110, color: '#7FE4FF' },
+    { c: place('Bolzano', 30, 10), r: 170, color: '#47DAFF' },
+    { c: place('Cortina', 0, 20), r: 130, color: '#47DAFF' },
+    { c: place('Trento', -90, -130), r: 110, color: '#7FE4FF' },
   ],
   temp: [
-    { c: [520, 420], r: 300, color: '#C9A273' },
-    { c: [1040, 300], r: 240, color: '#B98B5A' },
+    { c: place('Feltre', -60, 30), r: 300, color: '#C9A273' },
+    { c: place('Treviso', 240, -250), r: 240, color: '#B98B5A' },
   ],
   neutral: [
-    { c: [600, 300], r: 260, color: '#8E8A86' },
-    { c: [1100, 520], r: 200, color: '#7D7975' },
+    { c: place('Feltre', -40, -120), r: 260, color: '#8E8A86' },
+    { c: place('Treviso', 300, -80), r: 200, color: '#7D7975' },
   ],
 }
 
@@ -56,17 +63,14 @@ export function MapView({ mode, ramp, intensity, labels, pin, zoom = 1 }: MapVie
   const k = intensity ?? 0
   return (
     <div className={styles.viewport} data-mode={mode}>
-      <div className={styles.frame} style={{ '--zoom': zoom } as CSSProperties}>
-        <img className={styles.base} src={`${import.meta.env.BASE_URL}basemap.svg`} alt="" draggable={false} />
-        <div className={styles.lat} aria-hidden="true">
-          {/* 40°, 35° and 30°N sit under the rail at x 10: only the uncovered label is drawn (UX review U14). */}
-          {[['25°N', 764]].map(([t, y]) => (
-            <span key={t} style={at([10, Number(y) - 9])}>
-              {t}
-            </span>
-          ))}
-        </div>
-
+      <a className={styles.attribution} href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">
+        {/* "© OpenStreetMap" / "contributors" */}
+        <span>{geo.attribution.split(' ').slice(0, -1).join(' ')}</span>
+        <span>{geo.attribution.split(' ').at(-1)}</span>
+      </a>
+      <div className={styles.frame} style={frameStyle(zoom, pin.pos)}>
+        {/* Real map (OpenStreetMap, muted) of the original product's area: Trentino – Veneto, zoom 9. */}
+        <img className={styles.base} src={`${import.meta.env.BASE_URL}basemap.webp`} alt="" draggable={false} />
         <svg className={styles.data} viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true" style={{ opacity: intensity === null ? 0 : Math.min(1, 0.65 + 0.5 * k) }}>
           <defs>
             {blobs[ramp].map((b, i) => (

@@ -6,7 +6,7 @@ import { ModePill } from '../components/ModePill/ModePill'
 import { Readout } from '../components/Readout/Readout'
 import { Timebar, type Speed } from '../components/Timebar/Timebar'
 import { ModeWord, Toast } from '../components/Toast/Toast'
-import { groups } from '../data'
+import { groups, location } from '../data'
 import {
   addDays,
   dayWindow,
@@ -21,7 +21,6 @@ import styles from './ComponentsPage.module.css'
 import { Specimen, Variant } from './Specimen'
 
 const days = dayWindow()
-const COORDS = '41.90° N, 12.50° E'
 const rain = { max: 20, ramp: 'rain' as const }
 const snow = { max: 100, ramp: 'snow' as const }
 
@@ -142,22 +141,22 @@ export function BigSpecimens() {
         note="“Updated HH:MM” in Live; stale states the delay; no data shows “—”, never 0 (rule 9)."
       >
         <Variant label="live · updated">
-          <Readout mode="live" location="Rome" coords={COORDS} layer="Hourly rainfall" value={4.2} unit="mm" time="13:00" scale={rain} />
+          <Readout mode="live" location={location.name} coords={location.coords} layer="Hourly rainfall" value={4.2} unit="mm" time="13:00" scale={rain} />
         </Variant>
         <Variant label="archive">
-          <Readout mode="archive" offset="−24h" location="Rome" coords={COORDS} layer="Hourly rainfall" value={1.8} unit="mm" time={fmtStamp(ARCHIVE)} scale={rain} />
+          <Readout mode="archive" offset="−24h" location={location.name} coords={location.coords} layer="Hourly rainfall" value={1.8} unit="mm" time={fmtStamp(ARCHIVE)} scale={rain} />
         </Variant>
         <Variant label="forecast">
-          <Readout mode="forecast" offset="+24h" location="Rome" coords={COORDS} layer="Hourly rainfall" value={6.5} unit="mm" time={fmtStamp(FORECAST)} scale={rain} />
+          <Readout mode="forecast" offset="+24h" location={location.name} coords={location.coords} layer="Hourly rainfall" value={6.5} unit="mm" time={fmtStamp(FORECAST)} scale={rain} />
         </Variant>
         <Variant label="forecast · snow %">
-          <Readout mode="forecast" offset="+24h" location="Rome" coords={COORDS} layer="Snow probability" value={15} unit="%" time={fmtStamp(FORECAST)} scale={snow} />
+          <Readout mode="forecast" offset="+24h" location={location.name} coords={location.coords} layer="Snow probability" value={15} unit="%" time={fmtStamp(FORECAST)} scale={snow} />
         </Variant>
         <Variant label="live · stale">
-          <Readout mode="live" location="Rome" coords={COORDS} layer="Hydrometric level" value={182} unit="cm" time="12:20" state="stale" delayMin={40} scale={{ max: 400, ramp: 'rain' }} />
+          <Readout mode="live" location={location.name} coords={location.coords} layer="Hydrometric level" value={182} unit="cm" time="12:20" state="stale" delayMin={40} scale={{ max: 400, ramp: 'rain' }} />
         </Variant>
         <Variant label="archive · noData">
-          <Readout mode="archive" offset="−26h" location="Rome" coords={COORDS} layer="Leaf wetness" value={null} unit="h" time="Wed 14 Oct, 11:00" state="noData" scale={{ max: 24, ramp: 'rain' }} />
+          <Readout mode="archive" offset="−26h" location={location.name} coords={location.coords} layer="Leaf wetness" value={null} unit="h" time="Wed 14 Oct, 11:00" state="noData" scale={{ max: 24, ramp: 'rain' }} />
         </Variant>
       </Specimen>
 

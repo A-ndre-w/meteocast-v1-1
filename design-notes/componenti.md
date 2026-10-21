@@ -169,6 +169,8 @@ Altre scelte: "adesso" simulato = Thu 15 Oct 2026 13:00; i livelli a 5 minuti si
 
 ## Decisioni del 2026-10-21
 
+- **Mappa e località:** Roma sostituita da Trento, su una mappa reale OpenStreetMap (attenuata) dell'area del prodotto originale, per il prima / dopo del portfolio. Le note qui sopra ("Rome") descrivono il Figma letto il 2026-10-19; le schermate Figma vanno aggiornate con `basemap-1440x840.png`.
+
 - **Play:** parte dal pallino (non più da mezzanotte) e avanza ora per ora per 24 ore, anche oltre "adesso" nella previsione; poi torna al punto di partenza. Per i dati giornalieri, un fotogramma al giorno finché ci sono dati. Cambiare dato o gruppo mette in pausa (H14).
 - **H9, anteprima dei gruppi nella Rail:** provata e scartata lo stesso giorno: ingombrante e ridondante con il pannello livelli. Resta il tooltip col nome del gruppo (hover e focus).
 - **Icone di modalità:** archive e forecast ridisegnate con geometria esatta (vedi DESIGN_QA).

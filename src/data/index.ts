@@ -66,7 +66,7 @@ import seriesFile from './series.json'
 type SeriesFile = {
   start: string
   location: { name: string; coords: string; pin: [number, number] }
-  mapPoints: { pos: [number, number]; factor: number }[]
+  mapPoints: { name?: string; pos: [number, number]; factor: number }[]
   series: Record<string, { decimals: number; values: (number | null)[] }>
 }
 const data = seriesFile as unknown as SeriesFile

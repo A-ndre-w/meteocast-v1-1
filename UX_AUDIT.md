@@ -74,7 +74,7 @@ KLM operators: M (think) 1.35 s · P (point) 1.1 s · B (click) 0.1 s · K (key)
 
 | # | Task | Steps, pointer | KLM est. | Keyboard only | Outcome | Smooth? |
 |---|---|---|---|---|---|---|
-| F1 | "How much is it raining in Rome now?" | 0 (Readout shows it on load) | 1.4 s | 0 | 4.2 mm, "Updated 13:00" | ✓ Immediate |
+| F1 | "How much is it raining in Trento now?" | 0 (Readout shows it on load) | 1.4 s | 0 | 4.2 mm, "Updated 13:00" | ✓ Immediate |
 | F2 | Same hour yesterday | 1 (Wed 14) | 2.6 s | 28 Tabs + Enter | Archive, 1.8 mm, three mode cues change | ✓ |
 | F3 | Tomorrow at 18:00 | 2 (Fri 16, then the track at 18) | 3.8 s | 39 Tabs + Shift+→ + 5 × → (45 keys) | Forecast 10.2 mm. **A toast fires** ("switched to Forecast data") | ~ Toast is noise (§3, H1) |
 | F4 | Snow probability on Saturday | 3 (rail Snow, Snow probability, Sat 17) | 6.3 s | 3 Tabs + Enter, 10 Tabs + Enter, ~19 Tabs + Enter (≈ 35 keys) | Auto switch to Fri 16, then Sat 17. Toast with Undo | ✓ Rule 5 works. Finding "Snow" relies on the icon or a hover (H9) |

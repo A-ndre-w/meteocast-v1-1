@@ -12,6 +12,7 @@ import { SearchBar } from '../components/SearchBar/SearchBar'
 import { SectionLabel } from '../components/SectionLabel/SectionLabel'
 import { ValueLabel } from '../components/ValueLabel/ValueLabel'
 import { ZoomControl } from '../components/ZoomControl/ZoomControl'
+import { location } from '../data'
 import { Icon, iconNames } from '../icons/Icon'
 import type { Mode } from '../types'
 import { BigSpecimens } from './BigSpecimens'
@@ -286,7 +287,7 @@ export function ComponentsPage() {
 
       <Specimen name="MapPin" figma="— (from the screens)" props="label">
         <Variant label="default" onMap>
-          <MapPin label="Rome" />
+          <MapPin label={location.name} />
         </Variant>
       </Specimen>
 
