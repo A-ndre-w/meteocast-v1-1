@@ -39,6 +39,7 @@ export type TimebarProps = {
 }
 
 const HOURS = Array.from({ length: 25 }, (_, h) => h)
+const SPEEDS: Speed[] = [1, 2, 4]
 const pct = (h: number) => `${(h / 24) * 100}%`
 
 /** Figma: Timeline (2010:10063) — named Timebar in code. One timeline for Archive, Live and Forecast. */
@@ -146,6 +147,17 @@ export function Timebar({
             </button>
           </div>
 
+          {/* One button instead of three chips: each click moves to the next speed (compact timebar, concept A). */}
+          <button
+            type="button"
+            className={styles.speed}
+            aria-label={`${speed}× speed`}
+            title="Playback speed: 1×, 2× or 4×"
+            onClick={() => onSpeedChange?.(SPEEDS[(SPEEDS.indexOf(speed) + 1) % SPEEDS.length])}
+          >
+            {speed}×
+          </button>
+
           <span className={styles.badgeSlot}>
             <ModeBadge mode={mode} offset={offset} />
           </span>
@@ -176,68 +188,47 @@ export function Timebar({
         </div>
       </div>
 
-      <div className={styles.row2}>
-        <div className={styles.speeds} role="group" aria-label="Playback speed">
-          {([1, 2, 4] as const).map((s) => (
-            <button key={s} type="button" className={styles.speed} aria-pressed={speed === s} onClick={() => onSpeedChange?.(s)}>
-              {s}x
-            </button>
-          ))}
-        </div>
-
-        <div className={styles.bottom}>
-          <p className={styles.interval}>
-            <span className={styles.intervalLabel}>Time interval:</span>
-            <span>{daily ? '1 day' : '1 hour'}</span>
-          </p>
-
-          {!daily && (
-            <div className={styles.trackWrap}>
-              <div
-                ref={trackRef}
-                className={styles.track}
-                onPointerDown={onTrackPointerDown}
-                onPointerMove={onTrackPointerMove}
-              >
-                <div className={styles.ticks} aria-hidden="true">
-                  {HOURS.map((h) => (
-                    <span key={h} className={styles.tick} style={{ left: pct(h) }} />
-                  ))}
-                </div>
-                {unavailableHours.map((h) => (
-                  <span key={h} className={styles.gap} style={{ left: pct(h), width: pct(1) }} aria-hidden="true" />
-                ))}
-                {solidTo < 24 && (
-                  <span className={styles.lineDashed} style={{ left: pct(solidTo), right: 0 }} aria-hidden="true" />
-                )}
-                {solidTo > 0 && <span className={styles.lineSolid} style={{ left: 0, width: pct(solidTo) }} aria-hidden="true" />}
-                {selected?.time === 'today' && nowHour !== undefined && (
-                  <span className={styles.now} style={{ left: pct(nowHour) }} aria-hidden="true">
-                    <span className={styles.nowTag}>Now</span>
-                  </span>
-                )}
-                <span
-                  className={styles.thumb}
-                  style={{ left: pct(selectedHour) }}
-                  role="slider"
-                  tabIndex={0}
-                  aria-label="Hour"
-                  aria-valuemin={0}
-                  aria-valuemax={23}
-                  aria-valuenow={selectedHour}
-                  aria-valuetext={valueText}
-                  aria-keyshortcuts="ArrowLeft ArrowRight Shift+ArrowLeft Shift+ArrowRight Home End"
-                />
-              </div>
-              <div className={styles.labels} aria-hidden="true">
-                {['00', '06', '12', '18', '24'].map((l) => (
-                  <span key={l}>{l}</span>
+      {!daily && (
+        <div className={styles.trackRow}>
+          <span className={styles.end} aria-hidden="true">
+            00
+          </span>
+          <div className={styles.trackWrap}>
+            <div ref={trackRef} className={styles.track} onPointerDown={onTrackPointerDown} onPointerMove={onTrackPointerMove}>
+              <div className={styles.ticks} aria-hidden="true">
+                {HOURS.map((h) => (
+                  <span key={h} className={styles.tick} data-major={h % 6 === 0 || undefined} style={{ left: pct(h) }} />
                 ))}
               </div>
+              {unavailableHours.map((h) => (
+                <span key={h} className={styles.gap} style={{ left: pct(h), width: pct(1) }} aria-hidden="true" />
+              ))}
+              {solidTo < 24 && <span className={styles.lineDashed} style={{ left: pct(solidTo), right: 0 }} aria-hidden="true" />}
+              {solidTo > 0 && <span className={styles.lineSolid} style={{ left: 0, width: pct(solidTo) }} aria-hidden="true" />}
+              {selected?.time === 'today' && nowHour !== undefined && (
+                <span className={styles.now} style={{ left: pct(nowHour) }} aria-hidden="true">
+                  <span className={styles.nowTag}>Now</span>
+                </span>
+              )}
+              <span
+                className={styles.thumb}
+                style={{ left: pct(selectedHour) }}
+                role="slider"
+                tabIndex={0}
+                aria-label="Hour"
+                aria-valuemin={0}
+                aria-valuemax={23}
+                aria-valuenow={selectedHour}
+                aria-valuetext={valueText}
+                aria-keyshortcuts="ArrowLeft ArrowRight Shift+ArrowLeft Shift+ArrowRight Home End"
+              />
             </div>
-          )}
+          </div>
+          <span className={styles.end} aria-hidden="true">
+            24
+          </span>
         </div>
-      </div>
+      )}
     </section>
   )
 }

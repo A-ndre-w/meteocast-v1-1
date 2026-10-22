@@ -87,6 +87,7 @@ Scostamenti da Figma introdotti di proposito dalle correzioni di [UX_REVIEW.md](
 | Pannello livelli | Sezioni Real time / Forecast, stesso dato due volte (13 voci) | Una voce per dato (7 voci in Water & Storms), con le icone delle modalità (`ModeAvailability`); nessuna voce bloccata | U1, decisione del designer: l'utente sceglie il dato, la timeline decide la modalità |
 | Regola 7 | Livello real time in Forecast: Disabled con tooltip | Selezionabile: il tempo va a Live con Toast e Undo | Le voci bloccate scoraggiavano l'utente (decisione del designer) |
 | Cornice di modalità attorno allo schermo | Presente in Archive e Forecast | Rimossa | D7: sei segnali erano troppi, e un bordo attorno allo schermo richiama gli allarmi |
+| Timebar compatta (22 ottobre) | Tre righe, circa 150px: controlli e giorni · chip 1x/2x/4x · "Time interval" e traccia con le ore 00/06/12/18/24 | Due righe, 84px (61 sui dati giornalieri): controlli, velocità e giorni · traccia a tutta larghezza con 00 e 24 alle estremità e tacche più lunghe ogni 6 ore | Decisione del designer (concept A): la timeline era troppo ingombrante. La velocità è un solo pulsante che passa a 1×, 2×, 4×; l'intervallo lo dicono le tacche. Pannello e Rail ora arrivano 10px sopra la timebar |
 | Badge LIVE | Testo terziario | Testo secondario, puntino scuro | Si leggeva come "spento" (U8) |
 
 ## Mappa di Trento (21 ottobre 2026)

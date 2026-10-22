@@ -13,12 +13,12 @@
   top: 14px;
 }
 
-/* Figma height 486px; on short windows it stops 13px above the timebar and its list scrolls. */
+/* Figma height 486px; on short windows it stops 10px above the timebar and its list scrolls. */
 .rail {
   position: absolute;
   left: 13px;
   top: 61px;
-  height: min(486px, calc(100% - 61px - 172px));
+  height: min(486px, calc(100% - 61px - 106px));
   display: flex;
 }
 
@@ -26,8 +26,8 @@
   position: absolute;
   left: 81px;
   top: 60px;
-  /* Ends 13px above the timebar. */
-  bottom: 172px;
+  /* Ends 10px above the timebar (compact timebar: 12px from the bottom, 84px tall). */
+  bottom: 106px;
   display: flex;
   align-items: flex-start;
 }

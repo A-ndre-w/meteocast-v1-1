@@ -1,9 +1,10 @@
 /* Mode is signalled here by: top stripe (3px) + background tint + ModeBadge text/icon. */
+/* Compact (concept A, about 90px instead of 150): controls and days on one row, the hour track on the second. */
 .root {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 22px 20px 23px;
+  gap: 12px;
+  padding: 12px 20px 14px;
   background: var(--mode-tint);
   border: 1px solid var(--mode-color);
   border-top: var(--stroke-modestripe) solid var(--mode-color);
@@ -131,68 +132,43 @@
   background: var(--border-strong);
 }
 
-.row2 {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
-
-.speeds {
-  display: flex;
-  gap: 4px;
-}
-
+/* Playback speed: one button, each click moves to the next speed. Same size and shape as the small toggles. */
 .speed {
-  min-width: var(--size-sm);
+  min-width: var(--size-md);
   height: var(--size-sm);
   padding: 0 8px;
-  border: 1px solid transparent;
   border-radius: var(--radius-lg);
   background: var(--surface-sunken);
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
   font-size: var(--font-size-sm);
   font-weight: 500;
+  font-variant-numeric: tabular-nums;
 }
 
 .speed:hover {
   color: var(--text-primary);
 }
 
-/* Choice controls share one 'selected' look with LayerItem: accent-soft fill + accent border. */
-.speed[aria-pressed='true'] {
-  background: var(--accent-soft);
-  border-color: var(--accent-default);
-  color: var(--text-primary);
-}
+/* ---- Hour track ---- */
 
-.bottom {
+/* 00 and 24 at the ends of a full-width track; the 6-hour ticks are longer, so the hours read without labels. */
+.trackRow {
   display: flex;
-  align-items: flex-end;
-  gap: 20px;
+  align-items: center;
+  gap: 10px;
 }
 
-.interval {
+.end {
   flex: none;
-  display: flex;
-  flex-direction: column;
-  width: 100px;
-  margin: 0;
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
-  color: var(--text-primary);
-  text-transform: uppercase;
-}
-
-.intervalLabel {
+  line-height: 1;
   color: var(--text-tertiary);
 }
-
-/* ---- Hour track ---- */
 
 .trackWrap {
   flex: 1;
   min-width: 0;
-  padding-top: 4px;
 }
 
 .track {
@@ -214,6 +190,12 @@
   height: 5px;
   translate: -1px 0;
   background: var(--border-default);
+}
+
+.tick[data-major] {
+  top: -2px;
+  height: 9px;
+  background: var(--border-strong);
 }
 
 .lineSolid,
@@ -283,15 +265,6 @@
 .thumb:focus-visible {
   outline: 2px solid var(--accent-strong);
   outline-offset: 2px;
-}
-
-.labels {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 2px;
-  font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
-  color: var(--text-tertiary);
 }
 
 /* WCAG 2.5.8: 24px pointer targets without changing the drawing (UX audit H7). */
