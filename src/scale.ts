@@ -19,9 +19,13 @@ export function breaksOf(max: number, unit: string, patchy: boolean): number[] {
   })
 }
 
-/** Class index 0–4 of a value; -1 when there is nothing to draw (no data, or 0 for precipitation). */
+/**
+ * Class index 0–4 of a value; -1 when there is nothing to draw: no data, or a trace of precipitation (under 40% of
+ * the first bound, 0.4 mm for rain). Without the trace threshold the interpolation between a wet and a dry station
+ * spreads a thin veil over everything; trace values stay readable on hover.
+ */
 export function classOf(value: number | null, breaks: number[], patchy: boolean): number {
-  if (value === null || (patchy && value <= 0)) return -1
+  if (value === null || (patchy && value < breaks[0] * 0.4)) return -1
   const k = breaks.findIndex((b) => value <= b)
   return k === -1 ? CLASSES - 1 : k
 }

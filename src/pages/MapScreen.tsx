@@ -6,11 +6,11 @@ import { ModePill } from '../components/ModePill/ModePill'
 import { NotificationBell } from '../components/NotificationBell/NotificationBell'
 import { Rail } from '../components/Rail/Rail'
 import { Readout } from '../components/Readout/Readout'
-import { SearchBar } from '../components/SearchBar/SearchBar'
+import { SearchBar, type SearchResult } from '../components/SearchBar/SearchBar'
 import { Timebar } from '../components/Timebar/Timebar'
 import { Toast } from '../components/Toast/Toast'
 import { ZoomControl } from '../components/ZoomControl/ZoomControl'
-import { groups, instantAvailable, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
+import { groups, instantAvailable, isPatchy, modesOfStream, streamsOf, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
 import { breaksOf } from '../scale'
 import { useMeteo } from '../state/useMeteo'
 import {
@@ -37,6 +37,16 @@ function focusFirst(...selectors: string[]) {
 }
 
 /** The prototype screen (Figma: Screens 01–03). */
+// UX audit H9: the search bar also finds data, in any group ("wind" → Wind gusts), and opens it.
+const catalogue = groups.flatMap((g) => streamsOf(g).map((s) => ({ s, g })))
+const findData = (query: string): SearchResult[] => {
+  const q = query.toLowerCase()
+  return catalogue
+    .filter(({ s, g }) => [s.name, s.meta, g.title].some((t) => t.toLowerCase().includes(q)))
+    .slice(0, 6)
+    .map(({ s, g }) => ({ id: s.id, label: s.name, detail: `${g.title} · ${modesOfStream(s).map((m) => modeLabel[m]).join(', ')}`, icon: s.icon }))
+}
+
 export function MapScreen() {
   const { state, view, layer, actions } = useMeteo()
   const { sel } = view
@@ -53,6 +63,8 @@ export function MapScreen() {
   }, [layer, sel])
   const mapRef = useRef<MapViewHandle>(null)
   const [zoomRange, setZoomRange] = useState({ canIn: true, canOut: true })
+  // UX audit H8: while focus is in the timeline, the slider and the day chips announce the new time themselves.
+  const [timelineFocus, setTimelineFocus] = useState(false)
   // Data classes shared by the map and the Readout legend (src/scale.ts).
   const breaks = useMemo(() => breaksOf(layer.scale.max, layer.unit, isPatchy(layer)), [layer])
   const pin = useMemo(() => ({ pos: location.pin, label: location.name, value }), [value])
@@ -137,7 +149,12 @@ export function MapScreen() {
       )}
 
       <div className={styles.top} data-map-obstacle>
-        <SearchBar onSearch={() => actions.notInPrototype('Search')} onLocate={() => actions.notInPrototype('Locating you')} />
+        <SearchBar
+          suggest={findData}
+          onPick={actions.selectStream}
+          onSearch={() => actions.notInPrototype('Searching places')}
+          onLocate={() => actions.notInPrototype('Locating you')}
+        />
         <NotificationBell count={3} onClick={() => actions.notInPrototype('The alerts panel')} />
       </div>
 
@@ -166,7 +183,12 @@ export function MapScreen() {
         />
       </div>
 
-      <div className={styles.timebar} data-map-obstacle>
+      <div
+        className={styles.timebar}
+        data-map-obstacle
+        onFocus={() => setTimelineFocus(true)}
+        onBlur={(e) => setTimelineFocus(e.currentTarget.contains(e.relatedTarget))}
+      >
         <Timebar
           mode={mode}
           selectedDay={sel.day}
@@ -182,6 +204,8 @@ export function MapScreen() {
           onSelectHour={actions.selectHour}
           onStepHour={actions.stepHour}
           onStepDay={actions.stepDay}
+          atStart={sel.day === days[0].day && (daily || sel.hour === 0)}
+          atEnd={sel.day === days[days.length - 1].day && (daily || sel.hour === 23)}
           onNow={actions.goNow}
           onTogglePlay={actions.togglePlay}
           onSpeedChange={actions.setSpeed}
@@ -192,8 +216,9 @@ export function MapScreen() {
         Components
       </a>
 
-      {/* Announces what the map now shows when layer, time or mode change (not on every Play frame). */}
-      <p className="visually-hidden" aria-live="polite">
+      {/* Announces what the map now shows when layer, time or mode change (not on every Play frame). Silent while
+          the timeline has focus: its controls announce the time already, once per key press (UX audit H8). */}
+      <p className="visually-hidden" aria-live={timelineFocus ? 'off' : 'polite'}>
         {!state.playing &&
           `${layer.name}, ${daily ? fmtDayMedium(sel.day) : fmtStamp(sel)}, ${modeLabel[mode]}`}
       </p>

@@ -33,6 +33,8 @@ export type Notice =
   | { type: 'movedTo'; layer: Layer; mode: Mode; undo: View }
   /** Buttons outside the v1 scope (search, alerts, presets): say so instead of doing nothing. */
   | { type: 'notInPrototype'; feature: string }
+  /** A step past the first or last day of the timeline (UX audit H3): time does not move, the toast says why. */
+  | { type: 'windowEdge'; edge: 'start' | 'end'; day: string }
 
 export type Result = { view: View; notice?: Notice }
 
@@ -58,7 +60,10 @@ const normalize = (layer: Layer, sel: TimeSel): TimeSel =>
   layer.interval === 'day' && sel.day === NOW.day ? { ...sel, hour: NOW.hour } : sel
 
 export function moveExplicit(view: View, rawTarget: TimeSel): Result {
-  if (!inWindow(rawTarget)) return { view }
+  if (!inWindow(rawTarget)) {
+    const edge = rawTarget.day < windowDays[0] ? 'start' : 'end'
+    return { view, notice: { type: 'windowEdge', edge, day: edge === 'start' ? windowDays[0] : windowDays.at(-1)! } }
+  }
   const layer = layerById(view.layerId)
   const target = normalize(layer, rawTarget)
   if (instantAvailable(layer, target)) return { view: { ...view, sel: target } }

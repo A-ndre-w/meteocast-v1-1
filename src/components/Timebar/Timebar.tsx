@@ -30,6 +30,9 @@ export type TimebarProps = {
   onStepHour?: (delta: number) => void
   /** ±1 day (Shift+arrows, PageUp/Down, arrows on daily layers). */
   onStepDay?: (delta: number) => void
+  /** First / last instant of the timeline: the ‹ › buttons are shown disabled (UX audit H3). */
+  atStart?: boolean
+  atEnd?: boolean
   onNow?: () => void
   onTogglePlay?: () => void
   onSpeedChange?: (speed: Speed) => void
@@ -54,6 +57,8 @@ export function Timebar({
   onSelectHour,
   onStepHour,
   onStepDay,
+  atStart = false,
+  atEnd = false,
   onNow,
   onTogglePlay,
   onSpeedChange,
@@ -119,7 +124,7 @@ export function Timebar({
       <div className={styles.row}>
         <div className={styles.controls}>
           <div className={styles.player}>
-            <button type="button" className={styles.stepBtn} aria-label={daily ? 'Previous day' : 'Previous hour'} onClick={() => step(-1)}>
+            <button type="button" className={styles.stepBtn} aria-label={daily ? 'Previous day' : 'Previous hour'} aria-disabled={atStart || undefined} onClick={() => step(-1)}>
               <Icon name="chevron-left" size={16} />
             </button>
             <button
@@ -136,7 +141,7 @@ export function Timebar({
             <span id={playHintId} className="visually-hidden">
               Plays the next 24 hours from the selected time, then starts again.
             </span>
-            <button type="button" className={styles.stepBtn} aria-label={daily ? 'Next day' : 'Next hour'} onClick={() => step(1)}>
+            <button type="button" className={styles.stepBtn} aria-label={daily ? 'Next day' : 'Next hour'} aria-disabled={atEnd || undefined} onClick={() => step(1)}>
               <Icon name="chevron-right" size={16} />
             </button>
           </div>

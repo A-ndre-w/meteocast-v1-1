@@ -52,8 +52,17 @@
   color: var(--text-secondary);
 }
 
+/* Not disabled: a click at the edge still shows the toast that explains where the data ends. */
 .stepBtn:hover {
   background: var(--surface-sunken);
+}
+
+.stepBtn[aria-disabled='true'] {
+  color: var(--border-strong);
+}
+
+.stepBtn[aria-disabled='true']:hover {
+  background: none;
 }
 
 .play {

@@ -88,6 +88,21 @@ export function toastFor(n: Notice): ToastContent {
           </>
         ),
       }
+    case 'windowEdge':
+      return {
+        tone: 'info',
+        mode: n.edge === 'start' ? 'archive' : 'forecast',
+        message:
+          n.edge === 'start' ? (
+            <>
+              The <ModeWord mode="archive" /> starts {fmtDayMedium(n.day)}, 00:00.
+            </>
+          ) : (
+            <>
+              The <ModeWord mode="forecast" /> ends {fmtDayMedium(n.day)}, 23:00.
+            </>
+          ),
+      }
     case 'blockedHorizon':
       return {
         tone: 'warning',

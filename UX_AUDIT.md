@@ -38,6 +38,16 @@ Still open after that round: H3, H8–H15.
 | H14: Play continued on data change | Changing data or group pauses Play | — |
 | H15: unused library pieces | Kept, badged "Not used in the screen" on /#/components | — |
 
+**Third round (22 October 2026):**
+
+| Finding | Fix | Re-test |
+|---|---|---|
+| H3: silent no-op at the window edges | At Tue 13 00:00 and Tue 20 23:00 the ‹ › button on that side is drawn disabled (`aria-disabled`, still focusable). A step past the edge, by button or arrow key, shows a toast: "The Forecast ends Tue 20 Oct, 23:00" / "The Archive starts Tue 13 Oct, 00:00" | Both edges: time does not move, button dimmed, toast shown |
+| H8: two announcements per arrow press | The page's live summary is `aria-live="off"` while focus is in the timeline: the slider (`aria-valuetext`) and the day chips announce the time themselves. Back to `polite` when focus leaves | One announcement per key press |
+| H9: finding data across groups | Concept C: the search bar is an ARIA combobox that also finds data, by name, unit or group ("wind" → Wind speed, Wind gusts), with group and modes on each suggestion. Picking one opens it, in its group, at the nearest instant with data. No match: says that searching places is not in the prototype | "wind" → 2 suggestions; ↓ ↓ Enter opens Wind gusts in the Wind group. axe: 0 violations with the list open |
+
+Still open: H10 (touch, out of the desktop scope) and H13 (to validate in testing).
+
 Archive and forecast icons redrawn with exact geometry after designer feedback (they were hand-drawn and crooked); verified numerically (centred r = 8 arc, mirrored arrows, identical hands).
 
 axe-core after the second round: 0 violations. Still open: H3, H8, H9 (search), H10, H13.

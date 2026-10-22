@@ -1,4 +1,4 @@
-import { Map as MlMap, type FilterSpecification, type ImageSource } from 'maplibre-gl'
+import { Map as MlMap, type FilterSpecification, type GeoJSONSource, type ImageSource } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type Ref } from 'react'
 import type { Ramp } from '../../data'
@@ -96,8 +96,7 @@ function fieldImage(points: { pos: Point; value: number }[], ramp: Ramp, breaks:
     return top * (1 - ty) + bottom * ty
   }
 
-  // 2. Class of every fine pixel. Precipitation below 40% of the first bound (0.4 mm for rain) is "dry": the
-  //    interpolation between a wet and a dry station would otherwise spread a thin veil over everything.
+  // 2. Class of every fine pixel (traces of precipitation are -1: not drawn).
   const FX = GX * UP
   const FY = GY * UP
   const cls = new Int8Array(FX * FY)
@@ -107,7 +106,7 @@ function fieldImage(points: { pos: Point; value: number }[], ramp: Ramp, breaks:
       const gx = (i + 0.5) / UP - 0.5
       const gy = (j + 0.5) / UP - 0.5
       const v = at(val, gx, gy)
-      cls[j * FX + i] = patchy && v < breaks[0] * 0.4 ? -1 : classOf(v, breaks, patchy)
+      cls[j * FX + i] = classOf(v, breaks, patchy)
       alpha[j * FX + i] = at(fade, gx, gy)
     }
   }
@@ -154,7 +153,7 @@ function obstacles(container: HTMLElement): Rect[] {
 }
 
 /** Indices of the stations whose label fits, given their screen positions: whole, on screen, uncovered. */
-function placeLabels(stations: StationValue[], screen: Point[], unit: string, patchy: boolean, pin: Point, container: HTMLElement): Set<number> {
+function placeLabels(stations: StationValue[], screen: Point[], unit: string, breaks: number[], patchy: boolean, pin: Point, container: HTMLElement): Set<number> {
   // The pin (about 60 × 70 px, tip at the location) and the interface are never covered.
   const taken: Rect[] = [[pin[0] - 32, pin[1] - 72, pin[0] + 32, pin[1]], ...obstacles(container)]
   const { clientWidth: vw, clientHeight: vh } = container
@@ -162,7 +161,7 @@ function placeLabels(stations: StationValue[], screen: Point[], unit: string, pa
   const shown = new Set<number>()
   const order = stations
     .map((s, i) => ({ i, v: s.value }))
-    .filter((s): s is { i: number; v: number } => s.v !== null && (!patchy || s.v > 0))
+    .filter((s): s is { i: number; v: number } => classOf(s.v, breaks, patchy) >= 0)
     .sort((a, b) => b.v - a.v)
   for (const { i, v } of order) {
     const w = `${v} ${unit}`.length * CHAR_W + 14
@@ -242,6 +241,25 @@ export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations,
       const firstSymbol = map.getStyle().layers.find((l) => l.type === 'symbol')?.id
       map.addSource('field', { type: 'image', coordinates: CORNERS })
       map.addLayer({ id: 'field', type: 'raster', source: 'field', paint: { 'raster-fade-duration': 0, 'raster-resampling': 'linear' } }, firstSymbol)
+      // Invisible boxes where the value labels are, on top of every layer: they always take their place, so the
+      // base map's place names that would end up under a label are not drawn (MapLibre's own label collision).
+      map.addSource('label-boxes', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
+      map.addLayer({
+        id: 'label-boxes',
+        type: 'symbol',
+        source: 'label-boxes',
+        layout: {
+          'text-field': ['get', 'text'],
+          'text-font': ['Noto Sans Regular'],
+          'text-size': 12,
+          'text-anchor': 'bottom',
+          'text-offset': [0, -0.5],
+          'text-padding': 6,
+          'text-allow-overlap': true,
+          'text-ignore-placement': false,
+        },
+        paint: { 'text-opacity': 0 },
+      })
       // The pin already names the selected location: the base map doesn't write it a second time underneath.
       for (const l of map.getStyle().layers) {
         if (l.type !== 'symbol' || l['source-layer'] !== 'place') continue
@@ -286,7 +304,18 @@ export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations,
   const screen = stations.map((s) => project(s.pos))
   const pinAt = project(pin.pos)
   // Recomputed when the map settles (settled) or the data change, not on every frame.
-  const labelled = useMemo(() => (ready ? placeLabels(stations, screen, unit, patchy, pinAt, containerRef.current!) : new Set<number>()), [ready, settled, stations, unit, patchy])
+  const labelled = useMemo(() => (ready ? placeLabels(stations, screen, unit, breaks, patchy, pinAt, containerRef.current!) : new Set<number>()), [ready, settled, stations, unit, breaks, patchy])
+  useEffect(() => {
+    const source = ready ? (mapRef.current?.getSource('label-boxes') as GeoJSONSource | undefined) : undefined
+    source?.setData({
+      type: 'FeatureCollection',
+      features: [...labelled].map((i) => ({
+        type: 'Feature',
+        properties: { text: `${stations[i].value} ${unit}` },
+        geometry: { type: 'Point', coordinates: lngLat(stations[i].pos) },
+      })),
+    })
+  }, [ready, labelled, stations, unit])
   const listed = stations.filter((s) => s.value !== null && (!patchy || s.value > 0)).sort((a, b) => b.value! - a.value!)
   const tip = hover === null ? null : stations[hover]
   const at = ([x, y]: Point) => ({ left: x, top: y })
