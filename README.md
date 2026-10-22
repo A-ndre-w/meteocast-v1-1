@@ -23,8 +23,7 @@ Un percorso di prova:
 2. Clicca **Snow probability**: il tempo salta a venerdì, compare il Toast. Prova **Undo**.
 3. Clicca **Mon 19**: oltre l'orizzonte della previsione, il tempo non si sposta e compare un avviso.
 4. Torna con **Back to live**, apri **Water & Storms** (resta selezionato *Hourly rainfall*) e premi **▶**: l'animazione parte da adesso, mostra le 24 ore successive di previsione e ricomincia.
-5. Nella barra di ricerca scrivi **wind**: compaiono i dati del gruppo Wind, con le modalità disponibili; **↓** e **Invio** aprono quello scelto.
-6. Da tastiera: il primo **Tab** mostra "Skip to timeline". Con **Invio** il focus va sulla traccia: **←/→** sposta di un'ora, **Shift + ←/→** di un giorno.
+5. Da tastiera: il primo **Tab** mostra "Skip to timeline". Con **Invio** il focus va sulla traccia: **←/→** sposta di un'ora, **Shift + ←/→** di un giorno.
 
 ## Avvio in locale
 

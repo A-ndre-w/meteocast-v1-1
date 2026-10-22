@@ -1,5 +1,4 @@
 .root {
-  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -63,72 +62,4 @@
 
 .locate:hover {
   background: var(--surface-sunken);
-}
-
-/* ---- Suggestions (UX audit H9): data from every group, under the bar ---- */
-
-.popup {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  right: 0;
-  z-index: 3;
-  padding: 6px;
-  background: var(--surface-raised);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-}
-
-.popup[hidden] {
-  display: none;
-}
-
-.list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.option {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: var(--size-lg);
-  padding: 6px 8px;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-}
-
-/* The active option: the same accent-soft fill as the selected layer in the panel. */
-.option[aria-selected='true'] {
-  background: var(--accent-soft);
-}
-
-.optionIcon {
-  flex: none;
-  color: var(--text-secondary);
-}
-
-.optionText {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.optionLabel {
-  font-size: var(--font-size-sm);
-  color: var(--text-primary);
-}
-
-.optionDetail {
-  font-size: var(--font-size-xs);
-  color: var(--text-secondary);
-}
-
-.empty {
-  margin: 0;
-  padding: 6px 8px;
-  font-size: var(--font-size-xs);
-  color: var(--text-secondary);
 }

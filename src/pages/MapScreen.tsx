@@ -6,11 +6,11 @@ import { ModePill } from '../components/ModePill/ModePill'
 import { NotificationBell } from '../components/NotificationBell/NotificationBell'
 import { Rail } from '../components/Rail/Rail'
 import { Readout } from '../components/Readout/Readout'
-import { SearchBar, type SearchResult } from '../components/SearchBar/SearchBar'
+import { SearchBar } from '../components/SearchBar/SearchBar'
 import { Timebar } from '../components/Timebar/Timebar'
 import { Toast } from '../components/Toast/Toast'
 import { ZoomControl } from '../components/ZoomControl/ZoomControl'
-import { groups, instantAvailable, isPatchy, modesOfStream, streamsOf, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
+import { groups, instantAvailable, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
 import { breaksOf } from '../scale'
 import { useMeteo } from '../state/useMeteo'
 import {
@@ -37,16 +37,6 @@ function focusFirst(...selectors: string[]) {
 }
 
 /** The prototype screen (Figma: Screens 01–03). */
-// UX audit H9: the search bar also finds data, in any group ("wind" → Wind gusts), and opens it.
-const catalogue = groups.flatMap((g) => streamsOf(g).map((s) => ({ s, g })))
-const findData = (query: string): SearchResult[] => {
-  const q = query.toLowerCase()
-  return catalogue
-    .filter(({ s, g }) => [s.name, s.meta, g.title].some((t) => t.toLowerCase().includes(q)))
-    .slice(0, 6)
-    .map(({ s, g }) => ({ id: s.id, label: s.name, detail: `${g.title} · ${modesOfStream(s).map((m) => modeLabel[m]).join(', ')}`, icon: s.icon }))
-}
-
 export function MapScreen() {
   const { state, view, layer, actions } = useMeteo()
   const { sel } = view
@@ -149,12 +139,7 @@ export function MapScreen() {
       )}
 
       <div className={styles.top} data-map-obstacle>
-        <SearchBar
-          suggest={findData}
-          onPick={actions.selectStream}
-          onSearch={() => actions.notInPrototype('Searching places')}
-          onLocate={() => actions.notInPrototype('Locating you')}
-        />
+        <SearchBar onSearch={() => actions.notInPrototype('Search')} onLocate={() => actions.notInPrototype('Locating you')} />
         <NotificationBell count={3} onClick={() => actions.notInPrototype('The alerts panel')} />
       </div>
 

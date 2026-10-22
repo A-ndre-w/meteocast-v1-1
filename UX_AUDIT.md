@@ -44,9 +44,9 @@ Still open after that round: H3, H8–H15.
 |---|---|---|
 | H3: silent no-op at the window edges | At Tue 13 00:00 and Tue 20 23:00 the ‹ › button on that side is drawn disabled (`aria-disabled`, still focusable). A step past the edge, by button or arrow key, shows a toast: "The Forecast ends Tue 20 Oct, 23:00" / "The Archive starts Tue 13 Oct, 00:00" | Both edges: time does not move, button dimmed, toast shown |
 | H8: two announcements per arrow press | The page's live summary is `aria-live="off"` while focus is in the timeline: the slider (`aria-valuetext`) and the day chips announce the time themselves. Back to `polite` when focus leaves | One announcement per key press |
-| H9: finding data across groups | Concept C: the search bar is an ARIA combobox that also finds data, by name, unit or group ("wind" → Wind speed, Wind gusts), with group and modes on each suggestion. Picking one opens it, in its group, at the nearest instant with data. No match: says that searching places is not in the prototype | "wind" → 2 suggestions; ↓ ↓ Enter opens Wind gusts in the Wind group. axe: 0 violations with the list open |
+| H9: finding data across groups | Concept C (data in the location search bar) built and **dropped** by the designer the same day: mixing place search and data search in one field is incoherent | Open again: another way to reach data across groups is being designed |
 
-Still open: H10 (touch, out of the desktop scope) and H13 (to validate in testing).
+Still open: H9 (another solution), H10 (touch, out of the desktop scope) and H13 (to validate in testing).
 
 Archive and forecast icons redrawn with exact geometry after designer feedback (they were hand-drawn and crooked); verified numerically (centred r = 8 arc, mirrored arrows, identical hands).
 

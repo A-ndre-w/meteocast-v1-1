@@ -112,7 +112,7 @@ Decisione del designer: per il prima / dopo del portfolio la mappa deve mostrare
 | Nomi delle città | — | Nascosti dove c'è un'etichetta di valore | Riquadri invisibili nella posizione delle etichette, sopra gli altri livelli: MapLibre non disegna i nomi che finirebbero sotto ("Belluno" sotto "22.7 mm") |
 | Valori in traccia | Etichetta su una zona senza colore (0,2 mm) | Sotto il 40% del primo limite (0,4 mm) né colore né etichetta; il valore resta al passaggio del mouse | Etichetta e colore dicono sempre la stessa cosa |
 | Mappa in Archive e Forecast | — | Uguale al Live | Decisione del designer: ModePill, Readout e Timebar danno già abbastanza segnali |
-| Ricerca | Solo luoghi (non nel prototipo) | Trova anche i dati, in tutti i gruppi (UX audit H9) | Il pannello mostra un gruppo alla volta: la ricerca porta a un dato senza sapere in che gruppo sta |
+| Ricerca | Solo luoghi (non nel prototipo) | Invariata | La ricerca dei dati nella barra dei luoghi è stata provata e tolta (decisione del designer): due ricerche diverse nello stesso campo sono incoerenti |
 | Frecce ‹ › ai bordi | Sempre attive, nessun effetto | Attenuate al primo e all'ultimo istante; un clic spiega dove finiscono i dati (UX audit H3) | Restano focalizzabili (`aria-disabled`), così il messaggio arriva anche da tastiera |
 | Puntini delle stazioni | — | Anelli bianchi con bordo scuro | La base Positron ha già puntini neri per le città: le stazioni non devono confondersi con quelli |
 | Campo dei dati | — | Sotto le etichette della mappa | I nomi dei luoghi restano leggibili sopra la pioggia |
