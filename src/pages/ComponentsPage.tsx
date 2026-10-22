@@ -291,12 +291,18 @@ export function ComponentsPage() {
         </Variant>
       </Specimen>
 
-      <Specimen name="ValueLabel" figma="Data Map Label · 2009:9669" props="value: number | null, unit" note="No data shows “—”, never “0”.">
+      <Specimen name="ValueLabel" figma="Data Map Label · 2009:9669" props="value: number | null, unit, ramp?, level?: 0–4" note="No data shows “—”, never “0”. On the map the label is filled with its data class (src/scale.ts), the colour of the field under it.">
         <Variant label="value" onMap>
           <ValueLabel value={9.1} unit="mm/h" />
         </Variant>
         <Variant label="no data" onMap>
           <ValueLabel value={null} unit="mm/h" />
+        </Variant>
+        <Variant label="rain, class 2 (1–5 mm)" onMap>
+          <ValueLabel value={2.9} unit="mm" ramp="rain" level={1} />
+        </Variant>
+        <Variant label="rain, class 5 (20+ mm)" onMap>
+          <ValueLabel value={22.7} unit="mm" ramp="rain" level={4} />
         </Variant>
       </Specimen>
 

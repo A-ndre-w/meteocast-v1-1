@@ -11,6 +11,7 @@ import { Timebar } from '../components/Timebar/Timebar'
 import { Toast } from '../components/Toast/Toast'
 import { ZoomControl } from '../components/ZoomControl/ZoomControl'
 import { groups, instantAvailable, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
+import { breaksOf } from '../scale'
 import { useMeteo } from '../state/useMeteo'
 import {
   dayWindow,
@@ -52,6 +53,8 @@ export function MapScreen() {
   }, [layer, sel])
   const mapRef = useRef<MapViewHandle>(null)
   const [zoomRange, setZoomRange] = useState({ canIn: true, canOut: true })
+  // Data classes shared by the map and the Readout legend (src/scale.ts).
+  const breaks = useMemo(() => breaksOf(layer.scale.max, layer.unit, isPatchy(layer)), [layer])
   const pin = useMemo(() => ({ pos: location.pin, label: location.name, value }), [value])
   const stale = mode === 'live' && value !== null && layer.liveDelayMin !== undefined
   const updatedAt = NOW.hour * 60 - (stale ? layer.liveDelayMin! : 0)
@@ -78,7 +81,7 @@ export function MapScreen() {
       <MapView
         mode={mode}
         ramp={layer.scale.ramp}
-        max={layer.scale.max}
+        breaks={breaks}
         unit={layer.unit}
         patchy={isPatchy(layer)}
         layerName={layer.name}
@@ -150,7 +153,7 @@ export function MapScreen() {
           time={readoutTime}
           state={value === null ? 'noData' : stale ? 'stale' : 'updated'}
           delayMin={layer.liveDelayMin}
-          scale={layer.scale}
+          scale={{ ...layer.scale, breaks }}
         />
       </div>
 

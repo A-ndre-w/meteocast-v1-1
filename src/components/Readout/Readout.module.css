@@ -105,57 +105,62 @@
   gap: 4px;
 }
 
+/* The legend: five classes, the same colours as the map (src/scale.ts). No red, orange or green: reserved for alerts. */
 .bar {
   position: relative;
+  display: flex;
+  gap: 2px;
   height: 12px;
-  border-radius: var(--radius-md);
 }
 
-.bar[data-ramp='rain'] {
-  background: linear-gradient(to right, var(--data-rain-soft), var(--data-rain));
+.band {
+  flex: 1;
 }
 
-.bar[data-ramp='snow'] {
-  background: linear-gradient(to right, var(--data-snow-soft), var(--data-snow));
+.band:first-child {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
 }
 
-/* Warm ramp without orange/red: those are reserved for alerts. */
-.bar[data-ramp='temp'] {
-  background: linear-gradient(to right, var(--data-temp-soft), var(--data-temp));
-}
-
-.bar[data-ramp='neutral'] {
-  background: linear-gradient(to right, var(--surface-sunken), var(--text-tertiary));
+.band:nth-child(5) {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
 }
 
 .root[data-state='noData'] .bar {
   opacity: 0.35;
 }
 
-/* Triangle pointing up, sitting on the bar (Figma Polygon). */
+/* Triangle pointing up, sitting on the bar (Figma Polygon). Dark on every class colour. */
 .marker {
   position: absolute;
   bottom: 1px;
   width: 16px;
   height: 13px;
   translate: -50% 0;
-  background: var(--accent-default);
+  background: var(--text-primary);
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
 }
 
-.bar[data-ramp='snow'] .marker {
-  background: var(--data-snow-strong);
-}
 
-.bar[data-ramp='temp'] .marker,
-.bar[data-ramp='neutral'] .marker {
-  background: var(--text-secondary);
-}
-
+/* A label under each class bound: the first aligned left, the others centred on the bound. */
 .ticks {
-  display: flex;
-  justify-content: space-between;
+  position: relative;
+  height: 1.3em;
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
+  line-height: 1.3;
   color: var(--text-tertiary);
+}
+
+.ticks span {
+  position: absolute;
+  translate: -50% 0;
+}
+
+.ticks span:first-child {
+  translate: 0 0;
+}
+
+/* Percentages end at 100: the last label sits at the right end. */
+.ticks[data-closed] span:last-child {
+  translate: -100% 0;
 }

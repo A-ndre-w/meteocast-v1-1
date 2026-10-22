@@ -3,6 +3,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type Ref } from 'react'
 import type { Ramp } from '../../data'
 import { HOME, lngLat, STYLE, type Point } from '../../map/geo'
+import { classOf, classVar, CLASSES } from '../../scale'
 import type { Mode } from '../../types'
 import { MapPin } from '../MapPin/MapPin'
 import { ValueLabel } from '../ValueLabel/ValueLabel'
@@ -16,8 +17,8 @@ export type MapViewProps = {
   mode: Mode
   /** Colour family of the data layer. */
   ramp: Ramp
-  /** Top of the Readout scale: a value's colour on the map is its colour on that scale. */
-  max: number
+  /** Class bounds (src/scale.ts), the same as the Readout legend: a colour always means the same amount. */
+  breaks: number[]
   unit: string
   /** Precipitation: stations reading 0 get no label and no colour. */
   patchy: boolean
@@ -45,14 +46,6 @@ const CORNERS = [AREA[0], [AREA[1][0], AREA[0][1]], AREA[1], [AREA[0][0], AREA[1
 const REACH = 220 // stations further than this from a grid point don't count
 const FADE: Point = [90, 170] // the field fades out this far from the nearest station
 
-// Readout scale per colour family (Readout.module.css .bar): from the low end to the top.
-const scaleEnds: Record<Ramp, [string, string]> = {
-  rain: ['--data-rain-soft', '--data-rain'],
-  snow: ['--data-snow-soft', '--data-snow'],
-  temp: ['--data-temp-soft', '--data-temp'],
-  neutral: ['--surface-sunken', '--text-tertiary'],
-}
-
 /** RGBA of a colour token, resolved through a 1px canvas so any CSS colour format works. */
 function rgbaOf(token: string): [number, number, number, number] {
   const css = getComputedStyle(document.documentElement).getPropertyValue(token).trim()
@@ -63,9 +56,13 @@ function rgbaOf(token: string): [number, number, number, number] {
   return [r, g, b, a]
 }
 
-function fieldImage(points: { pos: Point; value: number }[], ramp: Ramp, max: number, patchy: boolean): ImageData {
-  const img = new ImageData(GX, GY)
-  const [lo, hi] = scaleEnds[ramp].map(rgbaOf)
+const UP = 8 // classes are drawn on a grid 8× finer than the interpolation (2 px): bands with clean edges
+const EDGE = 0.82 // a class edge is drawn slightly darker, like the isolines of a weather map
+
+function fieldImage(points: { pos: Point; value: number }[], ramp: Ramp, breaks: number[], patchy: boolean): ImageData {
+  // 1. Interpolated value and fade on the coarse grid.
+  const val = new Float32Array(GX * GY)
+  const fade = new Float32Array(GX * GY)
   for (let j = 0; j < GY; j++) {
     for (let i = 0; i < GX; i++) {
       const x = AREA[0][0] + (i + 0.5) * CELL
@@ -81,14 +78,53 @@ function fieldImage(points: { pos: Point; value: number }[], ramp: Ramp, max: nu
         sw += w
         sv += w * p.value
       }
-      if (sw === 0) continue
-      const v = sv / sw
-      if (patchy && v < max * 0.02) continue
-      const t = Math.min(1, v / max)
-      const fade = Math.min(1, Math.max(0, (FADE[1] - Math.sqrt(nearest)) / (FADE[1] - FADE[0])))
-      const o = (j * GX + i) * 4
-      for (let c = 0; c < 3; c++) img.data[o + c] = lo[c] + (hi[c] - lo[c]) * t
-      img.data[o + 3] = (lo[3] + (hi[3] - lo[3]) * t) * fade
+      val[j * GX + i] = sw === 0 ? 0 : sv / sw
+      fade[j * GX + i] = Math.min(1, Math.max(0, (FADE[1] - Math.sqrt(nearest)) / (FADE[1] - FADE[0])))
+    }
+  }
+  const at = (a: Float32Array, gx: number, gy: number) => {
+    const x = Math.min(GX - 1, Math.max(0, gx))
+    const y = Math.min(GY - 1, Math.max(0, gy))
+    const x0 = Math.floor(x)
+    const y0 = Math.floor(y)
+    const x1 = Math.min(GX - 1, x0 + 1)
+    const y1 = Math.min(GY - 1, y0 + 1)
+    const tx = x - x0
+    const ty = y - y0
+    const top = a[y0 * GX + x0] * (1 - tx) + a[y0 * GX + x1] * tx
+    const bottom = a[y1 * GX + x0] * (1 - tx) + a[y1 * GX + x1] * tx
+    return top * (1 - ty) + bottom * ty
+  }
+
+  // 2. Class of every fine pixel. Precipitation below 40% of the first bound (0.4 mm for rain) is "dry": the
+  //    interpolation between a wet and a dry station would otherwise spread a thin veil over everything.
+  const FX = GX * UP
+  const FY = GY * UP
+  const cls = new Int8Array(FX * FY)
+  const alpha = new Float32Array(FX * FY)
+  for (let j = 0; j < FY; j++) {
+    for (let i = 0; i < FX; i++) {
+      const gx = (i + 0.5) / UP - 0.5
+      const gy = (j + 0.5) / UP - 0.5
+      const v = at(val, gx, gy)
+      cls[j * FX + i] = patchy && v < breaks[0] * 0.4 ? -1 : classOf(v, breaks, patchy)
+      alpha[j * FX + i] = at(fade, gx, gy)
+    }
+  }
+
+  // 3. Colours, with the class edges a shade darker.
+  const colors = Array.from({ length: CLASSES }, (_, k) => rgbaOf(classVar(ramp, k)))
+  const img = new ImageData(FX, FY)
+  for (let j = 0; j < FY; j++) {
+    for (let i = 0; i < FX; i++) {
+      const n = j * FX + i
+      const k = cls[n]
+      if (k < 0) continue
+      const edge = (i + 1 < FX && cls[n + 1] !== k) || (j + 1 < FY && cls[n + FX] !== k)
+      const c = colors[k]
+      const o = n * 4
+      for (let ch = 0; ch < 3; ch++) img.data[o + ch] = edge ? c[ch] * EDGE : c[ch]
+      img.data[o + 3] = 255 * alpha[n]
     }
   }
   return img
@@ -148,7 +184,7 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
  * scale, drawn under the place names), a dot for every station, and a value label where it rains, decluttered
  * (zooming in reveals more). Hovering a dot or a label shows the station's name and value, zero included.
  */
-export function MapView({ mode, ramp, max, unit, patchy, layerName, stations, pin, onZoomRange, ref }: MapViewProps) {
+export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations, pin, onZoomRange, ref }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MlMap | null>(null)
   const [ready, setReady] = useState(false)
@@ -236,9 +272,9 @@ export function MapView({ mode, ramp, max, unit, patchy, layerName, stations, pi
   useEffect(() => {
     const map = mapRef.current
     if (!ready || !map) return
-    ;(map.getSource('field') as ImageSource).updateImage({ image: fieldImage(points, ramp, max, patchy) })
-    map.setPaintProperty('field', 'raster-opacity', patchy ? 0.9 : 0.55)
-  }, [ready, points, ramp, max, patchy])
+    ;(map.getSource('field') as ImageSource).updateImage({ image: fieldImage(points, ramp, breaks, patchy) })
+    map.setPaintProperty('field', 'raster-opacity', patchy ? 0.8 : 0.5)
+  }, [ready, points, ramp, breaks, patchy])
 
   // Overlay positions follow the map on every frame; label placement is redone when the map settles.
   const map = mapRef.current
@@ -267,7 +303,7 @@ export function MapView({ mode, ramp, max, unit, patchy, layerName, stations, pi
           {stations.map((s, i) =>
             labelled.has(i) ? (
               <span key={s.name} className={styles.label} style={at(screen[i])} onPointerEnter={() => setHover(i)}>
-                <ValueLabel value={s.value} unit={unit} />
+                <ValueLabel value={s.value} unit={unit} ramp={ramp} level={classOf(s.value, breaks, patchy)} />
               </span>
             ) : null,
           )}

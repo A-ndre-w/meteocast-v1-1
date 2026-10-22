@@ -171,6 +171,7 @@ Altre scelte: "adesso" simulato = Thu 15 Oct 2026 13:00; i livelli a 5 minuti si
 
 - **Mappa e località:** Roma sostituita da Trento, su una mappa reale OpenStreetMap (attenuata) dell'area del prodotto originale, per il prima / dopo del portfolio. Le note qui sopra ("Rome") descrivono il Figma letto il 2026-10-19; le schermate Figma vanno aggiornate con `basemap-1440x840.png`.
 - **Mappa vera:** MapLibre con tile vettoriali chiare di OpenFreeMap (Positron), pan e zoom reali, stazioni e campo su coordinate geografiche. Sostituisce l'immagine statica OSM, che sembrava poco rifinita.
+- **Data viz a classi:** cinque classi per famiglia di colore (token `data/<ramp>-1…5`), le stesse per campo, etichette e legenda del Readout. ValueLabel ha due prop nuove, `ramp` e `level`, per il riempimento di classe.
 - **Rete di stazioni:** 88 stazioni con gerarchia (puntini per tutte, valori solo dove piove senza sovrapposizioni, nome e valore al passaggio del mouse) e campo interpolato dalle stazioni. Risponde al prima / dopo: l'originale mostrava tutte le stazioni, il prototipo solo 3–4 valori.
 
 - **Play:** parte dal pallino (non più da mezzanotte) e avanza ora per ora per 24 ore, anche oltre "adesso" nella previsione; poi torna al punto di partenza. Per i dati giornalieri, un fotogramma al giorno finché ci sono dati. Cambiare dato o gruppo mette in pausa (H14).

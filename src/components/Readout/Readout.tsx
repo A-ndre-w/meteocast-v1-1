@@ -1,5 +1,6 @@
 import type { Ramp } from '../../data'
 import { Icon } from '../../icons/Icon'
+import { breaksOf, classVar, CLASSES, legendPos } from '../../scale'
 import type { Mode } from '../../types'
 import { ModeBadge } from '../ModeBadge/ModeBadge'
 import styles from './Readout.module.css'
@@ -21,14 +22,18 @@ export type ReadoutProps = {
   state?: 'updated' | 'stale' | 'noData'
   /** Minutes late, for state "stale". */
   delayMin?: number
-  scale: { max: number; ramp: Ramp }
+  /** Legend: colour family and class bounds (src/scale.ts), the same as the map. Without breaks, rain and snow
+   * get the precipitation classes and the others equal steps. */
+  scale: { max: number; ramp: Ramp; breaks?: number[] }
 }
 
 /** Figma: Layer Card (2014:15144) — named Readout in code. Point value for the selected location. */
 export function Readout({ mode, offset, location, coords, layer, value, unit, time, state = 'updated', delayMin, scale }: ReadoutProps) {
   const noData = state === 'noData' || value === null
-  const pos = noData ? null : Math.min(1, Math.max(0, value! / scale.max))
-  const maxLabel = unit === '%' ? `${scale.max}` : `${scale.max}+`
+  const breaks = scale.breaks ?? breaksOf(scale.max, unit, scale.ramp === 'rain' || scale.ramp === 'snow')
+  const pos = noData ? null : legendPos(value!, breaks)
+  // A label under each class bound; the top class is open ("20+"), except for percentages, which end at 100.
+  const ticks = unit === '%' ? [0, ...breaks, 100] : [0, ...breaks.slice(0, -1), `${breaks.at(-1)}+`]
   const rightText = mode === 'live' && !noData ? `Updated ${time}` : time
 
   return (
@@ -78,12 +83,17 @@ export function Readout({ mode, offset, location, coords, layer, value, unit, ti
 
       <div className={styles.scale} aria-hidden="true">
         <div className={styles.bar} data-ramp={scale.ramp}>
+          {Array.from({ length: CLASSES }, (_, k) => (
+            <span key={k} className={styles.band} style={{ background: `var(${classVar(scale.ramp, k)})` }} />
+          ))}
           {pos !== null && <span className={styles.marker} style={{ left: `${pos * 100}%` }} />}
         </div>
-        <div className={styles.ticks}>
-          <span>0</span>
-          <span>{scale.max / 2}</span>
-          <span>{maxLabel}</span>
+        <div className={styles.ticks} data-closed={unit === '%' || undefined}>
+          {ticks.map((t, i) => (
+            <span key={i} style={{ left: `${(i / CLASSES) * 100}%` }}>
+              {t}
+            </span>
+          ))}
         </div>
       </div>
     </section>

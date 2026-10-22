@@ -10,3 +10,14 @@
   line-height: 1.3;
   white-space: nowrap;
 }
+
+/* Filled with its data class (same colour as the map under it). Text colour per class is contrast-checked. */
+.root[data-filled] {
+  border-color: rgb(0 0 0 / 0.12);
+  background: var(--fill);
+  color: var(--text-primary);
+}
+
+.root[data-filled='dark'] {
+  color: var(--icon-selected);
+}
