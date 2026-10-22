@@ -10,7 +10,7 @@
   --border-strong: #C7C3C1;
   --bg-canvas: #F8F6F4;
   --bg-deep: #EDEBE7;
-  --bg-forecast: #F9F8FF;
+  --bg-forecast: #F2F8F9;
   --surface-default: #FDFCF9EB;
   --surface-raised: #FFFFFF;
   --surface-sunken: #F3F1EE;
@@ -22,8 +22,8 @@
   --status-warning: #E78C08;
   --status-success: #269E5F;
   --mode-archive: #46413E;
-  --mode-forecast: #8D84FF;
-  --mode-forecast-strong: #655BDE;
+  --mode-forecast: #4F98A5;
+  --mode-forecast-strong: #1B6573;
   --data-rain: #3B7EFF;
   --data-rain-soft: #3B7EFF24;
   --data-snow: #47DAFF;
