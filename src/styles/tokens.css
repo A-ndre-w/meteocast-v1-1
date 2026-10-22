@@ -14,10 +14,10 @@
   --surface-default: #FDFCF9EB;
   --surface-raised: #FFFFFF;
   --surface-sunken: #F3F1EE;
-  --accent-default: #3B7EFF;
-  --accent-strong: #2563D8;
+  --accent-default: #00A644;
+  --accent-strong: #00782F;
   --accent-on: #FFFFFF;
-  --accent-soft: #3B7EFF24;
+  --accent-soft: #00A64424;
   --status-danger: #DB2D27;
   --status-warning: #E78C08;
   --status-success: #269E5F;
@@ -29,7 +29,7 @@
   --data-snow: #47DAFF;
   --data-snow-soft: #47DAFF24;
   --map-water: #DEE6EC;
-  --accent-on-dark: #9DBBFF;
+  --accent-on-dark: #7DDBA3;
   --data-snow-strong: #1FB8E0;
   --data-temp-soft: #F3E9D6;
   --data-temp: #9A6B3F;

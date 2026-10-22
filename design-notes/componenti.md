@@ -154,7 +154,7 @@ Altre scelte: "adesso" simulato = Thu 15 Oct 2026 13:00; i livelli a 5 minuti si
   - *scelta* (LayerItem, chip velocità): fondo `accent/soft`, bordo `accent/default`, testo `text/primary`;
   - *navigazione* (Rail): disco scuro `text/secondary`;
   - *tempo* (DayChip): colore della modalità, perché lì la modalità è il contenuto.
-  - Il blu pieno (`accent/strong`) indica solo azioni: Back to live, Undo, link.
+  - L'accent pieno (`accent/strong`) indica solo azioni: Back to live, Undo, link. Dal 2026-10-22 è il verde MeteoCast (#00A644, testo #00782F), prima era blu.
 - **Elevazione:** `shadow/sm` per gli oggetti sulla mappa (etichette, pin, cursore della traccia), `shadow/md` per pannelli, card, timebar, pill e Toast, `shadow/lg` per gli overlay. Il pin usa un `drop-shadow` per la forma.
 - **Forme:** pillola per i toggle piccoli (velocità, Back to live) e per la Rail; 10px per card, chip con testo e campi.
 - **Tipografia:** pesi 400 / 500 (controlli) / 600 (titoli) / 700 (solo numeri display e logo). Mono solo per etichette maiuscole e dati tabellari (badge, etichette sulla mappa, intervallo); date e ore in sans.
@@ -171,6 +171,7 @@ Altre scelte: "adesso" simulato = Thu 15 Oct 2026 13:00; i livelli a 5 minuti si
 
 - **Mappa e località:** Roma sostituita da Trento, su una mappa reale OpenStreetMap (attenuata) dell'area del prodotto originale, per il prima / dopo del portfolio. Le note qui sopra ("Rome") descrivono il Figma letto il 2026-10-19; le schermate Figma vanno aggiornate con `basemap-1440x840.png`.
 - **Mappa vera:** MapLibre con tile vettoriali chiare di OpenFreeMap (Positron), pan e zoom reali, stazioni e campo su coordinate geografiche. Sostituisce l'immagine statica OSM, che sembrava poco rifinita.
+- **Accent verde (2026-10-22):** torna il verde MeteoCast / RadarMeteo #00A644 come accent (testo e pulsanti pieni #00782F, AA). Il Live resta neutro. Gli allarmi usano solo giallo, arancione e rosso (modifica della regola del brief). "Now" sotto la traccia; tacche della timeline ridisegnate in un SVG allineato ai pixel.
 - **Timebar compatta (concept A, 2026-10-22):** due righe. Riga 1: ‹ ▶ ›, pulsante velocità che cicla 1× → 2× → 4×, badge, data, Back to live, giorni. Riga 2: traccia a tutta larghezza, 00 e 24 alle estremità, tacche lunghe ogni 6 ore. Tolti i tre chip della velocità e "Time interval". 84px invece di circa 150.
 - **Data viz a classi:** cinque classi per famiglia di colore (token `data/<ramp>-1…5`), le stesse per campo, etichette e legenda del Readout. ValueLabel ha due prop nuove, `ramp` e `level`, per il riempimento di classe.
 - **Rete di stazioni:** 88 stazioni con gerarchia (puntini per tutte, valori solo dove piove senza sovrapposizioni, nome e valore al passaggio del mouse) e campo interpolato dalle stazioni. Risponde al prima / dopo: l'originale mostrava tutte le stazioni, il prototipo solo 3–4 valori.

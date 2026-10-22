@@ -195,11 +195,20 @@ export function Timebar({
           </span>
           <div className={styles.trackWrap}>
             <div ref={trackRef} className={styles.track} onPointerDown={onTrackPointerDown} onPointerMove={onTrackPointerMove}>
-              <div className={styles.ticks} aria-hidden="true">
+              <svg className={styles.ticks} viewBox="0 0 24 10" preserveAspectRatio="none" aria-hidden="true">
                 {HOURS.map((h) => (
-                  <span key={h} className={styles.tick} data-major={h % 6 === 0 || undefined} style={{ left: pct(h) }} />
+                  <line
+                    key={h}
+                    className={styles.tick}
+                    data-major={h % 6 === 0 || undefined}
+                    x1={h}
+                    x2={h}
+                    y1={h % 6 === 0 ? 1 : 3}
+                    y2={h % 6 === 0 ? 9 : 7}
+                    vectorEffect="non-scaling-stroke"
+                  />
                 ))}
-              </div>
+              </svg>
               {unavailableHours.map((h) => (
                 <span key={h} className={styles.gap} style={{ left: pct(h), width: pct(1) }} aria-hidden="true" />
               ))}

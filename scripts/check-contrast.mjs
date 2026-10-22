@@ -50,6 +50,8 @@ const pairs = [
   ['mode/forecast-strong', 'surface/raised', 4.5, '"Forecast" word in toast'],
   ['text/primary', 'accent/soft', 4.5, 'selected layer label and speed chip (accent-soft fill)'],
   ['status/danger', 'surface/raised', 3, 'bell icon (non-text, 3:1)'],
+  ['accent/on-dark', 'text/primary', 4.5, 'link on the dark tooltip'],
+  ['accent/default', 'surface/raised', 3, 'selected border, focus, pin (non-text, 3:1)'],
   // Value labels on the map, filled with their data class: dark text on classes 1–3, white on 4–5.
   ...['rain', 'snow', 'temp', 'neutral'].flatMap((r) =>
     [1, 2, 3, 4, 5].map((k) => [k <= 3 ? 'text/primary' : 'icon/selected', `data/${r}-${k}`, 4.5, `value label, ${r} class ${k}`]),
@@ -58,7 +60,7 @@ const pairs = [
   ['mode/forecast', 'bg/forecast', 3, 'INFO forecast stripe (supplementary, mode also in text)', true],
   // Reference only: the original Figma pairings that failed AA.
   ['icon/selected', 'mode/forecast', 4.5, 'REFERENCE Figma badge (replaced)', true],
-  ['accent/default', 'surface/raised', 4.5, 'REFERENCE Figma link colour (replaced)', true],
+  ['accent/default', 'surface/raised', 4.5, 'REFERENCE brand green #00A644 as text: not used for text, accent/strong is', true],
 ]
 
 let failed = 0

@@ -54,7 +54,7 @@ Corretti durante lo sviluppo, prima di questa revisione:
 | Elemento | Figma | Codice | Motivo |
 |---|---|---|---|
 | Badge FORECAST, chip selezionato in Forecast, parola "Forecast" nei Toast | `#8D84FF` con testo bianco (3,05:1) | `mode/forecast-strong #655BDE` (5,1:1) | Contrasto WCAG AA (decisione condivisa). Striscia, bordi e tinte restano `#8D84FF` |
-| "Back to live", "Undo", "Now" attivo, "Cast" nel logo | `#3B7EFF` (3,74:1 su bianco) | `accent/strong #2563D8` (5,4:1) | Contrasto AA |
+| "Back to live", "Undo", "Now" attivo, "Cast" nel logo | `#3B7EFF` (3,74:1 su bianco) | `accent/strong`: prima #2563D8 (5,4:1), dal 22 ottobre il verde #00782F (5,6:1) | Contrasto AA. Vedi "Accent verde" |
 | DayChip selezionato | Grigio neutro `#5B5B5B` | Colore della modalità (neutro in Live) | Regola 3 del brief (decisione condivisa) |
 | Puntino LIVE | Verde | Grigio scuro, con pulsazione | Il verde è riservato agli allarmi. La pulsazione si ferma con `prefers-reduced-motion` |
 | Striscia superiore della Timebar | 5px | 3px | Il brief indica 3px |
@@ -88,6 +88,9 @@ Scostamenti da Figma introdotti di proposito dalle correzioni di [UX_REVIEW.md](
 | Regola 7 | Livello real time in Forecast: Disabled con tooltip | Selezionabile: il tempo va a Live con Toast e Undo | Le voci bloccate scoraggiavano l'utente (decisione del designer) |
 | Cornice di modalità attorno allo schermo | Presente in Archive e Forecast | Rimossa | D7: sei segnali erano troppi, e un bordo attorno allo schermo richiama gli allarmi |
 | Timebar compatta (22 ottobre) | Tre righe, circa 150px: controlli e giorni · chip 1x/2x/4x · "Time interval" e traccia con le ore 00/06/12/18/24 | Due righe, 84px (61 sui dati giornalieri): controlli, velocità e giorni · traccia a tutta larghezza con 00 e 24 alle estremità e tacche più lunghe ogni 6 ore | Decisione del designer (concept A): la timeline era troppo ingombrante. La velocità è un solo pulsante che passa a 1×, 2×, 4×; l'intervallo lo dicono le tacche. Pannello e Rail ora arrivano 10px sopra la timebar |
+| Accent verde (22 ottobre) | Blu `#3B7EFF` | Verde MeteoCast / RadarMeteo `#00A644` per bordi, focus, pin e riempimenti senza testo; `#00782F` per testo e pulsanti pieni (5,6:1); `accent/soft` al 14% | Decisione del designer: torna il colore del prodotto originale. Il Live resta neutro (stato di partenza; Archive e Forecast sono le deviazioni e hanno un colore). La regola del brief cambia: gli allarmi usano solo giallo, arancione e rosso, il verde è del brand. Il blu resta solo alla pioggia |
+| "Now" nella timeline | Sopra la traccia | Sotto la traccia | Sopra urtava i chip dei giorni (segnalato dal designer) |
+| Tacche della timeline | Rettangoli di 2px in posizioni frazionarie | Un SVG con linee da 1px allineate ai pixel, tutte centrate sulla linea | Alcune tacche si sfocavano su due pixel e quelle delle 6 ore non avevano lo stesso centro: sembravano storte (segnalato dal designer) |
 | Badge LIVE | Testo terziario | Testo secondario, puntino scuro | Si leggeva come "spento" (U8) |
 
 ## Mappa di Trento (21 ottobre 2026)

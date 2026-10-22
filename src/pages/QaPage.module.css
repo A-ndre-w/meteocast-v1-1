@@ -15,7 +15,7 @@
 }
 
 .bar a {
-  color: #9dbbff;
+  color: var(--accent-on-dark);
 }
 
 .bar code {
