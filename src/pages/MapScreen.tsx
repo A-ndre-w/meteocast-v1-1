@@ -90,11 +90,11 @@ export function MapScreen() {
 
       <h1 className="visually-hidden">MeteoCast</h1>
 
-      <div className={styles.logo}>
+      <div className={styles.logo} data-map-obstacle>
         <Logo />
       </div>
 
-      <div className={styles.rail}>
+      <div className={styles.rail} data-map-obstacle>
         <Rail
           groups={groups}
           selectedGroupId={view.groupId}
@@ -103,7 +103,7 @@ export function MapScreen() {
         />
       </div>
 
-      <div className={styles.panel}>
+      <div className={styles.panel} data-map-obstacle>
         <LayerPanel
           group={group}
           selectedStreamId={layer.stream}
@@ -114,7 +114,7 @@ export function MapScreen() {
       </div>
 
       {/* Rule 2: the ModePill is one of the three mode signals; hidden in Live. */}
-      <div className={styles.pill}>
+      <div className={styles.pill} data-map-obstacle>
         <ModePill mode={mode} time={fmtStamp(sel)} relative={fmtOffset(sel)} onBackToLive={actions.goNow} />
       </div>
 
@@ -133,12 +133,12 @@ export function MapScreen() {
         </div>
       )}
 
-      <div className={styles.top}>
+      <div className={styles.top} data-map-obstacle>
         <SearchBar onSearch={() => actions.notInPrototype('Search')} onLocate={() => actions.notInPrototype('Locating you')} />
         <NotificationBell count={3} onClick={() => actions.notInPrototype('The alerts panel')} />
       </div>
 
-      <div className={styles.readout}>
+      <div className={styles.readout} data-map-obstacle>
         <Readout
           mode={mode}
           offset={fmtOffset(sel)}
@@ -154,7 +154,7 @@ export function MapScreen() {
         />
       </div>
 
-      <div className={styles.zoom}>
+      <div className={styles.zoom} data-map-obstacle>
         <ZoomControl
           onZoomIn={() => mapRef.current?.zoomIn()}
           onZoomOut={() => mapRef.current?.zoomOut()}
@@ -163,7 +163,7 @@ export function MapScreen() {
         />
       </div>
 
-      <div className={styles.timebar}>
+      <div className={styles.timebar} data-map-obstacle>
         <Timebar
           mode={mode}
           selectedDay={sel.day}
@@ -185,7 +185,7 @@ export function MapScreen() {
         />
       </div>
 
-      <a className={styles.componentsLink} href="#/components">
+      <a className={styles.componentsLink} href="#/components" data-map-obstacle>
         Components
       </a>
 

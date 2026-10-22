@@ -49,6 +49,7 @@ Poi apri http://localhost:5173. In sviluppo c'è anche `/#/qa`, il confronto con
 | `npm run data` | Rigenera i dati finti (`src/data/series.json`) |
 | `npm run icons` | Estrae le icone meteo dagli export Figma (`assets/32`) |
 | `node scripts/build-geo.mjs` | Rigenera le stazioni (`src/data/geo.json`) |
+| `node scripts/capture.mjs [scenario]` | Con `npm run dev` attivo: screenshot per il portfolio, di default 1440×751 a 2× (le proporzioni dello screenshot originale, 1082×564, e la stessa area di mappa) in `design-notes/` |
 | `node scripts/export-basemap.mjs` | Con `npm run dev` attivo: esporta la mappa di base per Figma (`design-notes/basemap-1440x840.png`) con Chrome o Edge headless |
 
 ## Pubblicazione su GitHub Pages

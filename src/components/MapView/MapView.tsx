@@ -1,4 +1,4 @@
-import { Map as MlMap, type ImageSource } from 'maplibre-gl'
+import { Map as MlMap, type FilterSpecification, type ImageSource } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type Ref } from 'react'
 import type { Ramp } from '../../data'
@@ -103,10 +103,26 @@ const DOT_GAP = 5 // label bottom above the dot
 type Rect = [number, number, number, number]
 const overlaps = (a: Rect, b: Rect) => a[0] < b[2] + GAP && b[0] < a[2] + GAP && a[1] < b[3] + GAP && b[1] < a[3] + GAP
 
-/** Indices of the stations whose label fits, given their screen positions. */
-function placeLabels(stations: StationValue[], screen: Point[], unit: string, patchy: boolean, pin: Point): Set<number> {
-  // The pin (about 60 × 70 px, tip at the location) is never covered.
-  const taken: Rect[] = [[pin[0] - 32, pin[1] - 72, pin[0] + 32, pin[1]]]
+/**
+ * The interface floating over the map, in map px: the children of every element marked data-map-obstacle, or the
+ * element itself when it has none (layer panel, Rail, Readout, timebar, search, zoom…). A label partly hidden
+ * under them reads as a glitch.
+ */
+function obstacles(container: HTMLElement): Rect[] {
+  const box = container.getBoundingClientRect()
+  return [...document.querySelectorAll('[data-map-obstacle]')]
+    .flatMap((el) => (el.children.length ? [...el.children] : [el]))
+    .map((c) => c.getBoundingClientRect())
+    .filter((r) => r.width > 0 && r.height > 0)
+    .map((r) => [r.left - box.left, r.top - box.top, r.right - box.left, r.bottom - box.top])
+}
+
+/** Indices of the stations whose label fits, given their screen positions: whole, on screen, uncovered. */
+function placeLabels(stations: StationValue[], screen: Point[], unit: string, patchy: boolean, pin: Point, container: HTMLElement): Set<number> {
+  // The pin (about 60 × 70 px, tip at the location) and the interface are never covered.
+  const taken: Rect[] = [[pin[0] - 32, pin[1] - 72, pin[0] + 32, pin[1]], ...obstacles(container)]
+  const { clientWidth: vw, clientHeight: vh } = container
+  const onScreen = (r: Rect) => r[0] >= GAP && r[1] >= GAP && r[2] <= vw - GAP && r[3] <= vh - GAP
   const shown = new Set<number>()
   const order = stations
     .map((s, i) => ({ i, v: s.value }))
@@ -116,7 +132,7 @@ function placeLabels(stations: StationValue[], screen: Point[], unit: string, pa
     const w = `${v} ${unit}`.length * CHAR_W + 14
     const [x, y] = screen[i]
     const r: Rect = [x - w / 2, y - DOT_GAP - LABEL_H, x + w / 2, y - DOT_GAP]
-    if (taken.some((t) => overlaps(t, r))) continue
+    if (!onScreen(r) || taken.some((t) => overlaps(t, r))) continue
     taken.push(r)
     shown.add(i)
   }
@@ -143,6 +159,7 @@ export function MapView({ mode, ramp, max, unit, patchy, layerName, stations, pi
   onZoomRangeRef.current = onZoomRange
   const pinPos = useRef(pin.pos)
   pinPos.current = pin.pos
+  const pinLabel = useRef(pin.label)
 
   useLayoutEffect(() => {
     const map = new MlMap({
@@ -175,7 +192,10 @@ export function MapView({ mode, ramp, max, unit, patchy, layerName, stations, pi
     map.on('zoomstart', (e) => {
       if (e.originalEvent) userMoved = true
     })
-    map.on('resize', frame)
+    map.on('resize', () => {
+      frame()
+      setSettled((n) => n + 1)
+    })
     map.on('move', () => setFrame((n) => n + 1))
     map.on('moveend', () => setSettled((n) => n + 1))
     map.on('zoomend', report)
@@ -186,6 +206,12 @@ export function MapView({ mode, ramp, max, unit, patchy, layerName, stations, pi
       const firstSymbol = map.getStyle().layers.find((l) => l.type === 'symbol')?.id
       map.addSource('field', { type: 'image', coordinates: CORNERS })
       map.addLayer({ id: 'field', type: 'raster', source: 'field', paint: { 'raster-fade-duration': 0, 'raster-resampling': 'linear' } }, firstSymbol)
+      // The pin already names the selected location: the base map doesn't write it a second time underneath.
+      for (const l of map.getStyle().layers) {
+        if (l.type !== 'symbol' || l['source-layer'] !== 'place') continue
+        const own = ['!=', ['get', 'name'], pinLabel.current]
+        map.setFilter(l.id, (l.filter ? ['all', l.filter, own] : own) as FilterSpecification)
+      }
       setReady(true)
     })
     return () => {
@@ -224,7 +250,7 @@ export function MapView({ mode, ramp, max, unit, patchy, layerName, stations, pi
   const screen = stations.map((s) => project(s.pos))
   const pinAt = project(pin.pos)
   // Recomputed when the map settles (settled) or the data change, not on every frame.
-  const labelled = useMemo(() => (ready ? placeLabels(stations, screen, unit, patchy, pinAt) : new Set<number>()), [ready, settled, stations, unit, patchy])
+  const labelled = useMemo(() => (ready ? placeLabels(stations, screen, unit, patchy, pinAt, containerRef.current!) : new Set<number>()), [ready, settled, stations, unit, patchy])
   const listed = stations.filter((s) => s.value !== null && (!patchy || s.value > 0)).sort((a, b) => b.value! - a.value!)
   const tip = hover === null ? null : stations[hover]
   const at = ([x, y]: Point) => ({ left: x, top: y })
@@ -261,7 +287,7 @@ export function MapView({ mode, ramp, max, unit, patchy, layerName, stations, pi
       )}
 
       {/* Map data credits (ODbL and OpenMapTiles licences), required, one short line each. */}
-      <p className={styles.attribution}>
+      <p className={styles.attribution} data-map-obstacle>
         <a href="https://openfreemap.org" target="_blank" rel="noreferrer">OpenFreeMap</a>
         <a href="https://www.openmaptiles.org/" target="_blank" rel="noreferrer">© OpenMapTiles</a>
         <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap</a>

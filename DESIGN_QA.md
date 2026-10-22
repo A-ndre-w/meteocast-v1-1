@@ -104,6 +104,8 @@ Decisione del designer: per il prima / dopo del portfolio la mappa deve mostrare
 | Etichette di latitudine | Solo 25°N | Rimosse | Su una mappa reale sono superflue |
 | Attribuzione | — | OpenFreeMap, © OpenMapTiles, © OpenStreetMap, in basso a destra, una riga ciascuno | Obbligatoria (ODbL e licenza OpenMapTiles). Su righe brevi entra nei 120px che la timebar lascia liberi sotto i 1328px |
 | Finestre strette | La mappa restava centrata | Scorre a destra quanto serve perché il pin resti a 398px, finché l'utente non sposta la mappa | Trento è vicina al bordo sinistro: sotto i 1440px finiva sotto il pannello |
+| Etichette e interfaccia | — | Un valore compare solo se è intero, dentro lo schermo e non coperto da pannello, Rail, Readout, timebar, ricerca, zoom | Un'etichetta mezza nascosta sotto un pannello sembrava un errore (segnalato dal designer a 1082×564) |
+| Nome della località | Pin con etichetta | Il nome "Trento" della mappa di base è nascosto | Sotto il pin si leggeva "Tr⊙nto": il pin lo nomina già |
 | Puntini delle stazioni | — | Anelli bianchi con bordo scuro | La base Positron ha già puntini neri per le città: le stazioni non devono confondersi con quelli |
 | Campo dei dati | — | Sotto le etichette della mappa | I nomi dei luoghi restano leggibili sopra la pioggia |
 | Zoom | Scala visiva 1×–2× | Zoom reale da 6,5 a 11 (la vista di partenza è 8); i pulsanti ingrandiscono attorno a Trento | Oltre l'11 la rete di stazioni è troppo rada per il campo |
