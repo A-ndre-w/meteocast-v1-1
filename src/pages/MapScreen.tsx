@@ -67,14 +67,6 @@ export function MapScreen() {
   // Data classes shared by the map and the Readout legend (src/scale.ts).
   const breaks = useMemo(() => breaksOf(layer.scale.max, layer.unit, isPatchy(layer)), [layer])
   const stale = mode === 'live' && value !== null && layer.liveDelayMin !== undefined
-  // The card: the instant the value refers to (late live data: the reading's time) and how fresh it is.
-  const readingAt = NOW.hour * 60 - (stale ? layer.liveDelayMin! : 0)
-  const readoutTime =
-    mode === 'live'
-      ? `${fmtDayMedium(sel.day)}, ${pad2(Math.floor(readingAt / 60))}:${pad2(readingAt % 60)}`
-      : daily
-        ? fmtDayMedium(sel.day)
-        : fmtStamp(sel)
   // Live: the last reading. Archive: when the hour (or the day) closed and was validated. Forecast: the last model
   // run, every 6 hours (00, 06, 12, 18).
   const updatedMinutes =
@@ -124,7 +116,6 @@ export function MapScreen() {
             layer={layer.name}
             value={value}
             unit={layer.unit}
-            time={readoutTime}
             updated={fmtAgo(updatedMinutes)}
             updatedHint={updatedHint}
             state={value === null ? 'noData' : stale ? 'stale' : 'updated'}

@@ -13,8 +13,6 @@ export type ReadoutProps = {
   /** null with state "noData". */
   value: number | null
   unit: string
-  /** The instant the value refers to, e.g. "Wed 14 Oct, 13:00" (the reading's time for late live data). */
-  time: string
   /** How fresh the value is, relative: "just now", "40 min ago", "23 h ago". Hidden with no data. */
   updated?: string
   /** What "updated" means for this mode (last reading, validation, model run): the tooltip of "Updated". */
@@ -31,9 +29,10 @@ export type ReadoutProps = {
 
 /**
  * Figma: Layer Card (2014:15144) — named Readout in code. Value at the selected point, in a compact card that
- * sits by the pin on the map. The scale moved to its own Legend, fixed at the top right.
+ * sits by the pin on the map. The scale moved to its own Legend, fixed at the top right. No date: the timeline
+ * shows it, and here it competed with the value (designer review).
  */
-export function Readout({ mode, location, coords, layer, value, unit, time, updated, updatedHint, state = 'updated', swatch, onClose, onLocate }: ReadoutProps) {
+export function Readout({ mode, location, coords, layer, value, unit, updated, updatedHint, state = 'updated', swatch, onClose, onLocate }: ReadoutProps) {
   const noData = state === 'noData' || value === null
 
   return (
@@ -87,8 +86,6 @@ export function Readout({ mode, location, coords, layer, value, unit, time, upda
             </p>
           )}
         </div>
-        {/* The instant of the value, right under it: followed while scrubbing the timeline or playing. */}
-        <p className={styles.time}>{time}</p>
         {noData && (
           <p className={styles.notice}>
             <Icon name="info" size={14} />
