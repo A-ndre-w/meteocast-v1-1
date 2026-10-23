@@ -13,6 +13,9 @@ export type ReadoutProps = {
   /** null with state "noData". */
   value: number | null
   unit: string
+  /** The instant of the value, short ("Fri 16, 16:00"): a quiet context line after the layer name, so the value
+   *  can be read with its time without looking down at the timeline. */
+  time?: string
   /** How fresh the value is, relative: "just now", "40 min ago", "23 h ago". Hidden with no data. */
   updated?: string
   /** What "updated" means for this mode (last reading, validation, model run): the tooltip of "Updated". */
@@ -29,10 +32,10 @@ export type ReadoutProps = {
 
 /**
  * Figma: Layer Card (2014:15144) — named Readout in code. Value at the selected point, in a compact card that
- * sits by the pin on the map. The scale moved to its own Legend, fixed at the top right. No date: the timeline
- * shows it, and here it competed with the value (designer review).
+ * sits by the pin on the map. The scale moved to its own Legend, fixed at the top right. The date is only a quiet
+ * context line beside the layer name: in bold under the value it competed with it (designer review).
  */
-export function Readout({ mode, location, coords, layer, value, unit, updated, updatedHint, state = 'updated', swatch, onClose, onLocate }: ReadoutProps) {
+export function Readout({ mode, location, coords, layer, value, unit, time, updated, updatedHint, state = 'updated', swatch, onClose, onLocate }: ReadoutProps) {
   const noData = state === 'noData' || value === null
 
   return (
@@ -60,7 +63,10 @@ export function Readout({ mode, location, coords, layer, value, unit, updated, u
       </header>
 
       <div className={styles.body}>
-        <h2 className={styles.layer}>{layer}</h2>
+        <h2 className={styles.layer}>
+          {layer}
+          {time && <span className={styles.when}> · {time}</span>}
+        </h2>
         <div className={styles.valueRow}>
           <p className={styles.value}>
             {swatch && !noData && swatch.level >= 0 && (

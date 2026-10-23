@@ -74,6 +74,11 @@
   text-transform: uppercase;
 }
 
+/* The date of the value: same quiet mono line as the layer name, no weight of its own. */
+.when {
+  white-space: nowrap;
+}
+
 .valueRow {
   display: flex;
   flex-wrap: wrap;

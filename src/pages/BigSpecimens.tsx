@@ -142,7 +142,7 @@ export function BigSpecimens() {
         note="Compact card by the pin on the map. How fresh the value is beside it (“Updated 40 min ago”); the date is on the timeline; stale shows a clock; no data shows “—”, never 0 (rule 9). The swatch is the value’s data class; the locate button appears when the card is docked because its point is off screen."
       >
         <Variant label="live · updated">
-          <Readout mode="live" location={location.name} coords={location.coords} layer="Hourly rainfall" value={4.2} unit="mm" updated="just now" swatch={{ ramp: 'rain', level: 1 }} onClose={() => {}} />
+          <Readout mode="live" location={location.name} coords={location.coords} layer="Hourly rainfall" value={4.2} unit="mm" time="Thu 15, 13:00" updated="just now" swatch={{ ramp: 'rain', level: 1 }} onClose={() => {}} />
         </Variant>
         <Variant label="archive">
           <Readout mode="archive" location={location.name} coords={location.coords} layer="Hourly rainfall" value={1.8} unit="mm" updated="23 h ago" swatch={{ ramp: 'rain', level: 1 }} />
@@ -230,7 +230,7 @@ export function BigSpecimens() {
       >
         <Variant label="Water & Storms · live">
           <div style={{ height: 520, display: 'flex' }}>
-            <LayerPanel group={water} selectedStreamId="water/hourly-rainfall" cursor="live" />
+            <LayerPanel group={water} selectedStreamId="water/hourly-rainfall" />
           </div>
         </Variant>
         <Variant label="Snow · forecast (Fri 16)">
@@ -238,7 +238,6 @@ export function BigSpecimens() {
             <LayerPanel
               group={snowGroup}
               selectedStreamId="snow/snow-probability"
-              cursor="forecast"
               isAvailable={(st) => st.layers.some((l) => l.modes.includes('forecast'))}
             />
           </div>
@@ -250,6 +249,7 @@ export function BigSpecimens() {
         figma="— (code addition, UX review H12)"
         props="modes: Mode[], current: Mode"
         note="The ModeBadge icons in timeline order: present = secondary, missing = faint, the selected instant's mode filled with its colour."
+        unused="Removed from the layer panel on 2026-10-24 after testing: superfluous, the timeline shows where each data has values."
       >
         {([
           [['archive', 'live', 'forecast'], 'live', 'all modes · now'],

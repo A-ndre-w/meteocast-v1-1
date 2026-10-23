@@ -19,6 +19,8 @@ import {
   dayWindow,
   fmtAgo,
   fmtDayMedium,
+  fmtDayShort,
+  fmtHour,
   fmtOffset,
   fmtStamp,
   hoursBetween,
@@ -69,6 +71,14 @@ export function MapScreen() {
   const stale = mode === 'live' && value !== null && layer.liveDelayMin !== undefined
   // Live: the last reading. Archive: when the hour (or the day) closed and was validated. Forecast: the last model
   // run, every 6 hours (00, 06, 12, 18).
+  // The card's quiet date line: the instant of the value, short (late live data: the reading's time).
+  const readingAt = NOW.hour * 60 - (stale ? layer.liveDelayMin! : 0)
+  const cardTime =
+    mode === 'live'
+      ? `${fmtDayShort(sel.day)}, ${pad2(Math.floor(readingAt / 60))}:${pad2(readingAt % 60)}`
+      : daily
+        ? fmtDayShort(sel.day)
+        : `${fmtDayShort(sel.day)}, ${fmtHour(sel.hour)}`
   const updatedMinutes =
     mode === 'live'
       ? stale
@@ -116,6 +126,7 @@ export function MapScreen() {
             layer={layer.name}
             value={value}
             unit={layer.unit}
+            time={cardTime}
             updated={fmtAgo(updatedMinutes)}
             updatedHint={updatedHint}
             state={value === null ? 'noData' : stale ? 'stale' : 'updated'}
@@ -147,7 +158,6 @@ export function MapScreen() {
         <LayerPanel
           group={group}
           selectedStreamId={layer.stream}
-          cursor={mode}
           isAvailable={(s) => s.layers.some((l) => instantAvailable(l, sel))}
           onSelect={actions.selectStream}
         />

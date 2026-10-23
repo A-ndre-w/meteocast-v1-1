@@ -262,6 +262,24 @@
   transition: left 0.12s ease;
 }
 
+/* The hour on the thumb while the time moves: where the eye is when dragging or watching Play. */
+.thumbLabel {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  z-index: 1;
+  translate: -50% 0;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  background: var(--text-primary);
+  color: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 .thumb:focus-visible {
   outline: 2px solid var(--accent-strong);
   outline-offset: 2px;

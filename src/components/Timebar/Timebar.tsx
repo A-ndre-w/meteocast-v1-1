@@ -1,6 +1,6 @@
-import { useEffect, useId, useRef, type KeyboardEvent, type PointerEvent } from 'react'
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
 import { Icon } from '../../icons/Icon'
-import { fmtDayLong, fmtDayMedium, fmtHour } from '../../time'
+import { fmtDayLong, fmtDayMedium, fmtDayShort, fmtHour } from '../../time'
 import { modeLabel, type Mode } from '../../types'
 import { DayStrip, type DayStripDay } from '../DayStrip/DayStrip'
 import { LiveViewButton } from '../LiveViewButton/LiveViewButton'
@@ -68,6 +68,9 @@ export function Timebar({
   const playHintId = useId()
   const dateHintId = useId()
   const trackRef = useRef<HTMLDivElement>(null)
+  // The hour label on the thumb shows while the time moves: dragging, keys on the slider, Play.
+  const [scrubbing, setScrubbing] = useState(false)
+  const [sliderFocus, setSliderFocus] = useState(false)
   const daily = interval === 'day'
   const selected = days.find((d) => d.day === selectedDay)
   // Rule 3: observed data = solid, forecast = dashed.
@@ -80,6 +83,7 @@ export function Timebar({
 
   const onTrackPointerDown = (e: PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId)
+    setScrubbing(true)
     onSelectHour?.(hourFromPointer(e))
     trackRef.current?.querySelector<HTMLElement>('[role="slider"]')?.focus()
   }
@@ -194,7 +198,14 @@ export function Timebar({
             00
           </span>
           <div className={styles.trackWrap}>
-            <div ref={trackRef} className={styles.track} onPointerDown={onTrackPointerDown} onPointerMove={onTrackPointerMove}>
+            <div
+              ref={trackRef}
+              className={styles.track}
+              onPointerDown={onTrackPointerDown}
+              onPointerMove={onTrackPointerMove}
+              onPointerUp={() => setScrubbing(false)}
+              onPointerCancel={() => setScrubbing(false)}
+            >
               <svg className={styles.ticks} viewBox="0 0 24 10" preserveAspectRatio="none" aria-hidden="true">
                 {HOURS.map((h) => (
                   <line
@@ -219,8 +230,15 @@ export function Timebar({
                   <span className={styles.nowTag}>Now</span>
                 </span>
               )}
+              {(scrubbing || sliderFocus || playing) && (
+                <span className={styles.thumbLabel} style={{ left: pct(selectedHour) }} aria-hidden="true">
+                  {fmtDayShort(selectedDay)} · {fmtHour(selectedHour)}
+                </span>
+              )}
               <span
                 className={styles.thumb}
+                onFocus={() => setSliderFocus(true)}
+                onBlur={() => setSliderFocus(false)}
                 style={{ left: pct(selectedHour) }}
                 role="slider"
                 tabIndex={0}
