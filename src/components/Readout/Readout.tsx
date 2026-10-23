@@ -13,12 +13,14 @@ export type ReadoutProps = {
   /** null with state "noData". */
   value: number | null
   unit: string
-  /** Live: update time "13:00". Archive/Forecast: data time "Wed 14 Oct, 13:00". */
+  /** The instant the value refers to, e.g. "Wed 14 Oct, 13:00" (the reading's time for late live data). */
   time: string
+  /** How fresh the value is, relative: "just now", "40 min ago", "23 h ago". Hidden with no data. */
+  updated?: string
+  /** What "updated" means for this mode (last reading, validation, model run): the tooltip of "Updated". */
+  updatedHint?: string
   /** Rule 9: updated = fresh live value; stale = late, with explicit delay; noData = "—", never 0. */
   state?: 'updated' | 'stale' | 'noData'
-  /** Minutes late, for state "stale". */
-  delayMin?: number
   /** The value's data class: a swatch of the same colour as the map and the legend. */
   swatch?: { ramp: Ramp; level: number }
   /** Close the card: the pin goes too, and the map shows only the legend until another station is clicked. */
@@ -31,9 +33,8 @@ export type ReadoutProps = {
  * Figma: Layer Card (2014:15144) — named Readout in code. Value at the selected point, in a compact card that
  * sits by the pin on the map. The scale moved to its own Legend, fixed at the top right.
  */
-export function Readout({ mode, location, coords, layer, value, unit, time, state = 'updated', delayMin, swatch, onClose, onLocate }: ReadoutProps) {
+export function Readout({ mode, location, coords, layer, value, unit, time, updated, updatedHint, state = 'updated', swatch, onClose, onLocate }: ReadoutProps) {
   const noData = state === 'noData' || value === null
-  const rightText = mode === 'live' && !noData ? `Updated ${time}` : time
 
   return (
     <section className={styles.root} data-mode={mode} data-state={noData ? 'noData' : state} aria-label={`${layer} at ${location}`}>
@@ -78,14 +79,16 @@ export function Readout({ mode, location, coords, layer, value, unit, time, stat
               </>
             )}
           </p>
-          <p className={styles.time}>{rightText}</p>
+          {updated && !noData && (
+            <p className={styles.updated} title={updatedHint}>
+              {/* Late live data (rule 9): the delay is the "Updated" text itself, marked with a clock. */}
+              {state === 'stale' && <Icon name="clock" size={13} />}
+              Updated {updated}
+            </p>
+          )}
         </div>
-        {state === 'stale' && !noData && (
-          <p className={styles.notice}>
-            <Icon name="clock" size={14} />
-            Data {delayMin ?? '?'} min late
-          </p>
-        )}
+        {/* The instant of the value, right under it: followed while scrubbing the timeline or playing. */}
+        <p className={styles.time}>{time}</p>
         {noData && (
           <p className={styles.notice}>
             <Icon name="info" size={14} />

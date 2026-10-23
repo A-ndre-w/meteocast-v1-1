@@ -3,7 +3,10 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-  width: 248px;
+  /* Grows with long values ("30.7 mm") instead of letting them out of the card. */
+  width: max-content;
+  min-width: 248px;
+  max-width: 320px;
   padding: 10px 12px 12px 14px;
   background: var(--surface-raised);
   border: 1px solid var(--border-default);
@@ -73,9 +76,10 @@
 
 .valueRow {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
   justify-content: space-between;
-  gap: 10px;
+  column-gap: 16px;
 }
 
 .value {
@@ -110,11 +114,22 @@
 
 /* When the value is followed through the timeline or Play, the time is half of the answer: second only to it. */
 .time {
-  margin: 0;
+  margin: 2px 0 0;
   font-size: var(--font-size-md);
-  font-weight: 500;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
   color: var(--text-primary);
+  white-space: nowrap;
+}
+
+/* How fresh the value is: small, beside the value. */
+.updated {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
   white-space: nowrap;
 }
 
@@ -127,7 +142,7 @@
   color: var(--text-secondary);
 }
 
-.root[data-state='stale'] .time {
+.root[data-state='stale'] .updated {
   text-decoration: underline dotted var(--border-strong);
   text-underline-offset: 3px;
 }

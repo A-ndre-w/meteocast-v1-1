@@ -15,13 +15,17 @@ import { coordsOf, groups, instantAvailable, isPatchy, location, stations, stati
 import { breaksOf, classOf } from '../scale'
 import { useMeteo } from '../state/useMeteo'
 import {
+  addDays,
   dayWindow,
+  fmtAgo,
   fmtDayMedium,
   fmtOffset,
   fmtStamp,
+  hoursBetween,
   modeOf,
   NOW,
   pad2,
+  shiftHours,
 } from '../time'
 import { modeLabel } from '../types'
 import styles from './MapScreen.module.css'
@@ -63,9 +67,26 @@ export function MapScreen() {
   // Data classes shared by the map and the Readout legend (src/scale.ts).
   const breaks = useMemo(() => breaksOf(layer.scale.max, layer.unit, isPatchy(layer)), [layer])
   const stale = mode === 'live' && value !== null && layer.liveDelayMin !== undefined
-  const updatedAt = NOW.hour * 60 - (stale ? layer.liveDelayMin! : 0)
+  // The card: the instant the value refers to (late live data: the reading's time) and how fresh it is.
+  const readingAt = NOW.hour * 60 - (stale ? layer.liveDelayMin! : 0)
   const readoutTime =
-    mode === 'live' ? `${pad2(Math.floor(updatedAt / 60))}:${pad2(updatedAt % 60)}` : daily ? fmtDayMedium(sel.day) : fmtStamp(sel)
+    mode === 'live'
+      ? `${fmtDayMedium(sel.day)}, ${pad2(Math.floor(readingAt / 60))}:${pad2(readingAt % 60)}`
+      : daily
+        ? fmtDayMedium(sel.day)
+        : fmtStamp(sel)
+  // Live: the last reading. Archive: when the hour (or the day) closed and was validated. Forecast: the last model
+  // run, every 6 hours (00, 06, 12, 18).
+  const updatedMinutes =
+    mode === 'live'
+      ? stale
+        ? layer.liveDelayMin!
+        : 0
+      : mode === 'archive'
+        ? 60 * hoursBetween(NOW, daily ? { day: addDays(sel.day, 1), hour: 0 } : shiftHours(sel, 1))
+        : 60 * (NOW.hour % 6)
+  const updatedHint =
+    mode === 'live' ? 'Last reading of the station' : mode === 'archive' ? 'When this value was recorded' : `Forecast model run at ${pad2(NOW.hour - (NOW.hour % 6))}:00`
 
   // Rule 8: what the stream (layer + twin) can show on the timeline.
   const unavailableHours = Array.from({ length: 24 }, (_, h) => h).filter((h) => !streamInstantAvailable(layer, { day: sel.day, hour: h }))
@@ -104,8 +125,9 @@ export function MapScreen() {
             value={value}
             unit={layer.unit}
             time={readoutTime}
+            updated={fmtAgo(updatedMinutes)}
+            updatedHint={updatedHint}
             state={value === null ? 'noData' : stale ? 'stale' : 'updated'}
-            delayMin={layer.liveDelayMin}
             swatch={{ ramp: layer.scale.ramp, level: classOf(value, breaks, isPatchy(layer)) }}
             onClose={() => setSelected(null)}
             onLocate={docked ? locate : undefined}

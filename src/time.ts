@@ -55,6 +55,14 @@ export const fmtDayLong = (day: string) => {
 /** The one absolute format used everywhere: "Wed 14 Oct, 13:00". */
 export const fmtStamp = (sel: TimeSel) => `${fmtDayMedium(sel.day)}, ${fmtHour(sel.hour)}`
 
+/** How long ago something happened, for "Updated …": "just now", "5 min ago", "23 h ago", "3 days ago". */
+export function fmtAgo(minutes: number): string {
+  if (minutes < 1) return 'just now'
+  if (minutes < 60) return `${Math.round(minutes)} min ago`
+  if (minutes < 48 * 60) return `${Math.round(minutes / 60)} h ago`
+  return `${Math.round(minutes / 1440)} days ago`
+}
+
 /** The one relative format used everywhere: "−24h", "+5h", "+3d" (days from 48h on). True minus sign. */
 export function fmtOffset(sel: TimeSel, now: TimeSel = NOW): string {
   const h = hoursBetween(sel, now)

@@ -138,23 +138,23 @@ export function BigSpecimens() {
       <Specimen
         name="Readout"
         figma="Layer Card · 2014:15144"
-        props="mode, location, coords, layer, value, unit, time, state: 'updated' | 'stale' | 'noData', delayMin, swatch, onClose, onLocate"
-        note="Compact card by the pin on the map. “Updated HH:MM” in Live; stale states the delay; no data shows “—”, never 0 (rule 9). The swatch is the value’s data class; the locate button appears when the card is docked because its point is off screen."
+        props="mode, location, coords, layer, value, unit, time, state: 'updated' | 'stale' | 'noData', updated, updatedHint, swatch, onClose, onLocate"
+        note="Compact card by the pin on the map. The instant of the value under it, how fresh it is (“Updated 40 min ago”) beside it; stale shows a clock; no data shows “—”, never 0 (rule 9). The swatch is the value’s data class; the locate button appears when the card is docked because its point is off screen."
       >
         <Variant label="live · updated">
-          <Readout mode="live" location={location.name} coords={location.coords} layer="Hourly rainfall" value={4.2} unit="mm" time="13:00" swatch={{ ramp: 'rain', level: 1 }} onClose={() => {}} />
+          <Readout mode="live" location={location.name} coords={location.coords} layer="Hourly rainfall" value={4.2} unit="mm" time="Thu 15 Oct, 13:00" updated="just now" swatch={{ ramp: 'rain', level: 1 }} onClose={() => {}} />
         </Variant>
         <Variant label="archive">
-          <Readout mode="archive" location={location.name} coords={location.coords} layer="Hourly rainfall" value={1.8} unit="mm" time={fmtStamp(ARCHIVE)} swatch={{ ramp: 'rain', level: 1 }} />
+          <Readout mode="archive" location={location.name} coords={location.coords} layer="Hourly rainfall" value={1.8} unit="mm" time={fmtStamp(ARCHIVE)} updated="23 h ago" swatch={{ ramp: 'rain', level: 1 }} />
         </Variant>
         <Variant label="forecast">
-          <Readout mode="forecast" location={location.name} coords={location.coords} layer="Hourly rainfall" value={6.5} unit="mm" time={fmtStamp(FORECAST)} swatch={{ ramp: 'rain', level: 2 }} onLocate={() => {}} />
+          <Readout mode="forecast" location={location.name} coords={location.coords} layer="Hourly rainfall" value={6.5} unit="mm" time={fmtStamp(FORECAST)} updated="1 h ago" swatch={{ ramp: 'rain', level: 2 }} onLocate={() => {}} />
         </Variant>
         <Variant label="forecast · snow %">
-          <Readout mode="forecast" location={location.name} coords={location.coords} layer="Snow probability" value={15} unit="%" time={fmtStamp(FORECAST)} swatch={{ ramp: 'snow', level: 1 }} />
+          <Readout mode="forecast" location={location.name} coords={location.coords} layer="Snow probability" value={15} unit="%" time={fmtStamp(FORECAST)} updated="1 h ago" swatch={{ ramp: 'snow', level: 1 }} />
         </Variant>
         <Variant label="live · stale">
-          <Readout mode="live" location={location.name} coords={location.coords} layer="Hydrometric level" value={182} unit="cm" time="12:20" state="stale" delayMin={40} />
+          <Readout mode="live" location={location.name} coords={location.coords} layer="Hydrometric level" value={182} unit="cm" time="Thu 15 Oct, 12:20" updated="40 min ago" state="stale" />
         </Variant>
         <Variant label="archive · noData">
           <Readout mode="archive" location={location.name} coords={location.coords} layer="Leaf wetness" value={null} unit="h" time="Wed 14 Oct, 11:00" state="noData" />
