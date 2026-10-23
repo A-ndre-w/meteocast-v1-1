@@ -108,11 +108,13 @@
   color: var(--text-secondary);
 }
 
+/* When the value is followed through the timeline or Play, the time is half of the answer: second only to it. */
 .time {
   margin: 0;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   white-space: nowrap;
 }
 

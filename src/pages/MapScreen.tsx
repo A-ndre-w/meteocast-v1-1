@@ -45,13 +45,9 @@ export function MapScreen() {
   const group = groups.find((g) => g.id === view.groupId)!
   const daily = layer.interval === 'day' // rule 6
 
-  // The selected point: any station of the network, Trento by default. Its card sits by the pin.
-  const [selected, setSelected] = useState(location.name)
-  const [cardOpen, setCardOpen] = useState(true)
-  const selectStation = (name: string) => {
-    setSelected(name)
-    setCardOpen(true)
-  }
+  // The selected point: any station of the network, Trento at the start. Its card sits by the pin. null = nothing
+  // pinned: closing the card or clicking the map away from the stations leaves only the legend.
+  const [selected, setSelected] = useState<string | null>(location.name)
   // Every station with its value at the selected instant (Trento's from its own series). Memoised: the map
   // redraws its field only when the data or the instant change.
   const network = useMemo(() => {
@@ -97,13 +93,13 @@ export function MapScreen() {
         layerName={layer.name}
         stations={network}
         selected={selected}
-        onSelect={selectStation}
-        cardOpen={cardOpen}
+        onSelect={setSelected}
+        onClear={() => setSelected(null)}
         card={(docked, locate) => (
           <Readout
             mode={mode}
-            location={selected}
-            coords={coordsOf(selected)}
+            location={selected!}
+            coords={coordsOf(selected!)}
             layer={layer.name}
             value={value}
             unit={layer.unit}
@@ -111,7 +107,7 @@ export function MapScreen() {
             state={value === null ? 'noData' : stale ? 'stale' : 'updated'}
             delayMin={layer.liveDelayMin}
             swatch={{ ramp: layer.scale.ramp, level: classOf(value, breaks, isPatchy(layer)) }}
-            onClose={() => setCardOpen(false)}
+            onClose={() => setSelected(null)}
             onLocate={docked ? locate : undefined}
           />
         )}
@@ -220,7 +216,7 @@ export function MapScreen() {
           the timeline has focus: its controls announce the time already, once per key press (UX audit H8). */}
       <p className="visually-hidden" aria-live={timelineFocus ? 'off' : 'polite'}>
         {!state.playing &&
-          `${layer.name} at ${selected}, ${daily ? fmtDayMedium(sel.day) : fmtStamp(sel)}, ${modeLabel[mode]}`}
+          `${layer.name}${selected ? ` at ${selected}` : ''}, ${daily ? fmtDayMedium(sel.day) : fmtStamp(sel)}, ${modeLabel[mode]}`}
       </p>
     </main>
   )

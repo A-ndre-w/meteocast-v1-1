@@ -81,10 +81,11 @@
   font-family: var(--font-mono);
 }
 
-/* Anchored at the pin tip. A click on it opens the closed card again. */
+/* Anchored at the pin tip. Only a mark: the card names the place. */
 .pin {
   position: absolute;
   translate: -50% -100%;
+  pointer-events: none;
 }
 
 /* The point card, beside the pin (data-side) or docked at the top right when the pin is off screen. */

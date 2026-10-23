@@ -26,13 +26,14 @@ export type MapViewProps = {
   layerName: string
   /** Every station, the selected one included. Positions in design-frame px (src/map/geo.ts). */
   stations: StationValue[]
-  /** Name of the selected station: the pin and the card stand on it. */
-  selected: string
-  /** A click (or Enter) on a station selects it and opens its card; on the selected one, reopens the card. */
+  /** Name of the selected station, where the pin and the card stand; null = nothing pinned, only the legend. */
+  selected: string | null
+  /** A click (or Enter) on a station selects it and opens its card. */
   onSelect: (name: string) => void
+  /** A click on the map away from the stations, or Escape in the card: the pin and the card go. */
+  onClear: () => void
   /** The card of the selected point, given whether it is docked (point off screen) and how to bring the point back. */
   card?: (docked: boolean, locate: () => void) => ReactNode
-  cardOpen?: boolean
   /** Tells the zoom control whether it can still zoom in / out. */
   onZoomRange?: (canIn: boolean, canOut: boolean) => void
   ref?: Ref<MapViewHandle>
@@ -159,9 +160,9 @@ function obstacles(container: HTMLElement, exclude?: Element | null): Rect[] {
 }
 
 /** Indices of the stations whose label fits, given their screen positions: whole, on screen, uncovered. */
-function placeLabels(stations: StationValue[], screen: Point[], unit: string, breaks: number[], patchy: boolean, pin: Point, skip: number, container: HTMLElement): Set<number> {
+function placeLabels(stations: StationValue[], screen: Point[], unit: string, breaks: number[], patchy: boolean, pin: Point | null, skip: number, container: HTMLElement): Set<number> {
   // The pin (about 60 × 70 px, tip at the location), the card by it and the interface are never covered.
-  const taken: Rect[] = [[pin[0] - 32, pin[1] - 72, pin[0] + 32, pin[1]], ...obstacles(container)]
+  const taken: Rect[] = [...(pin ? [[pin[0] - 32, pin[1] - 72, pin[0] + 32, pin[1]] as Rect] : []), ...obstacles(container)]
   const { clientWidth: vw, clientHeight: vh } = container
   const onScreen = (r: Rect) => r[0] >= GAP && r[1] >= GAP && r[2] <= vw - GAP && r[3] <= vh - GAP
   const shown = new Set<number>()
@@ -218,7 +219,7 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
  * scale, drawn under the place names), a dot for every station, and a value label where it rains, decluttered
  * (zooming in reveals more). Hovering a dot or a label shows the station's name and value, zero included.
  */
-export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations, selected, onSelect, card, cardOpen = true, onZoomRange, ref }: MapViewProps) {
+export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations, selected, onSelect, onClear, card, onZoomRange, ref }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MlMap | null>(null)
   const cardRef = useRef<HTMLDivElement>(null)
@@ -230,11 +231,14 @@ export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations,
   const [cardSize, setCardSize] = useState<[number, number]>([248, 120])
   const onZoomRangeRef = useRef(onZoomRange)
   onZoomRangeRef.current = onZoomRange
+  const onClearRef = useRef(onClear)
+  onClearRef.current = onClear
 
-  const sel = Math.max(0, stations.findIndex((s) => s.name === selected))
-  const pin = stations[sel]
-  const pinPos = useRef(pin.pos)
-  pinPos.current = pin.pos
+  const sel = selected === null ? -1 : stations.findIndex((s) => s.name === selected)
+  const pin = sel >= 0 ? stations[sel] : null
+  // The framing keeps the selected point (or, with none, the home location: the first station) clear of the panel.
+  const pinPos = useRef((pin ?? stations[0]).pos)
+  pinPos.current = (pin ?? stations[0]).pos
 
   useLayoutEffect(() => {
     const map = new MlMap({
@@ -274,6 +278,8 @@ export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations,
     map.on('move', () => setFrame((n) => n + 1))
     map.on('moveend', () => setSettled((n) => n + 1))
     map.on('zoomend', report)
+    // A click on the map itself (the stations are buttons above it, and a drag is not a click): unpin.
+    map.on('click', () => onClearRef.current?.())
     map.on('load', () => {
       frame()
       report()
@@ -318,7 +324,7 @@ export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations,
     if (!ready || !map) return
     for (const [id, filter] of placeFilters.current) {
       const own = ['!=', ['get', 'name'], selected]
-      map.setFilter(id, (filter ? ['all', filter, own] : own) as FilterSpecification)
+      map.setFilter(id, (selected === null ? filter ?? null : filter ? ['all', filter, own] : own) as FilterSpecification)
     }
   }, [ready, selected])
 
@@ -327,7 +333,7 @@ export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations,
     const map = mapRef.current
     if (!map) return
     const z = Math.min(map.getMaxZoom(), Math.max(map.getMinZoom(), Math.round(map.getZoom()) + d))
-    map.zoomTo(z, { around: lngLat(pinPos.current), animate: !reducedMotion() })
+    map.zoomTo(z, { around: pin ? lngLat(pin.pos) : undefined, animate: !reducedMotion() })
   }
   useImperativeHandle(ref, () => ({ zoomIn: () => zoomBy(1), zoomOut: () => zoomBy(-1) }))
   // Docked card: bring its point back into view, a little right of centre so the card fits beside it.
@@ -349,12 +355,12 @@ export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations,
     return [x, y]
   }
   const screen = stations.map((s) => project(s.pos))
-  const pinAt = screen[sel]
+  const pinAt = sel >= 0 ? screen[sel] : null
   // Recomputed when the map settles (settled), the selection or the data change, not on every frame.
   const labelled = useMemo(
     () => (ready ? placeLabels(stations, screen, unit, breaks, patchy, pinAt, sel, containerRef.current!) : new Set<number>()),
     // screen and pinAt are read when the map settles, on purpose: placing labels on every frame would flicker.
-    [ready, settled, stations, unit, breaks, patchy, sel, cardOpen],
+    [ready, settled, stations, unit, breaks, patchy, sel],
   )
   useEffect(() => {
     const source = ready ? (mapRef.current?.getSource('label-boxes') as GeoJSONSource | undefined) : undefined
@@ -375,13 +381,13 @@ export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations,
   })
   const container = containerRef.current
   const place =
-    ready && container && cardOpen
+    ready && container && pinAt
       ? placeCard(pinAt, cardSize, container.clientWidth, container.clientHeight, obstacles(container, cardRef.current))
       : null
-  const docked = cardOpen && place === null
+  const docked = pin !== null && place === null
   const legendBottom = (document.querySelector('[data-map-legend]')?.getBoundingClientRect().bottom ?? 160) - (container?.getBoundingClientRect().top ?? 0)
   // Labels avoid the card: place them again once the card has appeared, moved to another side or changed size.
-  const cardKey = `${cardOpen}|${selected}|${place?.side ?? 'docked'}|${cardSize}`
+  const cardKey = `${selected}|${place?.side ?? 'docked'}|${cardSize}`
   useEffect(() => setSettled((n) => n + 1), [cardKey])
   const cardStyle = place
     ? { left: place.at[0], top: place.at[1] }
@@ -389,7 +395,7 @@ export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations,
 
   // Stations as one keyboard stop: arrows walk them west to east, Enter selects (roving tabindex).
   const order = useMemo(() => stations.map((s, i) => ({ i, x: s.pos[0] })).sort((a, b) => a.x - b.x).map((o) => o.i), [stations])
-  const [focusIndex, setFocusIndex] = useState(sel)
+  const [focusIndex, setFocusIndex] = useState(Math.max(0, sel))
   const dotRefs = useRef<(HTMLButtonElement | null)[]>([])
   const onDotKey = (e: KeyboardEvent, i: number) => {
     const k = order.indexOf(i)
@@ -454,22 +460,23 @@ export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations,
         </div>
       )}
 
-      {ready && (
-        // The pin of the selected point; with the card closed it shows the name and a click opens the card again.
-        <button
-          type="button"
-          className={styles.pin}
-          style={at(pinAt)}
-          tabIndex={-1}
-          aria-hidden="true"
-          onClick={() => onSelect(pin.name)}
-        >
-          <MapPin label={cardOpen ? undefined : pin.name} />
-        </button>
+      {ready && pinAt && (
+        <span className={styles.pin} style={at(pinAt)} aria-hidden="true">
+          <MapPin />
+        </span>
       )}
 
-      {ready && cardOpen && card && (
-        <div ref={cardRef} className={styles.card} data-side={place?.side ?? 'docked'} style={cardStyle} data-map-obstacle>
+      {ready && pin && card && (
+        <div
+          ref={cardRef}
+          className={styles.card}
+          data-side={place?.side ?? 'docked'}
+          style={cardStyle}
+          data-map-obstacle
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') onClear()
+          }}
+        >
           {card(docked, locate)}
         </div>
       )}

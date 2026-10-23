@@ -21,7 +21,7 @@ export type ReadoutProps = {
   delayMin?: number
   /** The value's data class: a swatch of the same colour as the map and the legend. */
   swatch?: { ramp: Ramp; level: number }
-  /** Close the card (the pin stays; a click on it opens the card again). */
+  /** Close the card: the pin goes too, and the map shows only the legend until another station is clicked. */
   onClose?: () => void
   /** Shown when the card is docked because its point is off screen: brings the point back into view. */
   onLocate?: () => void
@@ -52,7 +52,7 @@ export function Readout({ mode, location, coords, layer, value, unit, time, stat
             </button>
           )}
           {onClose && (
-            <button type="button" className={styles.action} aria-label="Close" title="Close (click the pin to open it again)" onClick={onClose}>
+            <button type="button" className={styles.action} aria-label="Close" title="Close" onClick={onClose}>
               <Icon name="close" size={16} />
             </button>
           )}
