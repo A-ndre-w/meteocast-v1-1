@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { LayerPanel } from '../components/LayerPanel/LayerPanel'
+import { Legend } from '../components/Legend/Legend'
 import { Logo } from '../components/Logo/Logo'
 import { MapView, type MapViewHandle } from '../components/MapView/MapView'
 import { ModePill } from '../components/ModePill/ModePill'
@@ -10,8 +11,8 @@ import { SearchBar } from '../components/SearchBar/SearchBar'
 import { Timebar } from '../components/Timebar/Timebar'
 import { Toast } from '../components/Toast/Toast'
 import { ZoomControl } from '../components/ZoomControl/ZoomControl'
-import { groups, instantAvailable, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
-import { breaksOf } from '../scale'
+import { coordsOf, groups, instantAvailable, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
+import { breaksOf, classOf } from '../scale'
 import { useMeteo } from '../state/useMeteo'
 import {
   dayWindow,
@@ -44,20 +45,27 @@ export function MapScreen() {
   const group = groups.find((g) => g.id === view.groupId)!
   const daily = layer.interval === 'day' // rule 6
 
-  // Rule 9: Live shows "Updated HH:MM"; late data is "stale" with its delay; missing data is "—".
-  const value = valueAt(layer.id, sel)
-  // Memoised: the map redraws its field only when the data or the instant change.
+  // The selected point: any station of the network, Trento by default. Its card sits by the pin.
+  const [selected, setSelected] = useState(location.name)
+  const [cardOpen, setCardOpen] = useState(true)
+  const selectStation = (name: string) => {
+    setSelected(name)
+    setCardOpen(true)
+  }
+  // Every station with its value at the selected instant (Trento's from its own series). Memoised: the map
+  // redraws its field only when the data or the instant change.
   const network = useMemo(() => {
     const values = stationValues(layer, sel)
-    return stations.map((s, i) => ({ ...s, value: values[i] }))
+    return [{ name: location.name, pos: location.pin, value: valueAt(layer.id, sel) }, ...stations.map((s, i) => ({ ...s, value: values[i] }))]
   }, [layer, sel])
+  // Rule 9: Live shows "Updated HH:MM"; late data is "stale" with its delay; missing data is "—".
+  const value = network.find((s) => s.name === selected)?.value ?? null
   const mapRef = useRef<MapViewHandle>(null)
   const [zoomRange, setZoomRange] = useState({ canIn: true, canOut: true })
   // UX audit H8: while focus is in the timeline, the slider and the day chips announce the new time themselves.
   const [timelineFocus, setTimelineFocus] = useState(false)
   // Data classes shared by the map and the Readout legend (src/scale.ts).
   const breaks = useMemo(() => breaksOf(layer.scale.max, layer.unit, isPatchy(layer)), [layer])
-  const pin = useMemo(() => ({ pos: location.pin, label: location.name, value }), [value])
   const stale = mode === 'live' && value !== null && layer.liveDelayMin !== undefined
   const updatedAt = NOW.hour * 60 - (stale ? layer.liveDelayMin! : 0)
   const readoutTime =
@@ -88,7 +96,25 @@ export function MapScreen() {
         patchy={isPatchy(layer)}
         layerName={layer.name}
         stations={network}
-        pin={pin}
+        selected={selected}
+        onSelect={selectStation}
+        cardOpen={cardOpen}
+        card={(docked, locate) => (
+          <Readout
+            mode={mode}
+            location={selected}
+            coords={coordsOf(selected)}
+            layer={layer.name}
+            value={value}
+            unit={layer.unit}
+            time={readoutTime}
+            state={value === null ? 'noData' : stale ? 'stale' : 'updated'}
+            delayMin={layer.liveDelayMin}
+            swatch={{ ramp: layer.scale.ramp, level: classOf(value, breaks, isPatchy(layer)) }}
+            onClose={() => setCardOpen(false)}
+            onLocate={docked ? locate : undefined}
+          />
+        )}
         onZoomRange={(canIn, canOut) => setZoomRange({ canIn, canOut })}
         ref={mapRef}
       />
@@ -143,20 +169,9 @@ export function MapScreen() {
         <NotificationBell count={3} onClick={() => actions.notInPrototype('The alerts panel')} />
       </div>
 
-      <div className={styles.readout} data-map-obstacle>
-        <Readout
-          mode={mode}
-          offset={fmtOffset(sel)}
-          location={location.name}
-          coords={location.coords}
-          layer={layer.name}
-          value={value}
-          unit={layer.unit}
-          time={readoutTime}
-          state={value === null ? 'noData' : stale ? 'stale' : 'updated'}
-          delayMin={layer.liveDelayMin}
-          scale={{ ...layer.scale, breaks }}
-        />
+      {/* The legend stays at the top right for scanning the whole map; the triangle marks the selected point. */}
+      <div className={styles.legend} data-map-obstacle data-map-legend>
+        <Legend layer={layer.name} unit={layer.unit} ramp={layer.scale.ramp} max={layer.scale.max} breaks={breaks} value={value} />
       </div>
 
       <div className={styles.zoom} data-map-obstacle>
@@ -205,7 +220,7 @@ export function MapScreen() {
           the timeline has focus: its controls announce the time already, once per key press (UX audit H8). */}
       <p className="visually-hidden" aria-live={timelineFocus ? 'off' : 'polite'}>
         {!state.playing &&
-          `${layer.name}, ${daily ? fmtDayMedium(sel.day) : fmtStamp(sel)}, ${modeLabel[mode]}`}
+          `${layer.name} at ${selected}, ${daily ? fmtDayMedium(sel.day) : fmtStamp(sel)}, ${modeLabel[mode]}`}
       </p>
     </main>
   )

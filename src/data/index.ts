@@ -89,6 +89,12 @@ export type Station = { name: string; pos: Point }
 /** Every station except the selected location, which the pin and the Readout already show. */
 export const stations: Station[] = geo.stations.filter((s) => s.name !== location.name).map((s) => ({ name: s.name, pos: s.px as Point }))
 
+/** Coordinates of a station as the card shows them, e.g. "46.07° N, 11.12° E". */
+export function coordsOf(name: string): string {
+  const s = geo.stations.find((x) => x.name === name)
+  return s ? `${s.lat.toFixed(2)}° N, ${s.lon.toFixed(2)}° E` : ''
+}
+
 /** Precipitation comes in patches: stations outside them read 0. Other quantities vary smoothly across the map. */
 export const isPatchy = (layer: Layer) => /^(water|snow|storms)\//.test(layer.stream) && !/hydrometric|leaf-wetness/.test(layer.stream)
 

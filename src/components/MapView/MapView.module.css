@@ -37,11 +37,28 @@
   background: var(--surface-raised);
 }
 
-/* Value label just above its dot. */
+/* Stations are buttons: a click selects one and opens its card. */
+.dot:hover::before {
+  border-color: var(--text-primary);
+  inset: 3px;
+}
+
+.dot:focus-visible {
+  outline-offset: 0;
+  border-radius: 50%;
+}
+
+/* The selected station sits under the pin: its dot stays only as a keyboard stop. */
+.dot[data-selected]::before {
+  opacity: 0;
+}
+
+/* Value label just above its dot; a click on it selects the station too. */
 .label {
   position: absolute;
   translate: -50% calc(-100% - 5px);
   pointer-events: auto;
+  cursor: pointer;
 }
 
 .tip {
@@ -64,11 +81,51 @@
   font-family: var(--font-mono);
 }
 
-/* Anchored at the pin tip. */
+/* Anchored at the pin tip. A click on it opens the closed card again. */
 .pin {
   position: absolute;
   translate: -50% -100%;
-  pointer-events: none;
+}
+
+/* The point card, beside the pin (data-side) or docked at the top right when the pin is off screen. */
+.card {
+  position: absolute;
+  z-index: 2;
+}
+
+/* A small arrow on the side facing the pin. */
+.card[data-side]:not([data-side='docked'])::before {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-default);
+  rotate: 45deg;
+}
+
+.card[data-side='right']::before {
+  left: -6px;
+  top: calc(50% - 5px);
+  border-width: 0 0 1px 1px;
+}
+
+.card[data-side='left']::before {
+  right: -6px;
+  top: calc(50% - 5px);
+  border-width: 1px 1px 0 0;
+}
+
+.card[data-side='above']::before {
+  bottom: -6px;
+  left: calc(50% - 5px);
+  border-width: 0 1px 1px 0;
+}
+
+.card[data-side='below']::before {
+  top: -6px;
+  left: calc(50% - 5px);
+  border-width: 1px 0 0 1px;
 }
 
 /* Map data licences (ODbL, OpenMapTiles): required credits, between the zoom control and the components link.

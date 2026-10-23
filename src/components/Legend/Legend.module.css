@@ -1,0 +1,79 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 260px;
+  padding: 10px 14px 8px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.unit {
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+/* Five classes, the same colours as the map (src/scale.ts). No red, orange or green: reserved for alerts. */
+.bar {
+  position: relative;
+  display: flex;
+  gap: 2px;
+  height: 10px;
+  margin-top: 4px;
+}
+
+.band {
+  flex: 1;
+}
+
+.band:first-child {
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+}
+
+.band:nth-child(5) {
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+/* The selected point's value: a triangle on the bar, dark on every class colour. */
+.marker {
+  position: absolute;
+  bottom: 1px;
+  width: 14px;
+  height: 11px;
+  translate: -50% 0;
+  background: var(--text-primary);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+/* A label under each class bound: the first aligned left, the others centred on the bound. */
+.ticks {
+  position: relative;
+  height: 1.3em;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  line-height: 1.3;
+  color: var(--text-tertiary);
+}
+
+.ticks span {
+  position: absolute;
+  translate: -50% 0;
+}
+
+.ticks span:first-child {
+  translate: 0 0;
+}
+
+/* Percentages end at 100: the last label sits at the right end. */
+.ticks[data-closed] span:last-child {
+  translate: -100% 0;
+}

@@ -1,9 +1,10 @@
+/* Compact card by the pin: small enough not to hide the data around the point it describes. */
 .root {
   display: flex;
   flex-direction: column;
-  gap: 22px;
-  width: 307px;
-  padding: 15px 20px 14px;
+  gap: 10px;
+  width: 248px;
+  padding: 10px 12px 12px 14px;
   background: var(--surface-raised);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
@@ -14,7 +15,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
 }
 
 .place p {
@@ -24,18 +25,36 @@
 .location {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: var(--font-size-lg);
-  color: var(--text-secondary);
-}
-
-.location svg {
+  gap: 6px;
+  font-size: var(--font-size-md);
+  font-weight: 500;
   color: var(--text-primary);
 }
 
-.coords {
-  font-size: var(--font-size-sm);
+.place .coords {
+  margin-left: 24px;
+  font-size: var(--font-size-xs);
   color: var(--text-tertiary);
+}
+
+.actions {
+  display: flex;
+  gap: 2px;
+  margin: -4px -6px 0 0;
+}
+
+.action {
+  width: var(--size-sm);
+  height: var(--size-sm);
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+.action:hover {
+  background: var(--surface-sunken);
+  color: var(--text-primary);
 }
 
 .body {
@@ -46,7 +65,7 @@
 .layer {
   margin: 0;
   font-family: var(--font-mono);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-xs);
   font-weight: 400;
   color: var(--text-tertiary);
   text-transform: uppercase;
@@ -56,10 +75,13 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
 }
 
 .value {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
   margin: 0;
   font-size: var(--font-size-display);
   font-weight: 700;
@@ -69,8 +91,19 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* The value's data class, the same colour as the map and the legend. */
+.swatch {
+  align-self: center;
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-right: 4px;
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12);
+}
+
 .unit {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-lg);
   font-weight: 400;
   color: var(--text-secondary);
 }
@@ -95,72 +128,4 @@
 .root[data-state='stale'] .time {
   text-decoration: underline dotted var(--border-strong);
   text-underline-offset: 3px;
-}
-
-/* ---- Scale ---- */
-
-.scale {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* The legend: five classes, the same colours as the map (src/scale.ts). No red, orange or green: reserved for alerts. */
-.bar {
-  position: relative;
-  display: flex;
-  gap: 2px;
-  height: 12px;
-}
-
-.band {
-  flex: 1;
-}
-
-.band:first-child {
-  border-radius: var(--radius-md) 0 0 var(--radius-md);
-}
-
-.band:nth-child(5) {
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-}
-
-.root[data-state='noData'] .bar {
-  opacity: 0.35;
-}
-
-/* Triangle pointing up, sitting on the bar (Figma Polygon). Dark on every class colour. */
-.marker {
-  position: absolute;
-  bottom: 1px;
-  width: 16px;
-  height: 13px;
-  translate: -50% 0;
-  background: var(--text-primary);
-  clip-path: polygon(50% 0, 100% 100%, 0 100%);
-}
-
-
-/* A label under each class bound: the first aligned left, the others centred on the bound. */
-.ticks {
-  position: relative;
-  height: 1.3em;
-  font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
-  line-height: 1.3;
-  color: var(--text-tertiary);
-}
-
-.ticks span {
-  position: absolute;
-  translate: -50% 0;
-}
-
-.ticks span:first-child {
-  translate: 0 0;
-}
-
-/* Percentages end at 100: the last label sits at the right end. */
-.ticks[data-closed] span:last-child {
-  translate: -100% 0;
 }
