@@ -85,5 +85,8 @@ try {
 } finally {
   chrome.kill()
   await sleep(300)
-  rmSync(profile, { recursive: true, force: true })
+  // Chrome may still hold the profile for a moment on Windows: retry, and never fail the export for it.
+  try {
+    rmSync(profile, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 })
+  } catch {}
 }
