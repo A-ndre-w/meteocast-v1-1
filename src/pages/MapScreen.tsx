@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { AlertPanel } from '../components/AlertPanel/AlertPanel'
 import { LayerPanel } from '../components/LayerPanel/LayerPanel'
 import { PresetEditor } from '../components/PresetEditor/PresetEditor'
 import { Legend } from '../components/Legend/Legend'
@@ -13,6 +14,7 @@ import { Timebar } from '../components/Timebar/Timebar'
 import { Toast } from '../components/Toast/Toast'
 import { ZoomControl } from '../components/ZoomControl/ZoomControl'
 import { coordsOf, finestStep, groupById, groupOf, groups, inNowcast, instantAvailable, sourceAt, stepOf, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
+import { alerts, initiallyUnread } from '../data/alerts'
 import { breaksOf, classOf } from '../scale'
 import { presetStore, usePresets, type Preset } from '../state/presets'
 import { useMeteo } from '../state/useMeteo'
@@ -51,6 +53,24 @@ export function MapScreen() {
   const { state, view, layer, actions } = useMeteo()
   const { sel } = view
   const mode = modeOf(sel) // rule 1
+  // Alerts: the panel under the bell, and which ones are still unread (the bell's count).
+  const [alertsOpen, setAlertsOpen] = useState(false)
+  const [unread, setUnread] = useState<string[]>(initiallyUnread)
+  const closeAlerts = (refocus = true) => {
+    setAlertsOpen(false)
+    if (refocus) requestAnimationFrame(() => document.querySelector<HTMLElement>('[aria-haspopup="dialog"][aria-label^="Alerts"]')?.focus())
+  }
+  // A click outside the panel (and outside the bell, which toggles it) closes it.
+  useEffect(() => {
+    if (!alertsOpen) return
+    const onDown = (e: PointerEvent) => {
+      const t = e.target as Element
+      if (!t.closest('[data-alerts], [aria-label^="Alerts"]')) setAlertsOpen(false)
+    }
+    document.addEventListener('pointerdown', onDown)
+    return () => document.removeEventListener('pointerdown', onDown)
+  }, [alertsOpen])
+
   const presets = usePresets()
   // A default group or a user preset (a deleted preset in an old link falls back to the data's own group).
   const group = groupById(view.groupId) ?? groupOf(layer.id)
@@ -242,8 +262,27 @@ export function MapScreen() {
 
       <div className={styles.top} data-map-obstacle>
         <SearchBar onSearch={() => actions.notInPrototype('Search')} onLocate={() => actions.notInPrototype('Locating you')} />
-        <NotificationBell count={3} onClick={() => actions.notInPrototype('The alerts panel')} />
+        <NotificationBell count={unread.length} expanded={alertsOpen} onClick={() => (alertsOpen ? closeAlerts(false) : setAlertsOpen(true))} />
       </div>
+
+      {alertsOpen && (
+        <div className={styles.alerts} data-alerts data-map-obstacle>
+          <AlertPanel
+            alerts={alerts}
+            unread={unread}
+            onOpen={(a) => {
+              // The alert on the map: its data at its instant, its station pinned; read from now on.
+              actions.showAt(a.stream, a.at)
+              if (a.station) setSelected(a.station)
+              setUnread((u) => u.filter((id) => id !== a.id))
+              closeAlerts()
+            }}
+            onMarkAllRead={() => setUnread([])}
+            onManage={() => actions.notInPrototype('Managing alert subscriptions')}
+            onClose={() => closeAlerts()}
+          />
+        </div>
+      )}
 
       {/* The legend stays at the top right for scanning the whole map; the triangle marks the selected point. */}
       <div className={styles.legend} data-map-obstacle data-map-legend>

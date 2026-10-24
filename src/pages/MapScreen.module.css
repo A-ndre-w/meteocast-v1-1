@@ -48,6 +48,16 @@
   gap: 17px;
 }
 
+/* Under the bell, over the legend; ends 10px above the zoom control (bottom 83, 64 tall). */
+.alerts {
+  position: absolute;
+  right: 28px;
+  top: 67px;
+  z-index: 25;
+  max-height: calc(100% - 67px - 157px);
+  display: flex;
+}
+
 .legend {
   position: absolute;
   right: 28px;

@@ -154,6 +154,17 @@ export function selectGroup(view: View, groupId: string): Result {
   return { view: { groupId, layerId: group.layers[0].id, sel: view.sel } }
 }
 
+/**
+ * An alert opened from the panel: its data at its instant (on the twin across "now"), in the current group or
+ * preset when that has the data. Explicit intent: no toast.
+ */
+export function showInstant(view: View, streamId: string, at: TimeSel): Result {
+  const stream = streamById(streamId)
+  const layer = stream.layers.find((l) => instantAvailable(l, normalize(l, at, 'nearest')))
+  if (!layer) return selectStream(view, streamId)
+  return { view: { groupId: groupFor(view, layer), layerId: layer.id, sel: normalize(layer, at, 'nearest') } }
+}
+
 /** Every "Back to live" (timebar, ModePill). Explicit intent: no toast unless the layer changes unexpectedly. */
 export function goLive(view: View, layerId = view.layerId): Result {
   const layer = layerById(layerId)

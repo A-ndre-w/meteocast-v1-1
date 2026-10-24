@@ -1,0 +1,157 @@
+/* Level colours: base for borders and icons, -strong for text, -soft for fills (AA on every pair). */
+.root {
+  --level: var(--status-advisory);
+  --level-strong: var(--status-advisory-strong);
+  --level-soft: var(--status-advisory-soft);
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding: 14px 14px 14px 12px;
+  border-radius: var(--radius-md);
+  background: var(--surface-sunken);
+  transition: background-color 0.15s ease;
+}
+
+.root[data-severity='warning'] {
+  --level: var(--status-warning);
+  --level-strong: var(--status-warning-strong);
+  --level-soft: var(--status-warning-soft);
+}
+
+.root[data-severity='severe'] {
+  --level: var(--status-danger);
+  --level-strong: var(--status-danger-strong);
+  --level-soft: var(--status-danger-soft);
+}
+
+.root:hover {
+  background: var(--bg-deep);
+}
+
+/* Unread: a white card with a border; read ones sink into the list. */
+.root[data-unread] {
+  background: var(--surface-raised);
+  box-shadow: inset 0 0 0 1px var(--border-default);
+}
+
+.root[data-unread]:hover {
+  background: var(--surface-sunken);
+}
+
+.tile {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--level);
+  border-radius: 7px;
+  background: var(--level-soft);
+  color: var(--level-strong);
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.tag {
+  padding: 1px 8px;
+  border: 1px solid var(--level);
+  border-radius: var(--radius-pill);
+  background: var(--level-soft);
+  color: var(--level-strong);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.ago {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--level);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.open {
+  padding: 0;
+  font: inherit;
+  color: var(--text-primary);
+  text-align: left;
+}
+
+/* The whole card is the button's target. */
+.open::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-md);
+}
+
+.open:focus-visible {
+  outline: none;
+}
+
+.open:focus-visible::after {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.area,
+.text,
+.until {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.area {
+  color: var(--text-secondary);
+}
+
+.text {
+  margin-top: 6px;
+  color: var(--text-primary);
+}
+
+.until {
+  margin-top: 6px;
+  color: var(--text-tertiary);
+}
+
+/* Ended: kept for reference, quieter. */
+.root[data-expired] .tile,
+.root[data-expired] .tag {
+  border-color: var(--border-strong);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+}

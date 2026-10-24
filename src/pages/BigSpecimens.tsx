@@ -4,11 +4,14 @@ import { DayStrip } from '../components/DayStrip/DayStrip'
 import { LayerPanel } from '../components/LayerPanel/LayerPanel'
 import { ModePill } from '../components/ModePill/ModePill'
 import { Legend } from '../components/Legend/Legend'
+import { AlertCard } from '../components/AlertCard/AlertCard'
+import { AlertPanel } from '../components/AlertPanel/AlertPanel'
 import { PresetEditor } from '../components/PresetEditor/PresetEditor'
 import { Readout } from '../components/Readout/Readout'
 import { Timebar, type Speed } from '../components/Timebar/Timebar'
 import { ModeWord, Toast } from '../components/Toast/Toast'
 import { groups, location } from '../data'
+import { alerts, initiallyUnread } from '../data/alerts'
 import {
   addDays,
   dayWindow,
@@ -91,6 +94,34 @@ export function BigSpecimens() {
   const snowGroup = groups[1]
   return (
     <>
+      <Specimen
+        name="AlertPanel"
+        figma="Alert Panel · 2087:32857 (out of v1 in Figma; built from the designer's mockup)"
+        props="alerts, unread, updatedMin?, onOpen, onMarkAllRead, onManage, onClose"
+        note="Under the bell. Header: active severe count (red) and unread; Mark all read while something is unread. Filters All · Active · Severe. A card opens its alert on the map: data, instant and station; then it is read. Esc or a click outside closes."
+      >
+        <Variant label="3 unread">
+          <div style={{ height: 620, display: 'flex' }}>
+            <AlertPanel alerts={alerts} unread={initiallyUnread} autoFocus={false} />
+          </div>
+        </Variant>
+      </Specimen>
+
+      <Specimen
+        name="AlertCard"
+        figma="Alert · 2087:32511 + Alert/Severity tag"
+        props="alert, unread?, onOpen"
+        note="Levels as in Meteoalarm: Notice yellow, Warning orange, Severe red (green is the brand's). Unread: white with a border and a dot in the level colour. Ended: tag and tile neutral, 'Ended …'."
+      >
+        {alerts.map((a) => (
+          <Variant key={a.id} label={a.severity + (initiallyUnread.includes(a.id) ? ' · unread' : '')}>
+            <div style={{ width: 316 }}>
+              <AlertCard alert={a} unread={initiallyUnread.includes(a.id)} />
+            </div>
+          </Variant>
+        ))}
+      </Specimen>
+
       <Specimen
         name="PresetEditor"
         figma="— (new: presets were out of v1 in Figma)"

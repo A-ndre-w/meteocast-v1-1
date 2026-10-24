@@ -10,7 +10,8 @@
   color: var(--status-danger);
 }
 
-.root:hover {
+.root:hover,
+.root[data-expanded] {
   background: var(--surface-sunken);
 }
 

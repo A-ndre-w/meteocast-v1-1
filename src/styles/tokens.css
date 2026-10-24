@@ -21,6 +21,13 @@
   --status-danger: #DB2D27;
   --status-warning: #E78C08;
   --status-success: #269E5F;
+  --status-danger-strong: #B3261E;
+  --status-danger-soft: #FCECEB;
+  --status-warning-strong: #9A5B00;
+  --status-warning-soft: #FDF2E2;
+  --status-advisory: #E5B300;
+  --status-advisory-strong: #735600;
+  --status-advisory-soft: #FCF6DC;
   --mode-archive: #46413E;
   --mode-forecast: #4F98A5;
   --mode-forecast-strong: #1B6573;

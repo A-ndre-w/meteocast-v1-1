@@ -1,0 +1,164 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 340px;
+  max-height: 100%;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+}
+
+.root:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 14px 12px 16px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.summary {
+  margin: 2px 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.summary[data-severe] {
+  color: var(--status-danger-strong);
+}
+
+.unreadCount {
+  color: var(--text-secondary);
+}
+
+.markRead {
+  flex: none;
+  height: var(--size-sm);
+  padding: 0 12px;
+  border-radius: var(--radius-lg);
+  background: var(--accent-strong);
+  color: var(--accent-on);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.markRead:hover {
+  background: color-mix(in srgb, var(--accent-strong) 85%, black);
+}
+
+/* Filters: the same pills as the speed button; the chosen one dark, like a selected day chip. */
+.filters {
+  display: flex;
+  gap: 6px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--size-sm);
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.filter:hover {
+  color: var(--text-primary);
+}
+
+.filter[aria-pressed='true'] {
+  background: var(--text-primary);
+  color: var(--icon-selected);
+}
+
+.filterCount {
+  font-family: var(--font-mono);
+}
+
+.filterCount[data-severe] {
+  color: var(--status-danger-strong);
+}
+
+.filter[aria-pressed='true'] .filterCount[data-severe] {
+  color: inherit;
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 12px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.empty {
+  margin: 24px 0;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px 8px 10px;
+  border-top: 1px solid var(--border-default);
+  background: var(--surface-sunken);
+}
+
+.manage {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: var(--size-md);
+  padding: 0 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+.manage:hover {
+  background: var(--bg-deep);
+}
+
+.updated {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
