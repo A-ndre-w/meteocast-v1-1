@@ -95,6 +95,70 @@ const uiIcons = {
       <circle cx="12" cy="12" r="3" />
     </>
   ),
+  // Station series.
+  chart: <path d="M4.5 19.5h15M7.5 16.5v-5M12 16.5v-9M16.5 16.5v-7" />,
+  table: (
+    <>
+      <rect x="4" y="5" width="16" height="14" rx="2" />
+      <path d="M4 10h16M4 14.5h16M10 10v9" />
+    </>
+  ),
+  download: <path d="M12 4.5v10M7.5 10.5l4.5 4.5 4.5-4.5M5 19.5h14" />,
+  // Top bar: additional services, account; map tools.
+  apps: (
+    <>
+      <circle cx="6.5" cy="6.5" r="1.5" />
+      <circle cx="12" cy="6.5" r="1.5" />
+      <circle cx="17.5" cy="6.5" r="1.5" />
+      <circle cx="6.5" cy="12" r="1.5" />
+      <circle cx="12" cy="12" r="1.5" />
+      <circle cx="17.5" cy="12" r="1.5" />
+      <circle cx="6.5" cy="17.5" r="1.5" />
+      <circle cx="12" cy="17.5" r="1.5" />
+      <circle cx="17.5" cy="17.5" r="1.5" />
+    </>
+  ),
+  user: (
+    <>
+      <circle cx="12" cy="8.5" r="3.5" />
+      <path d="M5 19.5c1-3.5 3.8-5.5 7-5.5s6 2 7 5.5" />
+    </>
+  ),
+  help: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <circle cx="12" cy="12" r="3.5" />
+      <path d="m6 6 3.5 3.5M14.5 14.5 18 18M18 6l-3.5 3.5M9.5 14.5 6 18" />
+    </>
+  ),
+  'sign-out': <path d="M14 4.5H6.5v15H14M10.5 12h9M16.5 8.5l3.5 3.5-3.5 3.5" />,
+  support: (
+    <>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M12 3.5v4M12 16.5v4M3.5 12h4M16.5 12h4" />
+      <circle cx="12" cy="12" r="7" />
+    </>
+  ),
+  report: (
+    <>
+      <path d="M7 3.5h7l4 4v13H7z" />
+      <path d="M14 3.5v4h4M9.5 12h6M9.5 15.5h6" />
+    </>
+  ),
+  api: <path d="m8.5 7.5-4.5 4.5 4.5 4.5M15.5 7.5l4.5 4.5-4.5 4.5M13.5 5.5l-3 13" />,
+  ruler: (
+    <>
+      <path d="m3.5 16 12.5-12.5 4.5 4.5L8 20.5z" />
+      <path d="m7.5 12 2 2M10.5 9l2 2M13.5 6l2 2" />
+    </>
+  ),
+  camera: (
+    <>
+      <path d="M4 8h3l1.5-2.5h7L17 8h3v11H4z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </>
+  ),
+  basemap: <path d="M3.5 6.5 9 4.5l6 2 5.5-2v13l-5.5 2-6-2-5.5 2zM9 4.5v13M15 6.5v13" />,
   // Preset editing.
   edit: <path d="M4.5 19.5h4l10-10-4-4-10 10v4ZM13 7l4 4" />,
   trash: <path d="M4.5 7h15M10 4.5h4M6.5 7l1 12.5h9l1-12.5M10 11v5M14 11v5" />,

@@ -97,6 +97,8 @@ Fonte: file Figma *UXChallenge_RadarMeteo*, pagina "🎨 Stile & Componenti". Le
 | Map Pill | `ModePill` | `mode`, `time`, `relative` |
 | — | `Toast` | `mode`, `tone`, `message`, `onUndo` |
 | Alert Panel · Alert · Alert/Severity tag | `AlertPanel` · `AlertCard` | `alerts`, `unread`, `onOpen`, `onMarkAllRead` · `alert`, `unread` |
+| — | `SeriesPanel` | `layer`, `station`, `sel`, `onPick`, `onClose` — grafico e tabella di una stazione nel tempo |
+| — | `TopMenu` · `MapTools` | servizi aggiuntivi e account · strumenti mappa (icone e nomi; quello che aprono è fuori dal prototipo) |
 | — | `PresetEditor` | `preset`, `initialStreams`, `onSave`, `onCancel`, `onDelete` — crea e modifica i preset |
 | — | `Legend` | `layer`, `unit`, `source`, `ramp`, `max`, `breaks`, `value` — legenda fissa con il tag della fonte del dato |
 | Search bar · Alert Icon · Zoom Controls · Data Map Label | `SearchBar` · `NotificationBell` · `ZoomControl` · `ValueLabel` | |

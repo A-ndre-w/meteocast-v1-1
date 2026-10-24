@@ -137,6 +137,26 @@
   color: var(--text-secondary);
 }
 
+/* The station over time: a quiet link at the foot of the card. */
+.series {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 6px;
+  height: var(--size-sm);
+  padding: 0 8px;
+  margin: -2px 0 -4px -8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--accent-strong);
+}
+
+.series:hover,
+.series[aria-pressed='true'] {
+  background: var(--accent-soft);
+}
+
 .root[data-state='stale'] .updated {
   text-decoration: underline dotted var(--border-strong);
   text-underline-offset: 3px;

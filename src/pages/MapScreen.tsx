@@ -4,14 +4,17 @@ import { LayerPanel } from '../components/LayerPanel/LayerPanel'
 import { PresetEditor } from '../components/PresetEditor/PresetEditor'
 import { Legend } from '../components/Legend/Legend'
 import { Logo } from '../components/Logo/Logo'
+import { MapTools } from '../components/MapTools/MapTools'
 import { MapView, type MapViewHandle } from '../components/MapView/MapView'
 import { ModePill } from '../components/ModePill/ModePill'
 import { NotificationBell } from '../components/NotificationBell/NotificationBell'
 import { Rail } from '../components/Rail/Rail'
 import { Readout } from '../components/Readout/Readout'
+import { SeriesPanel } from '../components/SeriesPanel/SeriesPanel'
 import { SearchBar } from '../components/SearchBar/SearchBar'
 import { Timebar } from '../components/Timebar/Timebar'
 import { Toast } from '../components/Toast/Toast'
+import { TopMenu } from '../components/TopMenu/TopMenu'
 import { ZoomControl } from '../components/ZoomControl/ZoomControl'
 import { coordsOf, finestStep, groupById, groupOf, groups, inNowcast, instantAvailable, sourceAt, stepOf, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
 import { alerts, initiallyUnread } from '../data/alerts'
@@ -98,6 +101,8 @@ export function MapScreen() {
   // The selected point: any station of the network, Trento at the start. Its card sits by the pin. null = nothing
   // pinned: closing the card or clicking the map away from the stations leaves only the legend.
   const [selected, setSelected] = useState<string | null>(location.name)
+  // The selected station's chart and table, above the timeline. Follows the selection while open.
+  const [seriesOpen, setSeriesOpen] = useState(false)
   // Every station with its value at the selected instant (Trento's from its own series). Memoised: the map
   // redraws its field only when the data or the instant change.
   const network = useMemo(() => {
@@ -185,6 +190,8 @@ export function MapScreen() {
             swatch={{ ramp: layer.scale.ramp, level: classOf(value, breaks, isPatchy(layer)) }}
             onClose={() => setSelected(null)}
             onLocate={docked ? locate : undefined}
+            onSeries={() => setSeriesOpen((o) => !o)}
+            seriesOpen={seriesOpen}
           />
         )}
         onZoomRange={(canIn, canOut) => setZoomRange({ canIn, canOut })}
@@ -263,6 +270,30 @@ export function MapScreen() {
       <div className={styles.top} data-map-obstacle>
         <SearchBar onSearch={() => actions.notInPrototype('Search')} onLocate={() => actions.notInPrototype('Locating you')} />
         <NotificationBell count={unread.length} expanded={alertsOpen} onClick={() => (alertsOpen ? closeAlerts(false) : setAlertsOpen(true))} />
+        {/* The original platform's "Additional services" and account items (settings, help, sign out): icons and
+            names in place; what they open is outside the prototype. */}
+        <TopMenu
+          icon="apps"
+          label="Additional services"
+          heading="Additional services"
+          items={[
+            { icon: 'support', label: 'Operational support', description: 'A forecaster on call for your events', onSelect: () => actions.notInPrototype('Operational support') },
+            { icon: 'report', label: 'Reports', description: 'Event and weekly reports, as PDF', onSelect: () => actions.notInPrototype('Reports') },
+            { icon: 'download', label: 'Data download', description: 'Station and model data, as CSV', onSelect: () => actions.notInPrototype('Data download') },
+            { icon: 'api', label: 'API access', description: 'The same data in your own systems', onSelect: () => actions.notInPrototype('API access') },
+          ]}
+        />
+        <TopMenu
+          icon="user"
+          label="Account"
+          heading="Signed in as"
+          subheading="Demo account"
+          items={[
+            { icon: 'settings', label: 'Settings', onSelect: () => actions.notInPrototype('Settings') },
+            { icon: 'help', label: 'Help and support', onSelect: () => actions.notInPrototype('Help and support') },
+            { icon: 'sign-out', label: 'Sign out', onSelect: () => actions.notInPrototype('Signing out') },
+          ]}
+        />
       </div>
 
       {alertsOpen && (
@@ -287,6 +318,16 @@ export function MapScreen() {
       {/* The legend stays at the top right for scanning the whole map; the triangle marks the selected point. */}
       <div className={styles.legend} data-map-obstacle data-map-legend>
         <Legend layer={layer.name} unit={layer.unit} source={sourceAt(layer, sel)} ramp={layer.scale.ramp} max={layer.scale.max} breaks={breaks} value={value} />
+      </div>
+
+      <div className={styles.tools} data-map-obstacle>
+        <MapTools
+          tools={[
+            { id: 'measure', icon: 'ruler', label: 'Measure a distance', onClick: () => actions.notInPrototype('Measuring distances') },
+            { id: 'basemap', icon: 'basemap', label: 'Base map', onClick: () => actions.notInPrototype('Changing the base map') },
+            { id: 'screenshot', icon: 'camera', label: 'Save the map as an image', onClick: () => actions.notInPrototype('Map screenshots') },
+          ]}
+        />
       </div>
 
       <div className={styles.zoom} data-map-obstacle>
@@ -328,6 +369,12 @@ export function MapScreen() {
           onSpeedChange={actions.setSpeed}
         />
       </div>
+
+      {seriesOpen && (
+        <div className={styles.series} data-map-obstacle>
+          <SeriesPanel layer={layer} station={selected} sel={sel} onPick={actions.goTo} onClose={() => setSeriesOpen(false)} />
+        </div>
+      )}
 
       <a className={styles.componentsLink} href="#/components" data-map-obstacle>
         Components

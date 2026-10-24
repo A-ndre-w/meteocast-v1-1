@@ -1,5 +1,5 @@
 import type { IconName } from '../icons/Icon'
-import { addDays, dayDiff, minutesBetween, modeOf, NOW, shiftHours, type TimeSel } from '../time'
+import { addDays, dayDiff, minutesBetween, modeOf, NOW, shiftHours, shiftMinutes, type TimeSel } from '../time'
 import type { Mode } from '../types'
 import catalogue from './layers.json'
 
@@ -184,32 +184,77 @@ const cells: Record<'rain' | 'snow' | 'smooth', Cell[]> = {
 
 const seedOf = (s: string) => ([...s].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 16777619) >>> 0, 2166136261) % 628) / 100
 
+// Rain is one event: it builds up from yesterday, peaks around "now" and clears within a day and a half, in showers
+// that come and go every few hours (each cell on its own beat). Without this the series stayed at the peak for days.
+const hNow = dayDiff(NOW.day, data.start) * 24 + NOW.hour
+const beat = [0, -0.4, 0.3, -0.2, 0.5, -0.6, 0.35]
+const rainPulse = (h: number, k: number) => Math.exp(-(((h - hNow) / 30) ** 2)) * Math.max(0, Math.cos((h - hNow) / 4 + beat[k % beat.length])) ** 2
+
 /** Field strength at p, hour h (hours since the window start). Patchy fields are 0 outside the cells. */
 function field(kind: keyof typeof cells, [x, y]: Point, h: number, seed: number): number {
   let f = 0
   cells[kind].forEach(({ c, r, a }, k) => {
     const cx = c[0] + 45 * Math.sin(h / 9 + k * 1.7 + seed)
     const cy = c[1] + 30 * Math.cos(h / 13 + k * 2.3 + seed)
-    const amp = a * (0.75 + 0.25 * Math.sin(h / 7 + k + seed))
+    const amp = kind === 'rain' ? a * rainPulse(h, k) : a * (0.75 + 0.25 * Math.sin(h / 7 + k + seed))
     f += amp * Math.exp(-((x - cx) ** 2 + (y - cy) ** 2) / (2 * r * r))
   })
   return kind === 'smooth' ? Math.max(0.1, 0.7 + f) : Math.max(0, f - 0.4)
 }
 
+const kindOf = (layer: Layer) => (!isPatchy(layer) ? 'smooth' : layer.stream.startsWith('snow/') ? 'snow' : 'rain')
+const hourOf = (layer: Layer, sel: TimeSel) => dayDiff(sel.day, data.start) * 24 + (layer.interval === 'day' ? 12 : sel.hour + (sel.minute ?? 0) / 60)
+
+/**
+ * From field units to the layer's unit, fixed per layer: the field equals Trento's value at Trento at the first
+ * instant the layer has (now, or its first forecast step). Fixed, so a station's series rises and falls with the
+ * weather instead of following Trento's ups and downs. Half the scale when Trento is dry then.
+ */
+const scales = new Map<string, number>()
+function scaleOf(layer: Layer): number {
+  if (!scales.has(layer.id)) {
+    const at = instantAvailable(layer, NOW) ? NOW : firstForecastInstant(layer)
+    const v0 = valueAt(layer.id, at)
+    const f = field(kindOf(layer), location.pin, hourOf(layer, at), seedOf(layer.stream))
+    const fallback = layer.scale.max * 0.5
+    scales.set(layer.id, v0 && f > 0.05 ? Math.min(3 * fallback, Math.max(0.2 * fallback, v0 / f)) : fallback)
+  }
+  return scales.get(layer.id)!
+}
+
 /**
  * Values at every station (same order as `stations`), or null when the layer has no data at that instant.
- * Scaled so the field equals Trento's value at Trento: the network and the Readout always agree.
+ * Scaled by the layer's fixed factor (scaleOf): at its first instant the field equals Trento's value at Trento.
  */
 export function stationValues(layer: Layer, sel: TimeSel): (number | null)[] {
-  const v0 = valueAt(layer.id, sel)
-  if (v0 === null) return stations.map(() => null)
-  const kind = !isPatchy(layer) ? 'smooth' : layer.stream.startsWith('snow/') ? 'snow' : 'rain'
-  const h = dayDiff(sel.day, data.start) * 24 + (layer.interval === 'day' ? 12 : sel.hour + (sel.minute ?? 0) / 60)
+  if (valueAt(layer.id, sel) === null) return stations.map(() => null)
+  const kind = kindOf(layer)
+  const h = hourOf(layer, sel)
   const seed = seedOf(layer.stream)
-  const ratio = v0 / field(kind, location.pin, h, seed)
+  const ratio = scaleOf(layer)
   const dec = data.series[layer.id].decimals
   const cap = layer.unit === '%' ? 100 : Infinity
   return stations.map((s) => Number(Math.min(cap, field(kind, s.pos, h, seed) * ratio).toFixed(dec)))
+}
+
+/** One point of a station's series: the value and the layer it comes from (the twin across "now"). */
+export type SeriesPoint = { sel: TimeSel; value: number | null; layer?: Layer }
+
+/**
+ * A station's values over time, for the chart and the table: `count` points from `from`, one every `stepMin`
+ * minutes. Each point takes the layer of the stream that has data then, so a series can run from the archive
+ * through "now" into the forecast. No data (outside the window, a gap) is null, never 0.
+ */
+export function stationSeries(layer: Layer, name: string, from: TimeSel, count: number, stepMin: number): SeriesPoint[] {
+  const stream = [layer, twinOf(layer)].filter((l): l is Layer => l !== undefined)
+  const index = stations.findIndex((s) => s.name === name)
+  return Array.from({ length: count }, (_, i) => {
+    const sel = shiftMinutes(from, i * stepMin)
+    const l = stream.find((x) => instantAvailable(x, sel))
+    if (!l) return { sel, value: null }
+    const value = name === location.name ? valueAt(l.id, sel) : index < 0 ? null : stationValues(l, sel)[index]
+    return { sel, value, layer: l }
+  })
 }
 
 // ---- Twins: the same quantity split into a Real time and a Forecast layer ----

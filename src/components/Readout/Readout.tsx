@@ -28,6 +28,10 @@ export type ReadoutProps = {
   onClose?: () => void
   /** Shown when the card is docked because its point is off screen: brings the point back into view. */
   onLocate?: () => void
+  /** Opens the station's chart and table over a time range. */
+  onSeries?: () => void
+  /** The chart and table are open (the button then reads as on). */
+  seriesOpen?: boolean
 }
 
 /**
@@ -35,7 +39,23 @@ export type ReadoutProps = {
  * sits by the pin on the map. The scale moved to its own Legend, fixed at the top right. The date is only a quiet
  * context line beside the layer name: in bold under the value it competed with it (designer review).
  */
-export function Readout({ mode, location, coords, layer, value, unit, time, updated, updatedHint, state = 'updated', swatch, onClose, onLocate }: ReadoutProps) {
+export function Readout({
+  mode,
+  location,
+  coords,
+  layer,
+  value,
+  unit,
+  time,
+  updated,
+  updatedHint,
+  state = 'updated',
+  swatch,
+  onClose,
+  onLocate,
+  onSeries,
+  seriesOpen = false,
+}: ReadoutProps) {
   const noData = state === 'noData' || value === null
 
   return (
@@ -99,6 +119,12 @@ export function Readout({ mode, location, coords, layer, value, unit, time, upda
           </p>
         )}
       </div>
+      {onSeries && (
+        <button type="button" className={styles.series} aria-pressed={seriesOpen} onClick={onSeries}>
+          <Icon name="chart" size={16} aria-hidden="true" />
+          Chart &amp; table
+        </button>
+      )}
     </section>
   )
 }

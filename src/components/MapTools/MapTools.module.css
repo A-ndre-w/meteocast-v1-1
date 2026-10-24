@@ -1,0 +1,37 @@
+/* The zoom control's box (Figma Zoom Controls), with more buttons. */
+.root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 42px;
+  padding: 4px 0;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button {
+  width: var(--size-md);
+  height: var(--size-md);
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+}
+
+.button:hover {
+  background: var(--surface-sunken);
+}
+
+.divider {
+  width: 24px;
+  height: 1px;
+  margin: 2px 0;
+  background: var(--border-default);
+}

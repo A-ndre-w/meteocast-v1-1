@@ -6,11 +6,13 @@ import { ModePill } from '../components/ModePill/ModePill'
 import { Legend } from '../components/Legend/Legend'
 import { AlertCard } from '../components/AlertCard/AlertCard'
 import { AlertPanel } from '../components/AlertPanel/AlertPanel'
+import { MapTools } from '../components/MapTools/MapTools'
 import { PresetEditor } from '../components/PresetEditor/PresetEditor'
+import { SeriesPanel } from '../components/SeriesPanel/SeriesPanel'
 import { Readout } from '../components/Readout/Readout'
 import { Timebar, type Speed } from '../components/Timebar/Timebar'
 import { ModeWord, Toast } from '../components/Toast/Toast'
-import { groups, location } from '../data'
+import { groups, layerById, location } from '../data'
 import { alerts, initiallyUnread } from '../data/alerts'
 import {
   addDays,
@@ -94,6 +96,36 @@ export function BigSpecimens() {
   const snowGroup = groups[1]
   return (
     <>
+      <Specimen
+        name="SeriesPanel"
+        figma="— (new: the original platform's TABLE, with a chart)"
+        props="layer, station, sel, onPick, onClose"
+        note="Opens from the card's Chart &amp; table. The selected station over −24 h to +5 days from the selected time: bars in class colours for patchy amounts, a line for continuous quantities, forecast after NOW lighter. A bar or a row moves the timeline there. CSV download."
+      >
+        <Variant label="Belluno · Hourly rainfall · −24 h" wide>
+          <div style={{ width: 860 }}>
+            <SeriesPanel layer={layerById('rain-1h')} station="Belluno" sel={NOW} />
+          </div>
+        </Variant>
+        <Variant label="Trento · Air temperature (line)" wide>
+          <div style={{ width: 860 }}>
+            <SeriesPanel layer={layerById('temp')} station="Trento" sel={NOW} />
+          </div>
+        </Variant>
+      </Specimen>
+
+      <Specimen name="MapTools" figma="— (the original platform's map tools)" props="tools: { id, icon, label, onClick }[]" note="Above the zoom control, in the same box. Measure, base map and screenshot are outside the prototype: a toast says so.">
+        <Variant label="measure · base map · screenshot">
+          <MapTools
+            tools={[
+              { id: 'measure', icon: 'ruler', label: 'Measure a distance' },
+              { id: 'basemap', icon: 'basemap', label: 'Base map' },
+              { id: 'screenshot', icon: 'camera', label: 'Save the map as an image' },
+            ]}
+          />
+        </Variant>
+      </Specimen>
+
       <Specimen
         name="AlertPanel"
         figma="Alert Panel · 2087:32857 (out of v1 in Figma; built from the designer's mockup)"

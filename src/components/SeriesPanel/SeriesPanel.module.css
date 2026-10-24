@@ -1,0 +1,316 @@
+/* A sheet above the timeline, beside the layer panel: wide enough for a day hour by hour. */
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 10px 8px 16px;
+}
+
+.title {
+  margin: 0;
+  min-width: 0;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.what {
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+.tools {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Chart | Table: two halves of one pill. */
+.segmented {
+  display: flex;
+  padding: 2px;
+  margin-right: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+}
+
+.segmented button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: var(--size-sm);
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.segmented button[aria-pressed='true'] {
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.icon {
+  width: var(--size-sm);
+  height: var(--size-sm);
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+.icon:hover:not(:disabled) {
+  background: var(--surface-sunken);
+  color: var(--text-primary);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 16px 6px;
+}
+
+.ranges {
+  display: flex;
+  gap: 4px;
+}
+
+/* Same pills as the alert filters. */
+.range {
+  height: var(--size-sm);
+  padding: 0 10px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-sunken);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.range:hover {
+  color: var(--text-primary);
+}
+
+.range[aria-pressed='true'] {
+  background: var(--text-primary);
+  color: var(--icon-selected);
+}
+
+.rangeNote {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.summary {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.empty {
+  margin: 0;
+  padding: 24px 16px 32px;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+/* ---- Chart ---- */
+
+.chart {
+  position: relative;
+  height: 150px;
+  padding: 0 6px 6px;
+}
+
+.chart svg {
+  display: block;
+  cursor: pointer;
+}
+
+.grid {
+  stroke: var(--border-default);
+  stroke-width: 1;
+  shape-rendering: crispEdges;
+}
+
+.yTick,
+.xTick,
+.nowTag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  fill: var(--text-tertiary);
+}
+
+.yTick {
+  text-anchor: end;
+}
+
+.xTick,
+.nowTag {
+  text-anchor: middle;
+}
+
+.nowTag {
+  fill: var(--text-primary);
+}
+
+.now {
+  stroke: var(--text-primary);
+  stroke-width: 1.5;
+}
+
+/* Forecast: a faint band, and lighter bars or a dashed look. */
+.forecastBand {
+  fill: var(--bg-forecast);
+}
+
+.barRect[data-forecast] {
+  opacity: 0.6;
+}
+
+.barRect[data-hover] {
+  opacity: 1;
+  stroke: var(--text-secondary);
+  stroke-width: 1;
+}
+
+.barRect[data-selected] {
+  opacity: 1;
+  stroke: var(--text-primary);
+  stroke-width: 2;
+}
+
+.line {
+  fill: none;
+  stroke: var(--text-secondary);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.dot {
+  fill: var(--surface-raised);
+  stroke: var(--text-secondary);
+  stroke-width: 2;
+}
+
+.dot[data-selected] {
+  stroke: var(--text-primary);
+}
+
+.tip {
+  position: absolute;
+  translate: -50% -100%;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
+  background: var(--text-primary);
+  color: var(--surface-raised);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---- Table ---- */
+
+.tableWrap {
+  height: 150px;
+  overflow-y: auto;
+  margin: 0 6px 6px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.table th,
+.table td {
+  padding: 4px 10px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-default);
+  font-weight: 400;
+}
+
+.table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--surface-raised);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.table tr[data-selected] {
+  background: var(--accent-soft);
+}
+
+.table tr[data-forecast] {
+  background: var(--bg-forecast);
+}
+
+.table tr[data-forecast][data-selected] {
+  background: var(--accent-soft);
+}
+
+.rowPick {
+  padding: 0;
+  font: inherit;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+  text-decoration: underline dotted var(--border-strong);
+  text-underline-offset: 3px;
+}
+
+.rowPick:disabled {
+  color: var(--text-tertiary);
+  text-decoration: none;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.mode {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  color: var(--mode-text);
+}
+
+.mode[data-mode='live'] {
+  color: var(--text-secondary);
+}
+
+.offset {
+  text-transform: none;
+}
+
+.source {
+  color: var(--text-secondary);
+}
