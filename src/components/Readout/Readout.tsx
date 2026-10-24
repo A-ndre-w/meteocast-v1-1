@@ -32,6 +32,8 @@ export type ReadoutProps = {
   onSeries?: () => void
   /** The chart and table are open (the button then reads as on). */
   seriesOpen?: boolean
+  /** Data on top of the main one (concept A): their values at this point, one quiet line each. */
+  extra?: { name: string; value: number | null; unit: string }[]
 }
 
 /**
@@ -55,6 +57,7 @@ export function Readout({
   onLocate,
   onSeries,
   seriesOpen = false,
+  extra = [],
 }: ReadoutProps) {
   const noData = state === 'noData' || value === null
 
@@ -119,6 +122,16 @@ export function Readout({
           </p>
         )}
       </div>
+      {extra.length > 0 && (
+        <dl className={styles.extra}>
+          {extra.map((x) => (
+            <div key={x.name} className={styles.extraRow}>
+              <dt>{x.name}</dt>
+              <dd>{x.value === null ? '—' : `${x.value} ${x.unit}`}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
       {onSeries && (
         <button type="button" className={styles.series} aria-pressed={seriesOpen} onClick={onSeries}>
           <Icon name="chart" size={16} aria-hidden="true" />

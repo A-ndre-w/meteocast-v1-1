@@ -137,6 +137,37 @@
   color: var(--text-secondary);
 }
 
+/* Overlays at this point: label in the layer name's quiet mono, value on the right. */
+.extra {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-default);
+}
+
+.extraRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--font-size-sm);
+}
+
+.extraRow dt {
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.extraRow dd {
+  margin: 0;
+  font-weight: 500;
+  color: var(--text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
 /* The station over time: a quiet link at the foot of the card. */
 .series {
   display: inline-flex;

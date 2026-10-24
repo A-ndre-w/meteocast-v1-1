@@ -97,6 +97,7 @@ Fonte: file Figma *UXChallenge_RadarMeteo*, pagina "🎨 Stile & Componenti". Le
 | Map Pill | `ModePill` | `mode`, `time`, `relative` |
 | — | `Toast` | `mode`, `tone`, `message`, `onUndo` |
 | Alert Panel · Alert · Alert/Severity tag | `AlertPanel` · `AlertCard` | `alerts`, `unread`, `onOpen`, `onMarkAllRead` · `alert`, `unread` |
+| — | `OnTheMap` | `main`, `overlays`, `onRemove`, `onOpen` — cosa c'è sulla mappa, in cima al pannello |
 | — | `SeriesPanel` | `layer`, `station`, `sel`, `onPick`, `onClose` — grafico e tabella di una stazione nel tempo |
 | — | `TopMenu` · `MapTools` | servizi aggiuntivi e account · strumenti mappa (icone e nomi; quello che aprono è fuori dal prototipo) |
 | — | `PresetEditor` | `preset`, `initialStreams`, `onSave`, `onCancel`, `onDelete` — crea e modifica i preset |
@@ -132,7 +133,7 @@ Tutte le regole sono funzioni pure in [src/state/rules.ts](src/state/rules.ts): 
 7. **Cambio inverso (rivisto dopo la UX review):** nessun livello è bloccato. Il pannello ha una voce per dato, con le icone delle modalità in cui esistono dati. Se si sceglie un dato senza valori nell'istante selezionato (per esempio un dato real time in Forecast), il tempo va all'istante più vicino che li ha, con Toast e Undo. La versione originale del brief disattivava il livello.
 8. **Disponibilità:** ogni livello dichiara modalità, intervallo e orizzonte ([src/data/layers.json](src/data/layers.json)). I giorni fuori portata sono "unavailable".
 9. **Readout:** "Updated HH:MM" in Live, "stale" con il ritardo esplicito, "noData" con "—" (mai "0").
-10. **Selezione:** singola; la barra laterale cambia gruppo di livelli senza spostare il tempo.
+10. **Selezione:** un dato principale (campo colorato ed etichette) più fino a tre sovrapposizioni disegnate come simboli. La barra laterale apre l'elenco di un gruppo senza spostare il tempo né cambiare il dato sulla mappa (dal 2026-10-24); "On the map" in cima al pannello e un puntino sui gruppi della barra dicono cosa c'è sulla mappa.
 11. **Mappa:** base e livello dati separati, nessun filtro sui dati. In Archive si desatura solo la base.
 
 In più, decisi con il designer durante lo sviluppo:

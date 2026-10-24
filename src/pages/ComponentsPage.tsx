@@ -150,7 +150,7 @@ export function ComponentsPage() {
       <Specimen
         name="LayerItem"
         figma="Layer/Item · 2007:7454"
-        props="status: 'default' | 'hover' | 'selected' | 'disabled', icon, label, meta, availability, idle, onSelect, disabledReason, onGoLive"
+        props="status: 'default' | 'hover' | 'selected' | 'disabled', icon, label, meta, availability, idle, onSelect, disabledReason, onGoLive, onToggleOverlay, overlay, overlayFull"
         note="Disabled is a code addition for the original rule 7: focusable, with a tooltip and “Back to live”. The screen no longer locks layers (picking one moves time with Undo), so this variant is kept but unused."
       >
         {(['default', 'hover', 'selected', 'disabled'] as const).map((status) => (
@@ -160,6 +160,21 @@ export function ComponentsPage() {
             </div>
           </Variant>
         ))}
+        <Variant label="overlay toggle · off">
+          <div style={{ width: 213 }}>
+            <LayerItem icon="sever-thunderstorm" label="Lightning" meta="last 60 min - 5min" onToggleOverlay={() => {}} />
+          </div>
+        </Variant>
+        <Variant label="overlay toggle · on the map">
+          <div style={{ width: 213 }}>
+            <LayerItem icon="sever-thunderstorm" label="Lightning" meta="last 60 min - 5min" onToggleOverlay={() => {}} overlay />
+          </div>
+        </Variant>
+        <Variant label="overlay toggle · three already">
+          <div style={{ width: 213 }}>
+            <LayerItem icon="wind" label="Wind gusts" meta="km/h - 5min" onToggleOverlay={() => {}} overlayFull />
+          </div>
+        </Variant>
         <Variant label="long label">
           <div style={{ width: 213 }}>
             <LayerItem icon="drizzle" label="Accumulated precipitation in 24h" meta="mm - daily" />

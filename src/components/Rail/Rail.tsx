@@ -8,13 +8,15 @@ export type RailProps = {
   /** The user's presets, after the default groups. */
   presets?: { id: string; title: string; icon: LayerGroup['icon'] }[]
   selectedGroupId: string
+  /** Groups and presets with data on the map (main or overlay): a dot on their button when another one is open. */
+  onMapGroups?: string[]
   onSelect?: (groupId: string) => void
   /** Opens the preset editor. */
   onAdd?: () => void
 }
 
 /** Side rail: one RailButton per layer group (rule 10), the user's presets, and "add preset". Screen-level. */
-export function Rail({ groups, presets = [], selectedGroupId, onSelect, onAdd }: RailProps) {
+export function Rail({ groups, presets = [], selectedGroupId, onMapGroups = [], onSelect, onAdd }: RailProps) {
   const listRef = useRef<HTMLUListElement>(null)
   // The list scrolls on short windows or with many presets: keep the selected group or preset in view.
   useEffect(() => {
@@ -30,6 +32,7 @@ export function Rail({ groups, presets = [], selectedGroupId, onSelect, onAdd }:
               icon={g.icon}
               label={g.title}
               status={g.id === selectedGroupId ? 'selected' : 'default'}
+              onMap={g.id !== selectedGroupId && onMapGroups.includes(g.id)}
               onClick={() => onSelect?.(g.id)}
             />
           </li>
@@ -43,6 +46,7 @@ export function Rail({ groups, presets = [], selectedGroupId, onSelect, onAdd }:
               icon={p.icon}
               label={`${p.title} (preset)`}
               status={p.id === selectedGroupId ? 'selected' : 'default'}
+              onMap={p.id !== selectedGroupId && onMapGroups.includes(p.id)}
               onClick={() => onSelect?.(p.id)}
             />
           </li>

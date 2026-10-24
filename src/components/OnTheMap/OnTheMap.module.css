@@ -1,0 +1,102 @@
+.root {
+  margin-right: 16px;
+  padding-bottom: 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.title {
+  margin: 0 0 6px;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Overlays: outlined, like their symbols on the map. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  max-width: 100%;
+  height: var(--size-sm);
+  padding: 0 4px 0 8px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface-raised);
+  font-size: var(--font-size-xs);
+  color: var(--text-primary);
+}
+
+/* The main data: filled, as its field is on the map. */
+.chip[data-main] {
+  padding-right: 8px;
+  border-color: var(--accent-default);
+  background: var(--accent-soft);
+}
+
+.chip[data-nodata] {
+  color: var(--text-secondary);
+  border-style: dashed;
+}
+
+/* The chip's text opens the data's group. */
+.open {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+}
+
+.open:hover .name {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.role {
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+}
+
+.remove {
+  width: 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  color: var(--text-secondary);
+}
+
+.remove:hover {
+  background: var(--surface-sunken);
+  color: var(--text-primary);
+}
+
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 6px 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}

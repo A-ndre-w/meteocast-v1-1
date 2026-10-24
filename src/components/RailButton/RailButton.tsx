@@ -8,6 +8,8 @@ export type RailButtonProps = {
   icon?: IconName
   /** Accessible name — the button shows an icon only. Also shown as a tooltip on hover and keyboard focus. */
   label: string
+  /** The group has data on the map (main or overlay) while another group is open: a small dot. */
+  onMap?: boolean
   onClick?: () => void
 }
 
@@ -16,7 +18,7 @@ export type RailButtonProps = {
  * A group preview listing its data was tried for UX audit H9 and dropped (designer, 2026-10-21): bulky and
  * redundant with the layer panel. The name tooltip stays.
  */
-export function RailButton({ status = 'default', icon = 'drizzle', label, onClick }: RailButtonProps) {
+export function RailButton({ status = 'default', icon = 'drizzle', label, onMap = false, onClick }: RailButtonProps) {
   const isAdd = status === 'add'
   // Fixed position: the rail list scrolls, so an absolute tooltip would be clipped (same approach as LayerItem).
   const [tipPos, setTipPos] = useState<{ top: number; left: number }>()
@@ -31,11 +33,12 @@ export function RailButton({ status = 'default', icon = 'drizzle', label, onClic
         type="button"
         className={styles.root}
         data-status={status}
-        aria-label={label}
+        aria-label={onMap ? `${label}, on the map` : label}
         aria-pressed={isAdd ? undefined : status === 'selected'}
         onClick={onClick}
       >
         <Icon name={isAdd ? 'plus' : icon} size={22} strokeWidth={isAdd ? 2 : undefined} />
+        {onMap && <span className={styles.onMap} aria-hidden="true" />}
       </button>
       {/* Visual only: the button already carries the name. */}
       <span className={styles.tip} style={tipPos} aria-hidden="true">

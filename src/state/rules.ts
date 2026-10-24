@@ -88,7 +88,8 @@ export function moveExplicit(view: View, rawTarget: TimeSel, snap?: Snap): Resul
   const twinTarget = twin && normalize(twin, rawTarget, how)
   if (twin && twinTarget && instantAvailable(twin, twinTarget)) {
     return {
-      view: { groupId: groupFor(view, twin), layerId: twin.id, sel: twinTarget },
+      // The same data on its twin: the open list stays open (it may be another group, browsed meanwhile).
+      view: { groupId: view.groupId, layerId: twin.id, sel: twinTarget },
     }
   }
   return { view, notice: blockNotice(layer, target) }
@@ -143,15 +144,13 @@ export function selectStream(view: View, streamId: string): Result {
   return { view: next, notice: { type: 'movedTo', layer: best.layer, mode: to, undo: view } }
 }
 
-/** Rule 10: switching group never moves time. Pick the first layer that has data now, else apply rule 5. */
+/**
+ * Rule 10: switching group never moves time. Since the overlays (concept A, 2026-10-24) it does not change the data
+ * either: the Rail opens a group's list, and the map keeps what is on it until an entry is picked. "On the map" at
+ * the top of the panel and the dots on the Rail say what that is. (Before: the group's first layer with data.)
+ */
 export function selectGroup(view: View, groupId: string): Result {
-  const group = groupById(groupId)!
-  if (group.layers.some((l) => l.id === view.layerId)) return { view: { ...view, groupId } }
-  const ready = group.layers.find((l) => instantAvailable(l, normalize(l, view.sel)))
-  if (ready) return { view: { groupId, layerId: ready.id, sel: normalize(ready, view.sel) } }
-  const forecast = group.layers.find((l) => l.modes.includes('forecast'))
-  if (forecast) return selectStream({ ...view, groupId }, forecast.stream)
-  return { view: { groupId, layerId: group.layers[0].id, sel: view.sel } }
+  return { view: { ...view, groupId } }
 }
 
 /**
@@ -196,10 +195,10 @@ export function playStep(view: View, origin: TimeSel): View {
   const carrier = stream.find((l) => instantAvailable(l, normalize(l, next, 'up')))
   if (!inWindow(next) || minutesBetween(next, origin) >= span || !carrier) {
     const back = stream.find((l) => instantAvailable(l, origin)) ?? layer
-    return { groupId: groupFor(view, back), layerId: back.id, sel: origin }
+    return { groupId: view.groupId, layerId: back.id, sel: origin }
   }
   // Crossing "now" hands over to the twin layer, as a manual move does (no toast).
-  return { groupId: groupFor(view, carrier), layerId: carrier.id, sel: normalize(carrier, next, 'up') }
+  return { groupId: view.groupId, layerId: carrier.id, sel: normalize(carrier, next, 'up') }
 }
 
 export const stepDayTarget = (sel: TimeSel, d: number): TimeSel => ({ ...sel, day: addDays(sel.day, d) })

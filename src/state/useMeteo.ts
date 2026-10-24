@@ -93,7 +93,8 @@ export function useMeteo() {
     goNow: () => apply((v) => goLive(v)),
     // Changing the data pauses Play: the loop would silently change scope, e.g. hours → days (UX audit H14).
     selectStream: (streamId: string) => apply((v) => selectStream(v, streamId)),
-    selectGroup: (groupId: string) => apply((v) => selectGroup(v, groupId)),
+    // Opening a group only shows its list (concept A): Play goes on.
+    selectGroup: (groupId: string) => apply((v) => selectGroup(v, groupId), { stopPlay: false }),
     /** An instant picked in the chart or the table: the nearest instant of the data. */
     goTo: (sel: TimeSel) => apply((v) => moveExplicit(v, sel, 'nearest')),
     /** An alert's data at its instant. */

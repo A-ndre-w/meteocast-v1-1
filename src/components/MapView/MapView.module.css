@@ -61,6 +61,53 @@
   cursor: pointer;
 }
 
+/* ---- Overlays (concept A): symbols on top of the main layer ---- */
+
+/* An outlined value under the dot: never confused with the main layer's filled labels. */
+.ovValue {
+  position: absolute;
+  translate: -50% 0;
+  height: 16px;
+  padding: 0 5px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-xs);
+  background: var(--surface-raised);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  line-height: 14px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Lightning: a bolt beside the dot, bigger with more strikes; dark with a white halo on any colour. */
+.bolt {
+  position: absolute;
+  translate: 0 -50%;
+  fill: var(--text-primary);
+  stroke: var(--surface-raised);
+  stroke-width: 1;
+  paint-order: stroke;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* Wind: an arrow from the dot towards where the wind blows, longer when stronger. */
+.arrow {
+  position: absolute;
+  width: 10px;
+  translate: -50% -100%;
+  transform-origin: 50% 100%;
+  fill: none;
+  stroke: var(--text-primary);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(0 0 1px var(--surface-raised)) drop-shadow(0 0 1px var(--surface-raised));
+}
+
 .tip {
   position: absolute;
   z-index: 1;

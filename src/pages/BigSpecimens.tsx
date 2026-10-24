@@ -7,6 +7,7 @@ import { Legend } from '../components/Legend/Legend'
 import { AlertCard } from '../components/AlertCard/AlertCard'
 import { AlertPanel } from '../components/AlertPanel/AlertPanel'
 import { MapTools } from '../components/MapTools/MapTools'
+import { OnTheMap } from '../components/OnTheMap/OnTheMap'
 import { PresetEditor } from '../components/PresetEditor/PresetEditor'
 import { SeriesPanel } from '../components/SeriesPanel/SeriesPanel'
 import { Readout } from '../components/Readout/Readout'
@@ -272,7 +273,7 @@ export function BigSpecimens() {
       <Specimen
         name="Legend"
         figma="— (was the scale at the bottom of the Layer Card)"
-        props="layer, unit, source?, ramp, max, breaks?, value?"
+        props="layer, unit, source?, ramp, max, breaks?, value?, overlays?"
         note="Fixed at the top right, for scanning the whole map. Five classes, the same colours as the field and the value labels; the triangle marks the selected point. The tag names the product or model the values come from."
       >
         <Variant label="rain · 4.2 mm">
@@ -280,6 +281,46 @@ export function BigSpecimens() {
         </Variant>
         <Variant label="snow · 15 %">
           <Legend layer="Snow probability" unit="%" source="ICON-2I" ramp={snow.ramp} max={snow.max} value={15} />
+        </Variant>
+        <Variant label="with overlays (concept A)">
+          <Legend
+            layer="Hourly rainfall"
+            unit="mm"
+            source="GisMeteotrigger"
+            ramp={rain.ramp}
+            max={rain.max}
+            value={4.2}
+            overlays={[
+              { name: 'Lightning', unit: 'strikes', kind: 'bolt', source: 'Lightning network' },
+              { name: 'Wind speed', unit: 'km/h', kind: 'arrow', source: 'Weather stations' },
+              { name: 'Air temperature', unit: '°C', kind: 'value', source: 'Weather stations' },
+            ]}
+          />
+        </Variant>
+      </Specimen>
+
+      <Specimen
+        name="OnTheMap"
+        figma="— (new: overlays, concept A)"
+        props="main, overlays, onRemove, onOpen"
+        note="Top of the layer panel, whatever group is open: the main data (filled, its field on the map) and up to three data on top as symbols (outlined, removable). A name opens its group. With no overlays, a hint points at the layers button of the entries."
+      >
+        <Variant label="main only">
+          <div style={{ width: 220 }}>
+            <OnTheMap main={{ stream: 'water/hourly-rainfall', name: 'Hourly rainfall', icon: 'drizzle' }} overlays={[]} />
+          </div>
+        </Variant>
+        <Variant label="main + 3 overlays, one without data now">
+          <div style={{ width: 220 }}>
+            <OnTheMap
+              main={{ stream: 'water/hourly-rainfall', name: 'Hourly rainfall', icon: 'drizzle' }}
+              overlays={[
+                { stream: 'water/lightning', name: 'Lightning', icon: 'sever-thunderstorm', noData: true },
+                { stream: 'wind/wind-speed', name: 'Wind speed', icon: 'wind' },
+                { stream: 'temperature/air-temperature', name: 'Air temperature', icon: 'thermometer' },
+              ]}
+            />
+          </div>
         </Variant>
       </Specimen>
 

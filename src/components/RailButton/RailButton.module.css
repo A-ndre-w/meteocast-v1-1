@@ -1,4 +1,17 @@
+/* Data of this group are on the map: a dot at the top right, the accent with a ring of the rail's colour. */
+.onMap {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: var(--accent-default);
+  box-shadow: 0 0 0 2px var(--surface-raised);
+}
+
 .root {
+  position: relative;
   width: var(--size-lg);
   height: var(--size-lg);
   border-radius: var(--radius-pill);

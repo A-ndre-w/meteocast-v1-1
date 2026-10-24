@@ -3,6 +3,46 @@
   width: 100%;
 }
 
+/* Overlay toggle (concept A), inside the item on the right; the item's text keeps clear of it. */
+.wrap:has(.overlay) .root {
+  padding-right: 40px;
+}
+
+.overlay {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  translate: 0 -50%;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  color: var(--text-tertiary);
+}
+
+.overlay:hover {
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+
+/* On the map: the accent, like the selection, but outlined (it is not the main data). */
+.overlay[aria-pressed='true'] {
+  color: var(--accent-strong);
+  background: var(--surface-raised);
+  box-shadow: inset 0 0 0 1.5px var(--accent-default);
+}
+
+.overlay[aria-disabled='true'] {
+  color: var(--border-strong);
+}
+
+.overlay[aria-disabled='true']:hover {
+  background: none;
+  box-shadow: none;
+}
+
 .root {
   width: 100%;
   display: flex;

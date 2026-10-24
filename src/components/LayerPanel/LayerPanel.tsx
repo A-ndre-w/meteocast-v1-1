@@ -1,5 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { streamsOf, type LayerGroup, type Stream } from '../../data'
+import { MAX_OVERLAYS } from '../../state/overlays'
 import { LayerItem } from '../LayerItem/LayerItem'
 import { PresetHeader } from '../PresetHeader/PresetHeader'
 import styles from './LayerPanel.module.css'
@@ -12,6 +13,11 @@ export type LayerPanelProps = {
   onSelect?: (streamId: string) => void
   /** A user preset: the header says "Custom" and offers Edit. */
   onEditPreset?: () => void
+  /** Streams drawn on top of the main one (concept A). */
+  overlays?: string[]
+  onToggleOverlay?: (streamId: string) => void
+  /** What is on the map, above the group's list: stays the same whatever group is open. */
+  onMap?: ReactNode
 }
 
 /**
@@ -21,7 +27,7 @@ export type LayerPanelProps = {
  * timeline shows where each data has values). Nothing is locked:
  * picking data that has nothing at the selected instant moves time to the nearest instant, with Undo.
  */
-export function LayerPanel({ group, selectedStreamId, isAvailable, onSelect, onEditPreset }: LayerPanelProps) {
+export function LayerPanel({ group, selectedStreamId, isAvailable, onSelect, onEditPreset, overlays = [], onToggleOverlay, onMap }: LayerPanelProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const streams = streamsOf(group)
 
@@ -34,6 +40,7 @@ export function LayerPanel({ group, selectedStreamId, isAvailable, onSelect, onE
 
   return (
     <nav className={styles.root} aria-label={`${group.title} layers`}>
+      {onMap}
       <div className={styles.header}>
         <PresetHeader
           icon={group.icon}
@@ -54,6 +61,9 @@ export function LayerPanel({ group, selectedStreamId, isAvailable, onSelect, onE
                 status={s.id === selectedStreamId ? 'selected' : 'default'}
                 idle={isAvailable ? !isAvailable(s) : false}
                 onSelect={() => onSelect?.(s.id)}
+                onToggleOverlay={onToggleOverlay && s.id !== selectedStreamId ? () => onToggleOverlay(s.id) : undefined}
+                overlay={overlays.includes(s.id)}
+                overlayFull={overlays.length >= MAX_OVERLAYS}
               />
             </li>
           ))}

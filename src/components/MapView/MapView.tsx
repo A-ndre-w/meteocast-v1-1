@@ -13,6 +13,19 @@ type StationValue = { name: string; pos: Point; value: number | null }
 
 export type MapViewHandle = { zoomIn: () => void; zoomOut: () => void }
 
+/** Data drawn on top of the main layer as symbols (concept A): bolts, arrows or small outlined values. */
+export type MapOverlay = {
+  stream: string
+  name: string
+  unit: string
+  kind: 'bolt' | 'arrow' | 'value'
+  /** One per station, in the order of `stations`. */
+  values: (number | null)[]
+  /** Arrows: degrees clockwise from north. */
+  dirs: number[]
+  max: number
+}
+
 export type MapViewProps = {
   mode: Mode
   /** Colour family of the data layer. */
@@ -26,6 +39,8 @@ export type MapViewProps = {
   layerName: string
   /** Every station, the selected one included. Positions in design-frame px (src/map/geo.ts). */
   stations: StationValue[]
+  /** Up to three more data on top of the main layer, as symbols. */
+  overlays?: MapOverlay[]
   /** Name of the selected station, where the pin and the card stand; null = nothing pinned, only the legend. */
   selected: string | null
   /** A click (or Enter) on a station selects it and opens its card. */
@@ -181,6 +196,53 @@ function placeLabels(stations: StationValue[], screen: Point[], unit: string, br
   return shown
 }
 
+const OV_H = 16 // outlined overlay value under the dot
+const OV_GAP = 7
+
+/**
+ * Overlay values (concept A): under the dot, one row per value overlay, wherever they fit after the main labels.
+ * Highest first, like the labels, so the extremes are never the ones left out.
+ */
+function placeOverlayValues(
+  overlays: MapOverlay[],
+  stations: StationValue[],
+  screen: Point[],
+  labelled: Set<number>,
+  unit: string,
+  pin: Point | null,
+  skip: number,
+  container: HTMLElement,
+): Map<string, Set<number>> {
+  const taken: Rect[] = [...(pin ? [[pin[0] - 32, pin[1] - 72, pin[0] + 32, pin[1]] as Rect] : []), ...obstacles(container)]
+  for (const i of labelled) {
+    const w = `${stations[i].value} ${unit}`.length * CHAR_W + 14
+    const [x, y] = screen[i]
+    taken.push([x - w / 2, y - DOT_GAP - LABEL_H, x + w / 2, y - DOT_GAP])
+  }
+  const { clientWidth: vw, clientHeight: vh } = container
+  const out = new Map<string, Set<number>>()
+  overlays
+    .filter((o) => o.kind === 'value')
+    .forEach((o, row) => {
+      const shown = new Set<number>()
+      const order = o.values
+        .map((v, i) => ({ i, v }))
+        .filter((s): s is { i: number; v: number } => s.i !== skip && s.v !== null)
+        .sort((a, b) => b.v - a.v)
+      for (const { i, v } of order) {
+        const w = `${v} ${o.unit}`.length * CHAR_W + 12
+        const [x, y] = screen[i]
+        const top = y + OV_GAP + row * (OV_H + 2)
+        const r: Rect = [x - w / 2, top, x + w / 2, top + OV_H]
+        if (r[0] < GAP || r[1] < GAP || r[2] > vw - GAP || r[3] > vh - GAP || taken.some((t) => overlaps(t, r))) continue
+        taken.push(r)
+        shown.add(i)
+      }
+      out.set(o.stream, shown)
+    })
+  return out
+}
+
 // ---- Card by the pin ----
 const CARD_GAP = 8
 type Side = 'right' | 'left' | 'above' | 'below'
@@ -219,7 +281,7 @@ const reducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)'
  * scale, drawn under the place names), a dot for every station, and a value label where it rains, decluttered
  * (zooming in reveals more). Hovering a dot or a label shows the station's name and value, zero included.
  */
-export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations, selected, onSelect, onClear, card, onZoomRange, ref }: MapViewProps) {
+export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations, overlays = [], selected, onSelect, onClear, card, onZoomRange, ref }: MapViewProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<MlMap | null>(null)
   const cardRef = useRef<HTMLDivElement>(null)
@@ -362,6 +424,11 @@ export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations,
     // screen and pinAt are read when the map settles, on purpose: placing labels on every frame would flicker.
     [ready, settled, stations, unit, breaks, patchy, sel],
   )
+  const overlayShown = useMemo(
+    () => (ready ? placeOverlayValues(overlays, stations, screen, labelled, unit, pinAt, sel, containerRef.current!) : new Map<string, Set<number>>()),
+    // Same as the labels: placed when the map settles.
+    [ready, settled, overlays, labelled, stations, unit, sel],
+  )
   useEffect(() => {
     const source = ready ? (mapRef.current?.getSource('label-boxes') as GeoJSONSource | undefined) : undefined
     source?.setData({
@@ -412,6 +479,8 @@ export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations,
     dotRefs.current[next]?.focus()
   }
   const valueText = (s: StationValue) => (s.value === null ? 'no data' : `${s.value} ${unit}`)
+  // The station's accessible name carries the overlays too: "Belluno, 8.3 mm; Lightning 12 strikes".
+  const overlayText = (i: number) => overlays.map((o) => `; ${o.name} ${o.values[i] === null ? 'no data' : `${o.values[i]} ${o.unit}`}`).join('')
   const tip = hover === null || hover === sel ? null : stations[hover]
   const at = ([x, y]: Point) => ({ left: x, top: y })
 
@@ -432,7 +501,7 @@ export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations,
               data-selected={i === sel || undefined}
               style={at(screen[i])}
               tabIndex={i === focusIndex ? 0 : -1}
-              aria-label={`${s.name}, ${valueText(s)}`}
+              aria-label={`${s.name}, ${valueText(s)}${overlayText(i)}`}
               aria-pressed={i === sel}
               onPointerEnter={() => setHover(i)}
               onFocus={() => {
@@ -444,6 +513,38 @@ export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations,
               onClick={() => onSelect(s.name)}
             />
           ))}
+          {/* Overlays: symbols on top of the field but under the main labels, which stay readable. Decorative: the dots' names say the values. */}
+          {overlays.map((o) =>
+            o.kind === 'value'
+              ? [...(overlayShown.get(o.stream) ?? [])].map((i) => {
+                  const row = overlays.filter((x) => x.kind === 'value').indexOf(o)
+                  return (
+                    <span key={`${o.stream}-${i}`} className={styles.ovValue} style={{ left: screen[i][0], top: screen[i][1] + OV_GAP + row * (OV_H + 2) }} aria-hidden="true">
+                      {o.values[i]} {o.unit}
+                    </span>
+                  )
+                })
+              : o.values.map((v, i) => {
+                  if (v === null || v <= 0 || i === sel) return null
+                  const k = o.max > 0 ? v / o.max : 0
+                  return o.kind === 'bolt' ? (
+                    <svg key={`${o.stream}-${i}`} className={styles.bolt} style={{ left: screen[i][0] + 6, top: screen[i][1] - 2, width: 10 + 8 * k, height: 14 + 10 * k }} viewBox="0 0 10 14" aria-hidden="true">
+                      <path d="M6 0 0.5 8H4.5L3.5 14 9.5 5.5H5.5Z" />
+                    </svg>
+                  ) : (
+                    <svg
+                      key={`${o.stream}-${i}`}
+                      className={styles.arrow}
+                      style={{ left: screen[i][0], top: screen[i][1], height: 12 + 16 * k, rotate: `${o.dirs[i]}deg` }}
+                      viewBox="0 0 10 28"
+                      preserveAspectRatio="none"
+                      aria-hidden="true"
+                    >
+                      <path d="M5 28V3M1.5 7 5 2l3.5 5" vectorEffect="non-scaling-stroke" />
+                    </svg>
+                  )
+                }),
+          )}
           {stations.map((s, i) =>
             labelled.has(i) ? (
               <span key={s.name} className={styles.label} style={at(screen[i])} aria-hidden="true" onPointerEnter={() => setHover(i)} onClick={() => onSelect(s.name)}>
@@ -455,6 +556,11 @@ export function MapView({ mode, ramp, breaks, unit, patchy, layerName, stations,
             <span className={styles.tip} style={at(screen[hover!])} aria-hidden="true">
               <span className={styles.tipName}>{tip.name}</span>
               <span className={styles.tipValue}>{valueText(tip)}</span>
+              {overlays.map((o) => (
+                <span key={o.stream} className={styles.tipValue}>
+                  · {o.values[hover!] === null ? '—' : `${o.values[hover!]} ${o.unit}`}
+                </span>
+              ))}
             </span>
           )}
         </div>

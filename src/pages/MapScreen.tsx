@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AlertPanel } from '../components/AlertPanel/AlertPanel'
 import { LayerPanel } from '../components/LayerPanel/LayerPanel'
+import { OnTheMap } from '../components/OnTheMap/OnTheMap'
 import { PresetEditor } from '../components/PresetEditor/PresetEditor'
 import { Legend } from '../components/Legend/Legend'
 import { Logo } from '../components/Logo/Logo'
@@ -16,9 +17,10 @@ import { Timebar } from '../components/Timebar/Timebar'
 import { Toast } from '../components/Toast/Toast'
 import { TopMenu } from '../components/TopMenu/TopMenu'
 import { ZoomControl } from '../components/ZoomControl/ZoomControl'
-import { coordsOf, finestStep, groupById, groupOf, groups, inNowcast, instantAvailable, sourceAt, stepOf, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
+import { coordsOf, finestStep, groupById, streamById, groupOf, groups, inNowcast, instantAvailable, sourceAt, stepOf, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
 import { alerts, initiallyUnread } from '../data/alerts'
 import { breaksOf, classOf } from '../scale'
+import { MAX_OVERLAYS, overlayAt } from '../state/overlays'
 import { presetStore, usePresets, type Preset } from '../state/presets'
 import { useMeteo } from '../state/useMeteo'
 import {
@@ -109,6 +111,22 @@ export function MapScreen() {
     const values = stationValues(layer, sel)
     return [{ name: location.name, pos: location.pin, value: valueAt(layer.id, sel) }, ...stations.map((s, i) => ({ ...s, value: values[i] }))]
   }, [layer, sel])
+  // Concept A: data drawn on top of the main one, as symbols (up to three). Picking one as the main data takes it
+  // off the overlays; they stay when the group changes.
+  const [overlayIds, setOverlayIds] = useState<string[]>([])
+  useEffect(() => setOverlayIds((o) => o.filter((id) => id !== layer.stream)), [layer.stream])
+  const overlays = useMemo(
+    () => overlayIds.filter((id) => id !== layer.stream).map((id) => overlayAt(id, sel, network)),
+    [overlayIds, layer.stream, sel, network],
+  )
+  const toggleOverlay = (id: string) =>
+    setOverlayIds((o) => (o.includes(id) ? o.filter((x) => x !== id) : o.length >= MAX_OVERLAYS ? o : [...o, id]))
+  // Groups and presets that hold something on the map: their Rail button gets a dot.
+  const onMapStreams = [layer.stream, ...overlays.map((o) => o.stream)]
+  const onMapGroups = [...groups.map((g) => g.id), ...presets.map((p) => p.id)].filter((id) =>
+    groupById(id)?.layers.some((l) => onMapStreams.includes(l.stream)),
+  )
+  const selectedIndex = network.findIndex((s) => s.name === selected)
   // Rule 9: Live shows "Updated HH:MM"; late data is "stale" with its delay; missing data is "—".
   const value = network.find((s) => s.name === selected)?.value ?? null
   const mapRef = useRef<MapViewHandle>(null)
@@ -172,6 +190,7 @@ export function MapScreen() {
         patchy={isPatchy(layer)}
         layerName={layer.name}
         stations={network}
+        overlays={overlays}
         selected={selected}
         onSelect={setSelected}
         onClear={() => setSelected(null)}
@@ -192,6 +211,7 @@ export function MapScreen() {
             onLocate={docked ? locate : undefined}
             onSeries={() => setSeriesOpen((o) => !o)}
             seriesOpen={seriesOpen}
+            extra={overlays.map((o) => ({ name: o.name, value: o.values[selectedIndex] ?? null, unit: o.unit }))}
           />
         )}
         onZoomRange={(canIn, canOut) => setZoomRange({ canIn, canOut })}
@@ -205,7 +225,14 @@ export function MapScreen() {
       </div>
 
       <div className={styles.rail} data-map-obstacle>
-        <Rail groups={groups} presets={presets} selectedGroupId={view.groupId} onSelect={actions.selectGroup} onAdd={() => openEditor()} />
+        <Rail
+          groups={groups}
+          presets={presets}
+          selectedGroupId={view.groupId}
+          onMapGroups={onMapGroups}
+          onSelect={actions.selectGroup}
+          onAdd={() => openEditor()}
+        />
       </div>
 
       {/* The preset editor takes the panel's place: the map and the Rail stay in view. */}
@@ -236,6 +263,16 @@ export function MapScreen() {
             isAvailable={(s) => s.layers.some((l) => instantAvailable(l, sel))}
             onSelect={actions.selectStream}
             onEditPreset={editedPreset && (() => openEditor(editedPreset))}
+            overlays={overlays.map((o) => o.stream)}
+            onToggleOverlay={toggleOverlay}
+            onMap={
+              <OnTheMap
+                main={{ stream: layer.stream, name: layer.name, icon: layer.icon }}
+                overlays={overlays.map((o) => ({ stream: o.stream, name: o.name, icon: streamById(o.stream).icon, noData: !o.layer }))}
+                onRemove={toggleOverlay}
+                onOpen={(stream) => actions.selectGroup(groupOf(streamById(stream).layers[0].id).id)}
+              />
+            }
           />
         )}
       </div>
@@ -317,7 +354,10 @@ export function MapScreen() {
 
       {/* The legend stays at the top right for scanning the whole map; the triangle marks the selected point. */}
       <div className={styles.legend} data-map-obstacle data-map-legend>
-        <Legend layer={layer.name} unit={layer.unit} source={sourceAt(layer, sel)} ramp={layer.scale.ramp} max={layer.scale.max} breaks={breaks} value={value} />
+        <Legend layer={layer.name} unit={layer.unit} source={sourceAt(layer, sel)} ramp={layer.scale.ramp} max={layer.scale.max} breaks={breaks}
+          value={value}
+          overlays={overlays.map((o) => ({ name: o.name, unit: o.unit, kind: o.kind, source: o.layer && sourceAt(o.layer, sel) }))}
+        />
       </div>
 
       <div className={styles.tools} data-map-obstacle>

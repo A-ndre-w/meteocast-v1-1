@@ -15,13 +15,31 @@ export type LegendProps = {
   breaks?: number[]
   /** Value at the selected point: the triangle ties the legend to the card on the map. null = no marker. */
   value?: number | null
+  /** Data on top of the main one (concept A): one line each, with its symbol. */
+  overlays?: { name: string; unit: string; kind: 'bolt' | 'arrow' | 'value'; source?: string }[]
 }
+
+/** The overlay's symbol as drawn on the map, small. */
+function OverlaySymbol({ kind }: { kind: 'bolt' | 'arrow' | 'value' }) {
+  if (kind === 'value') return <span className={styles.ovValue}>12</span>
+  return kind === 'bolt' ? (
+    <svg className={styles.ovBolt} viewBox="0 0 10 14" aria-hidden="true">
+      <path d="M6 0 0.5 8H4.5L3.5 14 9.5 5.5H5.5Z" />
+    </svg>
+  ) : (
+    <svg className={styles.ovArrow} viewBox="0 0 10 28" aria-hidden="true">
+      <path d="M5 28V3M1.5 7 5 2l3.5 5" />
+    </svg>
+  )
+}
+
+const overlayHow = { bolt: 'bigger = more', arrow: 'longer = stronger', value: 'value' }
 
 /**
  * Fixed legend of the map (top right): for scanning the whole map, while the point card sits by the pin.
  * Was the scale at the bottom of the Layer Card (Readout); it now carries its own title and unit.
  */
-export function Legend({ layer, unit, source, ramp, max, breaks: given, value = null }: LegendProps) {
+export function Legend({ layer, unit, source, ramp, max, breaks: given, value = null, overlays = [] }: LegendProps) {
   const breaks = given ?? breaksOf(max, unit, ramp === 'rain' || ramp === 'snow')
   const pos = value === null ? null : legendPos(value, breaks)
   // A label under each class bound; the top class is open ("20+"), except for percentages, which end at 100.
@@ -57,6 +75,26 @@ export function Legend({ layer, unit, source, ramp, max, breaks: given, value = 
       <p className="visually-hidden">
         Five classes: {ticks.join(', ')} {unit}.
       </p>
+      {overlays.length > 0 && (
+        <ul className={styles.overlays} aria-label="On top">
+          {overlays.map((o) => (
+            <li key={o.name} className={styles.overlay}>
+              <span className={styles.ovSymbol} aria-hidden="true">
+                <OverlaySymbol kind={o.kind} />
+              </span>
+              <span className={styles.ovText}>
+                <span className={styles.ovName}>
+                  {o.name} <span className={styles.unit}>· {o.unit}</span>
+                </span>
+                <span className={styles.ovHow}>
+                  {overlayHow[o.kind]}
+                  {o.source && <span className={styles.ovSource}>{o.source}</span>}
+                </span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   )
 }

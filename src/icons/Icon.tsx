@@ -95,6 +95,9 @@ const uiIcons = {
       <circle cx="12" cy="12" r="3" />
     </>
   ),
+  // Overlays: add a data on top of the main one; lightning symbol.
+  stack: <path d="m12 4.5 8 4-8 4-8-4zM4 12.5l8 4 8-4M4 16l8 4 8-4" />,
+  bolt: <path d="M13 3.5 6 13.5h5l-1 7 7.5-10.5h-5z" />,
   // Station series.
   chart: <path d="M4.5 19.5h15M7.5 16.5v-5M12 16.5v-9M16.5 16.5v-7" />,
   table: (

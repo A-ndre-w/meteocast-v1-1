@@ -20,6 +20,12 @@ export type LayerItemProps = {
   availability?: { modes: Mode[]; current: Mode }
   /** No data at the selected instant: dimmed but still clickable (picking it moves time). */
   idle?: boolean
+  /** Concept A: draws this data on top of the main one, as symbols. Absent on the main data itself. */
+  onToggleOverlay?: () => void
+  /** It is on the map as an overlay. */
+  overlay?: boolean
+  /** Three overlays already: the toggle explains instead of adding. */
+  overlayFull?: boolean
 }
 
 /** Figma: Layer/Item (2007:7454). Single selection inside the layer panel. */
@@ -33,6 +39,9 @@ export function LayerItem({
   onGoLive,
   availability,
   idle,
+  onToggleOverlay,
+  overlay = false,
+  overlayFull = false,
 }: LayerItemProps) {
   const tipId = useId()
   const disabled = status === 'disabled'
@@ -79,6 +88,19 @@ export function LayerItem({
         </span>
         {disabled && <Icon name="lock" size={14} className={styles.lock} />}
       </button>
+      {onToggleOverlay && (
+        <button
+          type="button"
+          className={styles.overlay}
+          aria-pressed={overlay}
+          aria-label={overlay ? `Remove ${label} from the map` : `Add ${label} on top of the map`}
+          aria-disabled={(!overlay && overlayFull) || undefined}
+          title={overlay ? 'On the map: remove' : overlayFull ? 'Up to 3 data on top of the main one' : 'Add on top of the map'}
+          onClick={() => (!overlay && overlayFull ? undefined : onToggleOverlay())}
+        >
+          <Icon name="stack" size={16} />
+        </button>
+      )}
 
       {disabled && (
         <div className={styles.tip} id={tipId} role="tooltip" style={tipPos}>
