@@ -23,6 +23,17 @@ const or = (modes: Mode[]) =>
 /** Copy of every toast. Mode names always appear as words (never colour alone). */
 export function toastFor(n: Notice): ToastContent {
   switch (n.type) {
+    case 'presetDeleted':
+      return {
+        tone: 'info',
+        mode: 'live',
+        undo: n.undo,
+        message: (
+          <>
+            Preset <strong>{n.preset.title}</strong> deleted.
+          </>
+        ),
+      }
     case 'forecastOnly': // Screen 02, rule 5
       return {
         tone: 'info',

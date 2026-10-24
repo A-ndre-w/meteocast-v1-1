@@ -191,12 +191,15 @@ export function ComponentsPage() {
         </Variant>
       </Specimen>
 
-      <Specimen name="PresetHeader" figma="Set header · 2008:9539" props="icon, title, preset, layerCount">
+      <Specimen name="PresetHeader" figma="Set header · 2008:9539" props="icon, title, preset, layerCount, onEdit">
         <Variant label="Water & Storms">
           <PresetHeader icon="drizzle" title="Water & Storms" layerCount={16} />
         </Variant>
         <Variant label="Snow">
           <PresetHeader icon="snow" title="Snow" layerCount={5} />
+        </Variant>
+        <Variant label="user preset · Custom, with Edit">
+          <PresetHeader icon="waves" title="Flood watch" preset="Custom" layerCount={4} onEdit={() => {}} />
         </Variant>
       </Specimen>
 

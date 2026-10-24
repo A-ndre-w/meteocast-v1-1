@@ -1,20 +1,29 @@
+import { useEffect, useRef } from 'react'
 import type { LayerGroup } from '../../data'
 import { RailButton } from '../RailButton/RailButton'
 import styles from './Rail.module.css'
 
 export type RailProps = {
   groups: LayerGroup[]
+  /** The user's presets, after the default groups. */
+  presets?: { id: string; title: string; icon: LayerGroup['icon'] }[]
   selectedGroupId: string
   onSelect?: (groupId: string) => void
-  /** Preset creation is out of v1: the add button is rendered but inert. */
+  /** Opens the preset editor. */
   onAdd?: () => void
 }
 
-/** Side rail: one RailButton per layer group (rule 10), plus "add preset". Screen-level, no Figma component. */
-export function Rail({ groups, selectedGroupId, onSelect, onAdd }: RailProps) {
+/** Side rail: one RailButton per layer group (rule 10), the user's presets, and "add preset". Screen-level. */
+export function Rail({ groups, presets = [], selectedGroupId, onSelect, onAdd }: RailProps) {
+  const listRef = useRef<HTMLUListElement>(null)
+  // The list scrolls on short windows or with many presets: keep the selected group or preset in view.
+  useEffect(() => {
+    listRef.current?.querySelector('[aria-pressed="true"]')?.scrollIntoView({ block: 'nearest' })
+  }, [selectedGroupId, presets.length])
+
   return (
     <nav className={styles.root} aria-label="Layer groups">
-      <ul className={styles.list}>
+      <ul className={styles.list} ref={listRef}>
         {groups.map((g) => (
           <li key={g.id}>
             <RailButton
@@ -22,6 +31,19 @@ export function Rail({ groups, selectedGroupId, onSelect, onAdd }: RailProps) {
               label={g.title}
               status={g.id === selectedGroupId ? 'selected' : 'default'}
               onClick={() => onSelect?.(g.id)}
+            />
+          </li>
+        ))}
+        {presets.length > 0 && (
+          <li className={styles.divider} aria-hidden="true" />
+        )}
+        {presets.map((p) => (
+          <li key={p.id}>
+            <RailButton
+              icon={p.icon}
+              label={`${p.title} (preset)`}
+              status={p.id === selectedGroupId ? 'selected' : 'default'}
+              onClick={() => onSelect?.(p.id)}
             />
           </li>
         ))}

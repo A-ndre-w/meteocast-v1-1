@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from 'react'
 import { LayerPanel } from '../components/LayerPanel/LayerPanel'
+import { PresetEditor } from '../components/PresetEditor/PresetEditor'
 import { Legend } from '../components/Legend/Legend'
 import { Logo } from '../components/Logo/Logo'
 import { MapView, type MapViewHandle } from '../components/MapView/MapView'
@@ -11,8 +12,9 @@ import { SearchBar } from '../components/SearchBar/SearchBar'
 import { Timebar } from '../components/Timebar/Timebar'
 import { Toast } from '../components/Toast/Toast'
 import { ZoomControl } from '../components/ZoomControl/ZoomControl'
-import { coordsOf, finestStep, groups, inNowcast, instantAvailable, sourceAt, stepOf, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
+import { coordsOf, finestStep, groupById, groupOf, groups, inNowcast, instantAvailable, sourceAt, stepOf, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
 import { breaksOf, classOf } from '../scale'
+import { presetStore, usePresets, type Preset } from '../state/presets'
 import { useMeteo } from '../state/useMeteo'
 import {
   addDays,
@@ -49,7 +51,28 @@ export function MapScreen() {
   const { state, view, layer, actions } = useMeteo()
   const { sel } = view
   const mode = modeOf(sel) // rule 1
-  const group = groups.find((g) => g.id === view.groupId)!
+  const presets = usePresets()
+  // A default group or a user preset (a deleted preset in an old link falls back to the data's own group).
+  const group = groupById(view.groupId) ?? groupOf(layer.id)
+  const editedPreset = presets.find((p) => p.id === view.groupId)
+  // The preset editor: null = closed; without a preset it creates one.
+  const [editor, setEditor] = useState<{ preset?: Preset } | null>(null)
+  const editorOpener = useRef<HTMLElement | null>(null)
+  const openEditor = (preset?: Preset) => {
+    editorOpener.current = document.activeElement as HTMLElement | null
+    setEditor({ preset })
+  }
+  // Focus after closing: what opened the editor (Cancel), or the given place (the saved preset, the group after a delete).
+  const closeEditor = (focus?: string) => {
+    setEditor(null)
+    requestAnimationFrame(() => {
+      const opener = editorOpener.current
+      const back =
+        (focus && document.querySelector<HTMLElement>(focus)) ||
+        (opener?.isConnected && opener !== document.body ? opener : document.querySelector<HTMLElement>('[aria-label="Create preset"]'))
+      back?.focus()
+    })
+  }
   const daily = layer.interval === 'day' // rule 6
 
   // The selected point: any station of the network, Trento at the start. Its card sits by the pin. null = nothing
@@ -155,21 +178,39 @@ export function MapScreen() {
       </div>
 
       <div className={styles.rail} data-map-obstacle>
-        <Rail
-          groups={groups}
-          selectedGroupId={view.groupId}
-          onSelect={actions.selectGroup}
-          onAdd={() => actions.notInPrototype('Creating presets')}
-        />
+        <Rail groups={groups} presets={presets} selectedGroupId={view.groupId} onSelect={actions.selectGroup} onAdd={() => openEditor()} />
       </div>
 
+      {/* The preset editor takes the panel's place: the map and the Rail stay in view. */}
       <div className={styles.panel} data-map-obstacle>
-        <LayerPanel
-          group={group}
-          selectedStreamId={layer.stream}
-          isAvailable={(s) => s.layers.some((l) => instantAvailable(l, sel))}
-          onSelect={actions.selectStream}
-        />
+        {editor ? (
+          <PresetEditor
+            key={editor.preset?.id ?? 'new'}
+            preset={editor.preset}
+            initialStreams={[layer.stream]}
+            onSave={(p) => {
+              const id = presetStore.save(p)
+              actions.selectGroup(id)
+              closeEditor('nav[aria-label="Layer groups"] [aria-pressed="true"]')
+            }}
+            onCancel={() => closeEditor()}
+            onDelete={
+              editor.preset &&
+              (() => {
+                actions.deletePreset(editor.preset!.id)
+                closeEditor('nav[aria-label="Layer groups"] [aria-pressed="true"]')
+              })
+            }
+          />
+        ) : (
+          <LayerPanel
+            group={group}
+            selectedStreamId={layer.stream}
+            isAvailable={(s) => s.layers.some((l) => instantAvailable(l, sel))}
+            onSelect={actions.selectStream}
+            onEditPreset={editedPreset && (() => openEditor(editedPreset))}
+          />
+        )}
       </div>
 
       {/* Rule 2: the ModePill is one of the three mode signals; hidden in Live. */}
@@ -184,7 +225,14 @@ export function MapScreen() {
             mode={toast.mode}
             tone={toast.tone}
             message={toast.message}
-            onUndo={toast.undo && (() => actions.undo(toast.undo!))}
+            onUndo={
+              toast.undo &&
+              (() => {
+                const n = state.notice!
+                if (n.type === 'presetDeleted') presetStore.restore(n.preset, n.index)
+                actions.undo(toast.undo!)
+              })
+            }
             onClose={actions.dismissNotice}
             // key 0 = opened by a QA scenario: keep it on screen for the comparison.
             duration={state.notice.key === 0 ? 0 : undefined}

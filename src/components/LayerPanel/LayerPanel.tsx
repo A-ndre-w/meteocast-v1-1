@@ -10,6 +10,8 @@ export type LayerPanelProps = {
   /** Does this stream have data at the selected instant? If not the item is quieter but still clickable. */
   isAvailable?: (stream: Stream) => boolean
   onSelect?: (streamId: string) => void
+  /** A user preset: the header says "Custom" and offers Edit. */
+  onEditPreset?: () => void
 }
 
 /**
@@ -19,7 +21,7 @@ export type LayerPanelProps = {
  * timeline shows where each data has values). Nothing is locked:
  * picking data that has nothing at the selected instant moves time to the nearest instant, with Undo.
  */
-export function LayerPanel({ group, selectedStreamId, isAvailable, onSelect }: LayerPanelProps) {
+export function LayerPanel({ group, selectedStreamId, isAvailable, onSelect, onEditPreset }: LayerPanelProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
   const streams = streamsOf(group)
 
@@ -33,7 +35,13 @@ export function LayerPanel({ group, selectedStreamId, isAvailable, onSelect }: L
   return (
     <nav className={styles.root} aria-label={`${group.title} layers`}>
       <div className={styles.header}>
-        <PresetHeader icon={group.icon} title={group.title} layerCount={streams.length} />
+        <PresetHeader
+          icon={group.icon}
+          title={group.title}
+          preset={onEditPreset ? 'Custom' : 'Default'}
+          layerCount={streams.length}
+          onEdit={onEditPreset}
+        />
       </div>
       <div className={styles.scroll} ref={scrollRef}>
         <ul className={styles.list}>

@@ -138,7 +138,7 @@ Severity: **High** = blocks a user group or misleads about data · **Medium** = 
 | Play, then picking another data stream | Keeps playing, loop scope may change (hours → days) | ~ H14 |
 | Deep link with an unknown scenario (`#/?s=foo`) | Ignored, default view | ✓ |
 | Deep link changed on an open page | Applied | ✓ |
-| Inert features (search, alerts, locate, presets) | "… is not part of this prototype yet" | ✓ |
+| Inert features (search, alerts, locate; presets until 2026-10-24) | "… is not part of this prototype yet" | ✓ |
 | Short window (650 px tall) | Rail and panel scroll; "+" stays inside | ✓ |
 | Narrow window (< 1280 px) | Overflow and clipping | ✗ H11 |
 | `prefers-reduced-motion` | Transitions and the LIVE pulse are off; Play still steps (content change, user-started) | ✓ |

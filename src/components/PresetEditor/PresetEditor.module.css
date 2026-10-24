@@ -1,0 +1,289 @@
+/* Same frame as the layer panel, a little wider for the data list. */
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  max-height: 100%;
+  margin: 0;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+/* The form only groups the fields: its children lay out in the frame above. */
+.form {
+  display: contents;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 12px 10px 16px;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-md);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.close {
+  width: var(--size-sm);
+  height: var(--size-sm);
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+.close:hover {
+  background: var(--surface-sunken);
+  color: var(--text-primary);
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 14px 16px 16px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+/* Mono caps, like the panel's "DEFAULT · 7 LAYERS". */
+.label {
+  padding: 0;
+  margin-bottom: 6px;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.field .label {
+  margin-bottom: 0;
+}
+
+.count {
+  text-transform: none;
+}
+
+.input {
+  height: var(--size-md);
+  padding: 0 10px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-raised);
+  font: inherit;
+  font-size: var(--font-size-md);
+  color: var(--text-primary);
+}
+
+.input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--status-danger);
+}
+
+/* Icon choice: round buttons like the Rail's, the chosen one dark as a selected Rail button. */
+.icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.iconOption {
+  width: var(--size-md);
+  height: var(--size-md);
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-pill);
+  color: var(--icon-default);
+  cursor: pointer;
+}
+
+.iconOption:hover {
+  background: var(--surface-sunken);
+}
+
+.iconOption:has(input:checked) {
+  background: var(--text-secondary);
+  color: var(--icon-selected);
+}
+
+.iconOption:has(input:focus-visible) {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.group + .group {
+  margin-top: 12px;
+}
+
+.groupTitle {
+  margin: 0 0 4px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.streams {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stream {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--size-md);
+  padding: 4px 6px;
+  margin: 0 -6px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.stream:hover {
+  background: var(--surface-sunken);
+}
+
+/* The native checkbox stays focusable and clickable, drawn by .box. */
+.check {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.box {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 4px;
+  color: transparent;
+  background: var(--surface-raised);
+}
+
+.check:checked + .box {
+  border-color: var(--accent-strong);
+  background: var(--accent-strong);
+  color: var(--accent-on);
+}
+
+.check:focus-visible + .box {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.streamText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.streamName {
+  font-size: var(--font-size-sm);
+  color: var(--text-primary);
+}
+
+.streamMeta {
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+}
+
+.foot {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px 12px 16px;
+  border-top: 1px solid var(--border-default);
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--status-danger);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--size-md);
+  padding: 0 8px;
+  margin-right: auto;
+  margin-left: -8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.delete:hover {
+  background: var(--surface-sunken);
+  color: var(--text-primary);
+}
+
+.cancel,
+.save {
+  height: var(--size-md);
+  padding: 0 14px;
+  border-radius: var(--radius-lg);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.cancel {
+  color: var(--text-secondary);
+}
+
+.cancel:hover {
+  background: var(--surface-sunken);
+  color: var(--text-primary);
+}
+
+.save {
+  background: var(--accent-strong);
+  color: var(--accent-on);
+}
+
+.save:hover {
+  background: color-mix(in srgb, var(--accent-strong) 85%, black);
+}

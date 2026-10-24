@@ -4,6 +4,7 @@ import {
   allLayers,
   dayAvailable,
   firstForecastInstant,
+  groupById,
   groups,
   instantAvailable,
   layerById,
@@ -15,6 +16,7 @@ import {
 } from '../data'
 import { addDays, dayDiff, dayWindow, minutesBetween, modeOf, NOW, shiftMinutes, snapTo, type Snap, type TimeSel } from '../time'
 import type { Mode } from '../types'
+import type { Preset } from './presets'
 
 /** What the user is looking at. Undo restores a whole View. */
 export type View = { groupId: string; layerId: string; sel: TimeSel }
@@ -36,12 +38,17 @@ export type Notice =
   | { type: 'notInPrototype'; feature: string }
   /** A step past the first or last day of the timeline (UX audit H3): time does not move, the toast says why. */
   | { type: 'windowEdge'; edge: 'start' | 'end'; day: string }
+  /** A user preset was deleted: Undo puts it back where it was and shows it again. */
+  | { type: 'presetDeleted'; preset: Preset; index: number; undo: View }
 
 export type Result = { view: View; notice?: Notice }
 
 const windowDays = dayWindow().map((d) => d.day)
 const inWindow = (sel: TimeSel) => windowDays.includes(sel.day)
 const groupIdOf = (layer: Layer) => groups.find((g) => g.layers.includes(layer))!.id
+/** Where to show a layer: the current group or preset when it has the layer (a preset stays selected across
+ *  "now"), else the layer's default group. */
+const groupFor = (view: View, layer: Layer) => (groupById(view.groupId)?.layers.includes(layer) ? view.groupId : groupIdOf(layer))
 const streamModes = (layer: Layer): Mode[] => {
   const twin = twinOf(layer)
   const all = new Set([...layer.modes, ...(twin?.modes ?? [])])
@@ -81,7 +88,7 @@ export function moveExplicit(view: View, rawTarget: TimeSel, snap?: Snap): Resul
   const twinTarget = twin && normalize(twin, rawTarget, how)
   if (twin && twinTarget && instantAvailable(twin, twinTarget)) {
     return {
-      view: { groupId: groupIdOf(twin), layerId: twin.id, sel: twinTarget },
+      view: { groupId: groupFor(view, twin), layerId: twin.id, sel: twinTarget },
     }
   }
   return { view, notice: blockNotice(layer, target) }
@@ -115,7 +122,7 @@ export function selectStream(view: View, streamId: string): Result {
   const stream = streamById(streamId)
   // From 12:55 on 5-minute data to an hourly stream: the same instant on its grid (12:00), silently.
   const here = stream.layers.find((l) => instantAvailable(l, normalize(l, view.sel)))
-  if (here) return { view: { groupId: groupIdOf(here), layerId: here.id, sel: normalize(here, view.sel) } }
+  if (here) return { view: { groupId: groupFor(view, here), layerId: here.id, sel: normalize(here, view.sel) } }
 
   const candidates: { layer: Layer; sel: TimeSel }[] = []
   for (const l of stream.layers) {
@@ -125,7 +132,7 @@ export function selectStream(view: View, streamId: string): Result {
   if (!candidates.length) return { view }
   const distance = (sel: TimeSel) => Math.abs(minutesBetween(sel, view.sel))
   const best = candidates.reduce((a, b) => (distance(b.sel) < distance(a.sel) ? b : a))
-  const next: View = { groupId: groupIdOf(best.layer), layerId: best.layer.id, sel: best.sel }
+  const next: View = { groupId: groupFor(view, best.layer), layerId: best.layer.id, sel: best.sel }
   const from = modeOfView(view)
   const to = modeOf(best.sel)
 
@@ -138,7 +145,7 @@ export function selectStream(view: View, streamId: string): Result {
 
 /** Rule 10: switching group never moves time. Pick the first layer that has data now, else apply rule 5. */
 export function selectGroup(view: View, groupId: string): Result {
-  const group = groups.find((g) => g.id === groupId)!
+  const group = groupById(groupId)!
   if (group.layers.some((l) => l.id === view.layerId)) return { view: { ...view, groupId } }
   const ready = group.layers.find((l) => instantAvailable(l, normalize(l, view.sel)))
   if (ready) return { view: { groupId, layerId: ready.id, sel: normalize(ready, view.sel) } }
@@ -151,13 +158,13 @@ export function selectGroup(view: View, groupId: string): Result {
 export function goLive(view: View, layerId = view.layerId): Result {
   const layer = layerById(layerId)
   const sel = NOW
-  if (instantAvailable(layer, sel)) return { view: { groupId: groupIdOf(layer), layerId, sel } }
+  if (instantAvailable(layer, sel)) return { view: { groupId: groupFor(view, layer), layerId, sel } }
   const twin = twinOf(layer)
-  if (twin && instantAvailable(twin, sel)) return { view: { groupId: groupIdOf(twin), layerId: twin.id, sel } }
-  const group = groups.find((g) => g.id === groupIdOf(layer))!
+  if (twin && instantAvailable(twin, sel)) return { view: { groupId: groupFor(view, twin), layerId: twin.id, sel } }
+  const group = groupById(groupFor(view, layer))!
   const live = group.layers.find((l) => instantAvailable(l, sel)) ?? allLayers.find((l) => instantAvailable(l, sel))!
   return {
-    view: { groupId: groupIdOf(live), layerId: live.id, sel },
+    view: { groupId: groupFor(view, live), layerId: live.id, sel },
     notice: { type: 'noLive', from: layer, to: live, undo: view },
   }
 }
@@ -178,10 +185,10 @@ export function playStep(view: View, origin: TimeSel): View {
   const carrier = stream.find((l) => instantAvailable(l, normalize(l, next, 'up')))
   if (!inWindow(next) || minutesBetween(next, origin) >= span || !carrier) {
     const back = stream.find((l) => instantAvailable(l, origin)) ?? layer
-    return { groupId: groupIdOf(back), layerId: back.id, sel: origin }
+    return { groupId: groupFor(view, back), layerId: back.id, sel: origin }
   }
   // Crossing "now" hands over to the twin layer, as a manual move does (no toast).
-  return { groupId: groupIdOf(carrier), layerId: carrier.id, sel: normalize(carrier, next, 'up') }
+  return { groupId: groupFor(view, carrier), layerId: carrier.id, sel: normalize(carrier, next, 'up') }
 }
 
 export const stepDayTarget = (sel: TimeSel, d: number): TimeSel => ({ ...sel, day: addDays(sel.day, d) })

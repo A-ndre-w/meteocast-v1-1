@@ -4,6 +4,7 @@ import { DayStrip } from '../components/DayStrip/DayStrip'
 import { LayerPanel } from '../components/LayerPanel/LayerPanel'
 import { ModePill } from '../components/ModePill/ModePill'
 import { Legend } from '../components/Legend/Legend'
+import { PresetEditor } from '../components/PresetEditor/PresetEditor'
 import { Readout } from '../components/Readout/Readout'
 import { Timebar, type Speed } from '../components/Timebar/Timebar'
 import { ModeWord, Toast } from '../components/Toast/Toast'
@@ -90,6 +91,28 @@ export function BigSpecimens() {
   const snowGroup = groups[1]
   return (
     <>
+      <Specimen
+        name="PresetEditor"
+        figma="— (new: presets were out of v1 in Figma)"
+        props="preset?, initialStreams?, onSave, onCancel, onDelete?"
+        note="Opens in the layer panel's place from the Rail's + (new) or the pencil in a preset's header (edit). Name (24 characters), icon, data from every group; the data on the map comes ticked. Saved in this browser. Delete has Undo in a toast."
+      >
+        <Variant label="new · from Hourly rainfall">
+          <div style={{ height: 520, display: 'flex' }}>
+            <PresetEditor initialStreams={['water/hourly-rainfall']} autoFocus={false} />
+          </div>
+        </Variant>
+        <Variant label="edit · Flood watch">
+          <div style={{ height: 520, display: 'flex' }}>
+            <PresetEditor
+              preset={{ id: 'demo', title: 'Flood watch', icon: 'waves', streams: ['water/hourly-rainfall', 'water/rainfall-rate', 'water/hydrometric-level'] }}
+              onDelete={() => {}}
+              autoFocus={false}
+            />
+          </div>
+        </Variant>
+      </Specimen>
+
       <Specimen
         name="DayStrip"
         figma="Daystrip · 2010:10400"

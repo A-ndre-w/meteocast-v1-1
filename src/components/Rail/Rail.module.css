@@ -33,6 +33,14 @@
   display: none;
 }
 
+/* Between the default groups and the user's presets. */
+.divider {
+  width: 24px;
+  height: 1px;
+  margin: 2px auto;
+  background: var(--border-strong);
+}
+
 .add {
   flex: none;
   margin-top: auto;

@@ -40,6 +40,14 @@ export const allLayers = groups.flatMap((g) => g.layers)
 export const layerById = (id: string) => allLayers.find((l) => l.id === id)!
 export const groupOf = (layerId: string) => groups.find((g) => g.layers.some((l) => l.id === layerId))!
 
+// User presets behave like groups (src/state/presets.ts keeps this list in step with what is saved).
+let presetGroups: LayerGroup[] = []
+export const setPresetGroups = (list: LayerGroup[]) => {
+  presetGroups = list
+}
+/** A default group or a user preset. */
+export const groupById = (id: string): LayerGroup | undefined => groups.find((g) => g.id === id) ?? presetGroups.find((g) => g.id === id)
+
 /** Real-time section = layers that have Live; Forecast section = forecast-only layers. */
 export const sectionOf = (layer: Layer) => (layer.modes.includes('live') ? 'realtime' : 'forecast')
 

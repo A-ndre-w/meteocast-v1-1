@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { Speed } from '../components/Timebar/Timebar'
-import { layerById, stepOf } from '../data'
+import { groupOf, layerById, stepOf } from '../data'
 import { NOW, shiftMinutes, type TimeSel } from '../time'
 import {
   goLive,
@@ -13,6 +13,7 @@ import {
   type Result,
   type View,
 } from './rules'
+import { presetStore } from './presets'
 import { scenarioFromUrl } from './scenarios'
 
 type State = {
@@ -98,6 +99,20 @@ export function useMeteo() {
       setState((s) => ({ ...s, notice: { type: 'notInPrototype', feature, key: ++noticeKey } })),
     togglePlay: () => setState((s) => ({ ...s, playing: !s.playing, playOrigin: s.playing ? undefined : s.view.sel })),
     setSpeed: (speed: Speed) => setState((s) => ({ ...s, speed })),
+    /** Deletes a preset; when it was on screen, its data stays and the panel shows the data's own group. */
+    deletePreset: (id: string) => {
+      const list = presetStore.get()
+      const index = list.findIndex((p) => p.id === id)
+      if (index < 0) return
+      const preset = list[index]
+      presetStore.remove(id)
+      setState((s) => ({
+        ...s,
+        view: s.view.groupId === id ? { ...s.view, groupId: groupOf(s.view.layerId).id } : s.view,
+        playing: false,
+        notice: { type: 'presetDeleted', preset, index, undo: s.view, key: ++noticeKey },
+      }))
+    },
   }
 
   return { state, view: state.view, layer: layerById(state.view.layerId), actions }

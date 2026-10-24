@@ -88,6 +88,10 @@ const uiIcons = {
       <path d="M12 7.5V12l3 2" />
     </>
   ),
+  // Preset editing.
+  edit: <path d="M4.5 19.5h4l10-10-4-4-10 10v4ZM13 7l4 4" />,
+  trash: <path d="M4.5 7h15M10 4.5h4M6.5 7l1 12.5h9l1-12.5M10 11v5M14 11v5" />,
+  check: <path d="m5.5 12.5 4 4 9-9" />,
   lock: (
     <>
       <rect x="5.5" y="10.5" width="13" height="9.5" rx="2" />

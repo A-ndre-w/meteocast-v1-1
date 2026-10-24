@@ -96,6 +96,7 @@ Fonte: file Figma *UXChallenge_RadarMeteo*, pagina "🎨 Stile & Componenti". Le
 | Layer Card | `Readout` | `mode`, `location`, `coords`, `layer`, `value`, `unit`, `time`, `state: updated \| stale \| noData` |
 | Map Pill | `ModePill` | `mode`, `time`, `relative` |
 | — | `Toast` | `mode`, `tone`, `message`, `onUndo` |
+| — | `PresetEditor` | `preset`, `initialStreams`, `onSave`, `onCancel`, `onDelete` — crea e modifica i preset |
 | — | `Legend` | `layer`, `unit`, `source`, `ramp`, `max`, `breaks`, `value` — legenda fissa con il tag della fonte del dato |
 | Search bar · Alert Icon · Zoom Controls · Data Map Label | `SearchBar` · `NotificationBell` · `ZoomControl` · `ValueLabel` | |
 | Panel · Logo | `LayerPanel` · `Logo` | |
@@ -165,4 +166,4 @@ Stack: React + Vite + TypeScript, CSS Modules e custom properties. Nessuna libre
 
 ## Limiti noti
 
-Dati finti, con "adesso" fissato a giovedì 15 ottobre 2026 alle 13:00. Pannello allarmi, ricerca e creazione dei preset sono solo pulsanti. Il layout è progettato per desktop (da 1100px di larghezza). L'elenco completo, con le differenze rispetto a Figma, è in [DESIGN_QA.md](DESIGN_QA.md).
+Dati finti, con "adesso" fissato a giovedì 15 ottobre 2026 alle 13:00. Pannello allarmi e ricerca sono solo pulsanti. I preset funzionano e restano salvati nel browser (localStorage). Il layout è progettato per desktop (da 1100px di larghezza). L'elenco completo, con le differenze rispetto a Figma, è in [DESIGN_QA.md](DESIGN_QA.md).
