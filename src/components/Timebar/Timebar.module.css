@@ -1,10 +1,12 @@
-/* Mode is signalled here by: top stripe (3px) + background tint + ModeBadge text/icon. */
-/* Compact (concept A, about 90px instead of 150): controls and days on one row, the hour track on the second. */
+/* Mode is signalled here by: top stripe (3px) + background tint; the ModePill above the map names it. */
+/* One row, 52px (was two rows, 84px): Play · the day with ‹ › and the calendar · the 24 h track · Back to live. */
 .root {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 12px 20px 22px;
+  align-items: center;
+  gap: 16px;
+  height: 52px;
+  box-sizing: border-box;
+  padding: 0 16px;
   background: var(--mode-tint);
   border: 1px solid var(--mode-color);
   border-top: var(--stroke-modestripe) solid var(--mode-color);
@@ -13,57 +15,20 @@
   transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
-.row {
-  display: flex;
-  align-items: center;
-  /* Tighter than Figma (20/16) to fit the longer "Back to live" label (UX review U4). */
-  gap: 12px;
-  min-width: 0;
+.divider {
+  flex: none;
+  width: 1px;
+  height: 20px;
+  background: var(--border-default);
 }
 
-.controls {
+/* ---- Play ---- */
+
+.player {
   flex: none;
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-/* Figma: chevron 4px · 12 · play 30 · 12 · chevron 4px (62px). The chevrons keep a 24px hit area
-   by overlapping the gaps with negative margins. */
-.player {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-
-.player > :first-child {
-  margin-left: -10px;
-}
-
-.player > :last-child {
-  margin-right: -10px;
-}
-
-.stepBtn {
-  width: var(--size-sm);
-  height: var(--size-md);
-  display: grid;
-  place-items: center;
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-}
-
-/* Not disabled: a click at the edge still shows the toast that explains where the data ends. */
-.stepBtn:hover {
-  background: var(--surface-sunken);
-}
-
-.stepBtn[aria-disabled='true'] {
-  color: var(--border-strong);
-}
-
-.stepBtn[aria-disabled='true']:hover {
-  background: none;
+  gap: 8px;
 }
 
 .play {
@@ -80,59 +45,7 @@
   background: var(--text-primary);
 }
 
-.badgeSlot {
-  display: flex;
-  min-width: 135px;
-}
-
-.badgeSlot > * {
-  flex: 1;
-}
-
-.datetime {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  /* 150 + the 12px of padding that the negative margins give back: the layout matches Figma. */
-  min-width: 162px;
-  height: var(--size-md);
-  padding: 0 6px;
-  margin: 0 -6px;
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-lg);
-  white-space: nowrap;
-}
-
-/* Daily layers: no hour, so no reserved width (Figma Mode=forecastdaily keeps Now next to the date). */
-.datetime[data-daily] {
-  min-width: 130px;
-}
-
-.datetime:hover {
-  background: var(--surface-sunken);
-}
-
-.calendar {
-  color: var(--text-secondary);
-}
-
-.date {
-  color: var(--text-primary);
-}
-
-.hour {
-  color: var(--text-tertiary);
-  font-variant-numeric: tabular-nums;
-}
-
-.divider {
-  flex: none;
-  width: 1px;
-  height: 15px;
-  background: var(--border-strong);
-}
-
-/* Playback speed: one button, each click moves to the next speed. Same size and shape as the small toggles. */
+/* Playback speed: one button, each click moves to the next speed. */
 .speed {
   min-width: var(--size-md);
   height: var(--size-sm);
@@ -149,31 +62,127 @@
   color: var(--text-primary);
 }
 
-/* ---- Hour track ---- */
+/* ---- The day ---- */
 
-/* 00 and 24 at the ends of a full-width track; the 6-hour ticks are longer, so the hours read without labels. */
-.trackRow {
+.day {
+  flex: none;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 2px;
 }
 
-.end {
+.dayStep {
+  width: var(--size-sm);
+  height: var(--size-md);
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+}
+
+/* Not disabled: a click at the edge still shows the toast that explains where the data ends. */
+.dayStep:hover {
+  background: var(--surface-sunken);
+}
+
+.dayStep[aria-disabled='true'] {
+  color: var(--border-strong);
+}
+
+.dayStep[aria-disabled='true']:hover {
+  background: none;
+}
+
+.dayAnchor {
+  position: relative;
+  display: flex;
+}
+
+/* Fixed width: the arrows don't move when the day changes ("Wed 14 Oct" / "Mon 19 Oct"). */
+.dayBtn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 136px;
+  height: var(--size-md);
+  padding: 0 8px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}
+
+.dayBtn:hover,
+.dayBtn[aria-expanded='true'] {
+  background: var(--surface-sunken);
+}
+
+.calendar {
   flex: none;
-  font-family: var(--font-mono);
-  font-size: var(--font-size-xs);
-  line-height: 1;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
 }
 
+.dayLabel {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Same mark as the today chip. */
+.todayDot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--text-primary);
+}
+
+/* The calendar: the 8 days of the window above the bar. */
+.popover {
+  position: absolute;
+  bottom: calc(100% + 14px);
+  left: 0;
+  z-index: 20;
+  padding: 10px;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.chips {
+  display: flex;
+  gap: 4px;
+}
+
+.chips > * {
+  flex: none;
+}
+
+.time {
+  flex: none;
+  width: 48px;
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.spacer {
+  flex: 1;
+}
+
+/* ---- 24 h track ---- */
+
+/* Room at both ends for the centred "00" and "24". */
 .trackWrap {
   flex: 1;
   min-width: 0;
+  padding: 0 8px;
 }
 
+/* Track in the middle of the row: NOW above, the hours 00 06 12 18 24 below. */
 .track {
   position: relative;
   height: 10px;
+  margin: 8px 0 10px;
   cursor: pointer;
   touch-action: none;
 }
@@ -195,6 +204,17 @@
 
 .tick[data-major] {
   stroke: var(--border-strong);
+}
+
+.hourLabel {
+  position: absolute;
+  top: calc(100% + 3px);
+  translate: -50% 0;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  line-height: 1;
+  color: var(--text-tertiary);
+  pointer-events: none;
 }
 
 .lineSolid,
@@ -236,12 +256,12 @@
   border-left: 1.5px solid var(--text-primary);
 }
 
-/* Under the track: above it the tag ran into the day chips of the first row. */
+/* Above the track: below it are the hour labels. */
 .nowTag {
   position: absolute;
-  top: 100%;
+  bottom: 100%;
   left: 0;
-  translate: -50% 5px;
+  translate: -50% -3px;
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
   line-height: 1;
@@ -262,10 +282,10 @@
   transition: left 0.12s ease;
 }
 
-/* The hour on the thumb while the time moves: where the eye is when dragging or watching Play. */
+/* The time on the thumb while it moves, above the bar: where the eye is when dragging or watching Play. */
 .thumbLabel {
   position: absolute;
-  bottom: calc(100% + 8px);
+  bottom: calc(100% + 22px);
   z-index: 1;
   translate: -50% 0;
   padding: 3px 8px;
@@ -297,10 +317,4 @@
   position: absolute;
   inset: -6px;
   border-radius: var(--radius-pill);
-}
-
-/* The day strip takes the remaining width and scrolls inside it when narrow (UX audit H11). */
-.strip {
-  flex: 1 1 auto;
-  min-width: 0;
 }

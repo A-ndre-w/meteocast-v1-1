@@ -15,6 +15,8 @@ export type Layer = {
   unit: string
   modes: Mode[]
   interval: 'hour' | 'day'
+  /** Resolution in minutes for data measured more often than hourly (5: radar, lightning, gusts). Default 60. */
+  stepMin?: number
   archiveDays: number
   horizonDays: number
   scale: { max: number; ramp: Ramp }
@@ -47,6 +49,8 @@ export function dayAvailable(layer: Layer, day: string, now: TimeSel = NOW): boo
 /** Does this layer have data at this exact instant? */
 export function instantAvailable(layer: Layer, sel: TimeSel, now: TimeSel = NOW): boolean {
   if (!dayAvailable(layer, sel.day, now)) return false
+  // Only on the layer's own grid: hourly data have no 12:55.
+  if (layer.interval === 'hour' && ((sel.minute ?? 0) % stepOf(layer) !== 0)) return false
   // Daily layers: one value per day. Past/future days are decided by the day; today needs the mode too,
   // so a live-only daily layer is not available at a forecast hour of today (rule 7 disables it).
   if (layer.interval === 'day') return dayDiff(sel.day, now.day) !== 0 || layer.modes.includes(modeOf(sel, now))
@@ -57,6 +61,9 @@ export function instantAvailable(layer: Layer, sel: TimeSel, now: TimeSel = NOW)
 export function firstForecastInstant(layer: Layer, now: TimeSel = NOW): TimeSel {
   return layer.interval === 'day' ? { day: addDays(now.day, 1), hour: now.hour } : shiftHours(now, 1)
 }
+
+/** Step of the timeline for this layer, in minutes: 5 for 5-minute data, 60 for hourly, a whole day for daily. */
+export const stepOf = (layer: Layer) => (layer.interval === 'day' ? 1440 : (layer.stepMin ?? 60))
 
 export const offersMode = (layer: Layer, mode: Mode) => layer.modes.includes(mode)
 
@@ -72,12 +79,22 @@ const data = seriesFile as unknown as SeriesFile
 
 export const location = data.location
 
-/** Value at the selected location, or null when the layer has no data at that instant. */
+/**
+ * Value at the selected location, or null when the layer has no data at that instant. The series is hourly;
+ * 5-minute data between two hours follow the line between them, with a small deterministic wobble.
+ */
 export function valueAt(layerId: string, sel: TimeSel): number | null {
   const s = data.series[layerId]
   const d = dayDiff(sel.day, data.start)
-  if (!s || d < 0 || d * 24 + sel.hour >= s.values.length) return null
-  return s.values[d * 24 + sel.hour]
+  const i = d * 24 + sel.hour
+  if (!s || d < 0 || i >= s.values.length) return null
+  const v = s.values[i]
+  const minute = sel.minute ?? 0
+  if (!minute || v === null) return v
+  const next = s.values[i + 1] ?? v
+  const t = minute / 60
+  const wobble = 1 + 0.08 * Math.sin(i * 1.7 + minute * 0.9)
+  return Number(Math.max(0, (v + ((next ?? v) - v) * t) * wobble).toFixed(s.decimals))
 }
 
 // ---- Stations: the network around the selected location (src/data/geo.json, real towns) ----
@@ -149,7 +166,7 @@ export function stationValues(layer: Layer, sel: TimeSel): (number | null)[] {
   const v0 = valueAt(layer.id, sel)
   if (v0 === null) return stations.map(() => null)
   const kind = !isPatchy(layer) ? 'smooth' : layer.stream.startsWith('snow/') ? 'snow' : 'rain'
-  const h = dayDiff(sel.day, data.start) * 24 + (layer.interval === 'day' ? 12 : sel.hour)
+  const h = dayDiff(sel.day, data.start) * 24 + (layer.interval === 'day' ? 12 : sel.hour + (sel.minute ?? 0) / 60)
   const seed = seedOf(layer.stream)
   const ratio = v0 / field(kind, location.pin, h, seed)
   const dec = data.series[layer.id].decimals

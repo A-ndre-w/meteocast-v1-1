@@ -11,7 +11,7 @@ import { SearchBar } from '../components/SearchBar/SearchBar'
 import { Timebar } from '../components/Timebar/Timebar'
 import { Toast } from '../components/Toast/Toast'
 import { ZoomControl } from '../components/ZoomControl/ZoomControl'
-import { coordsOf, groups, instantAvailable, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
+import { coordsOf, groups, instantAvailable, stepOf, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
 import { breaksOf, classOf } from '../scale'
 import { useMeteo } from '../state/useMeteo'
 import {
@@ -20,14 +20,15 @@ import {
   fmtAgo,
   fmtDayMedium,
   fmtDayShort,
-  fmtHour,
+  fmtTime,
   fmtOffset,
   fmtStamp,
-  hoursBetween,
+  minuteOfDay,
+  minutesBetween,
   modeOf,
   NOW,
   pad2,
-  shiftHours,
+  shiftMinutes,
 } from '../time'
 import { modeLabel } from '../types'
 import styles from './MapScreen.module.css'
@@ -69,7 +70,7 @@ export function MapScreen() {
   // Data classes shared by the map and the Readout legend (src/scale.ts).
   const breaks = useMemo(() => breaksOf(layer.scale.max, layer.unit, isPatchy(layer)), [layer])
   const stale = mode === 'live' && value !== null && layer.liveDelayMin !== undefined
-  // Live: the last reading. Archive: when the hour (or the day) closed and was validated. Forecast: the last model
+  // Live: the last reading. Archive: when the step (5 minutes, the hour or the day) closed and was validated. Forecast: the last model
   // run, every 6 hours (00, 06, 12, 18).
   // The card's quiet date line: the instant of the value, short (late live data: the reading's time).
   const readingAt = NOW.hour * 60 - (stale ? layer.liveDelayMin! : 0)
@@ -78,14 +79,14 @@ export function MapScreen() {
       ? `${fmtDayShort(sel.day)}, ${pad2(Math.floor(readingAt / 60))}:${pad2(readingAt % 60)}`
       : daily
         ? fmtDayShort(sel.day)
-        : `${fmtDayShort(sel.day)}, ${fmtHour(sel.hour)}`
+        : `${fmtDayShort(sel.day)}, ${fmtTime(sel)}`
   const updatedMinutes =
     mode === 'live'
       ? stale
         ? layer.liveDelayMin!
         : 0
       : mode === 'archive'
-        ? 60 * hoursBetween(NOW, daily ? { day: addDays(sel.day, 1), hour: 0 } : shiftHours(sel, 1))
+        ? minutesBetween(NOW, daily ? { day: addDays(sel.day, 1), hour: 0 } : shiftMinutes(sel, stepOf(layer)))
         : 60 * (NOW.hour % 6)
   const updatedHint =
     mode === 'live' ? 'Last reading of the station' : mode === 'archive' ? 'When this value was recorded' : `Forecast model run at ${pad2(NOW.hour - (NOW.hour % 6))}:00`
@@ -99,7 +100,7 @@ export function MapScreen() {
     <main className={styles.screen}>
       {/* WCAG 2.4.1: the timeline is the last block in the tab order (stop 39 of 40). UX audit H4. */}
       <div className={styles.skip}>
-        <button type="button" className={styles.skipLink} onClick={() => focusFirst('[aria-label="Timeline"] [role="slider"]', '[aria-label="Timeline"] [data-daystrip] [aria-pressed="true"]')}>
+        <button type="button" className={styles.skipLink} onClick={() => focusFirst('[aria-label="Timeline"] [role="slider"]', '[aria-label="Timeline"] [aria-haspopup="dialog"]')}>
           Skip to timeline
         </button>
         <button type="button" className={styles.skipLink} onClick={() => focusFirst('nav[aria-label$=" layers"] [aria-pressed="true"]', 'nav[aria-label$=" layers"] button')}>
@@ -211,20 +212,20 @@ export function MapScreen() {
         <Timebar
           mode={mode}
           selectedDay={sel.day}
-          selectedHour={sel.hour}
+          selectedMinute={minuteOfDay(sel)}
+          stepMin={stepOf(layer)}
           interval={layer.interval}
           days={days.map((d) => ({ ...d, unavailable: !streamDayAvailable(layer, d.day) }))}
-          offset={fmtOffset(sel)}
           nowHour={NOW.hour}
           unavailableHours={unavailableHours}
           playing={state.playing}
           speed={state.speed}
           onSelectDay={actions.selectDay}
-          onSelectHour={actions.selectHour}
-          onStepHour={actions.stepHour}
+          onSelectTime={actions.selectTime}
+          onStep={actions.step}
           onStepDay={actions.stepDay}
-          atStart={sel.day === days[0].day && (daily || sel.hour === 0)}
-          atEnd={sel.day === days[days.length - 1].day && (daily || sel.hour === 23)}
+          atStart={sel.day === days[0].day}
+          atEnd={sel.day === days[days.length - 1].day}
           onNow={actions.goNow}
           onTogglePlay={actions.togglePlay}
           onSpeedChange={actions.setSpeed}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Speed } from '../components/Timebar/Timebar'
-import { layerById } from '../data'
-import { NOW, shiftHours, type TimeSel } from '../time'
+import { layerById, stepOf } from '../data'
+import { NOW, shiftMinutes, type TimeSel } from '../time'
 import {
   goLive,
   moveExplicit,
@@ -81,8 +81,10 @@ export function useMeteo() {
   const actions = {
     // Manual gestures = explicit intent: may cross "now" (on the twin layer) or be blocked with a warning.
     selectDay: (day: string) => apply((v) => moveExplicit(v, { ...v.sel, day })),
-    selectHour: (hour: number) => apply((v) => moveExplicit(v, { ...v.sel, hour })),
-    stepHour: (d: number) => apply((v) => moveExplicit(v, shiftHours(v.sel, d))),
+    // A point on the 24 h track, in minutes from midnight: the rules snap it to the data's own step.
+    selectTime: (minute: number) => apply((v) => moveExplicit(v, shiftMinutes({ day: v.sel.day, hour: 0 }, minute))),
+    // One step of the selected data's own resolution: 5 minutes, an hour, or a day for daily data.
+    step: (d: number) => apply((v) => moveExplicit(v, shiftMinutes(v.sel, d * stepOf(layerById(v.layerId))))),
     stepDay: (d: number) => apply((v) => moveExplicit(v, stepDayTarget(v.sel, d))),
     goNow: () => apply((v) => goLive(v)),
     // Changing the data pauses Play: the loop would silently change scope, e.g. hours → days (UX audit H14).

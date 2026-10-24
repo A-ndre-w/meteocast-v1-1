@@ -15,7 +15,8 @@ import {
   fmtStamp,
   modeOf,
   NOW,
-  shiftHours,
+  minuteOfDay,
+  shiftMinutes,
   type TimeSel,
 } from '../time'
 import styles from './ComponentsPage.module.css'
@@ -29,22 +30,32 @@ const ARCHIVE: TimeSel = { day: addDays(NOW.day, -1), hour: 13 }
 const FORECAST: TimeSel = { day: addDays(NOW.day, 1), hour: 13 }
 
 /** Static Timebar in a given state, with mode derived from the instant (rule 1). */
-function TimebarAt({ sel, interval = 'hour', unavailableHours }: { sel: TimeSel; interval?: 'hour' | 'day'; unavailableHours?: number[] }) {
+function TimebarAt({
+  sel,
+  interval = 'hour',
+  stepMin,
+  unavailableHours,
+}: {
+  sel: TimeSel
+  interval?: 'hour' | 'day'
+  stepMin?: number
+  unavailableHours?: number[]
+}) {
   return (
     <Timebar
       mode={modeOf(sel)}
       selectedDay={sel.day}
-      selectedHour={sel.hour}
+      selectedMinute={minuteOfDay(sel)}
+      stepMin={stepMin}
       interval={interval}
       days={days}
-      offset={fmtOffset(sel)}
       nowHour={NOW.hour}
       unavailableHours={unavailableHours}
     />
   )
 }
 
-/** Interactive Timebar: arrows = hours, Shift+arrows = days, drag the track, Now. */
+/** Interactive Timebar on 5-minute data: arrows = 5 minutes, Shift+arrows = days, drag the track, calendar, Now. */
 function TimebarPlayground() {
   const [sel, setSel] = useState<TimeSel>(NOW)
   const [speed, setSpeed] = useState<Speed>(1)
@@ -53,17 +64,19 @@ function TimebarPlayground() {
     <Timebar
       mode={modeOf(sel)}
       selectedDay={sel.day}
-      selectedHour={sel.hour}
+      selectedMinute={minuteOfDay(sel)}
+      stepMin={5}
       interval="hour"
       days={days}
-      offset={fmtOffset(sel)}
       nowHour={NOW.hour}
       speed={speed}
       onSpeedChange={setSpeed}
       onSelectDay={(day) => setSel({ ...sel, day })}
-      onSelectHour={(hour) => setSel({ ...sel, hour })}
-      onStepHour={(d) => setSel(clampDay(shiftHours(sel, d)))}
+      onSelectTime={(m) => setSel(shiftMinutes({ day: sel.day, hour: 0 }, m))}
+      onStep={(d) => setSel(clampDay(shiftMinutes(sel, d * 5)))}
       onStepDay={(d) => setSel(clampDay({ ...sel, day: addDays(sel.day, d) }))}
+      atStart={sel.day === days[0].day}
+      atEnd={sel.day === days[days.length - 1].day}
       onNow={() => setSel(NOW)}
     />
   )
@@ -79,6 +92,7 @@ export function BigSpecimens() {
         figma="Daystrip · 2010:10400"
         props="days, selectedDay, mode, onSelect"
         note="Arrows move the selection by one day. Unavailable days come from the layer’s modes and horizon (rule 8)."
+        unused="Left the timeline on 2026-10-24: the one-row Timebar has ‹ › for the day and shows the DayChips in its calendar."
       >
         <Variant label="live · today selected" wide>
           <DayStrip days={days} selectedDay={NOW.day} mode="live" />
@@ -95,10 +109,10 @@ export function BigSpecimens() {
       <Specimen
         name="Timebar"
         figma="Timeline · 2010:10063"
-        props="mode, selectedDay, selectedHour, interval: 'hour' | 'day', days, offset, nowHour, unavailableHours, playing, speed, on…"
-        note="Mode shows in the 3px top stripe, the tint and the badge. Track: solid = observed, dashed = forecast; today carries a NOW marker."
+        props="mode, selectedDay, selectedMinute, stepMin, interval: 'hour' | 'day', days, nowHour, unavailableHours, playing, speed, on…"
+        note="One row, 52px. Mode shows in the 3px top stripe and the tint. The day opens the calendar; ‹ › move by a day. Track: solid = observed, dashed = forecast, NOW on today; it moves in the data's own step (5 min or 1 h)."
       >
-        <Variant label="interactive — try ← → (hours), Shift+← → (days), drag, Now" wide>
+        <Variant label="interactive · 5-minute data — try ← → (5 min), Shift+← → (days), drag, the day (calendar), Now" wide>
           <div className={styles.full}>
             <TimebarPlayground />
           </div>
@@ -106,6 +120,11 @@ export function BigSpecimens() {
         <Variant label="mode=live" wide>
           <div className={styles.full}>
             <TimebarAt sel={NOW} />
+          </div>
+        </Variant>
+        <Variant label="mode=archive · 5-minute data · Thu 15 12:55" wide>
+          <div className={styles.full}>
+            <TimebarAt sel={{ day: NOW.day, hour: 12, minute: 55 }} stepMin={5} />
           </div>
         </Variant>
         <Variant label="mode=archive · Wed 14 13:00" wide>

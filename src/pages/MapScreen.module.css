@@ -18,7 +18,7 @@
   position: absolute;
   left: 13px;
   top: 61px;
-  height: min(486px, calc(100% - 61px - 106px));
+  height: min(486px, calc(100% - 61px - 74px));
   display: flex;
 }
 
@@ -26,8 +26,8 @@
   position: absolute;
   left: 81px;
   top: 60px;
-  /* Ends 10px above the timebar (compact timebar: 12px from the bottom, 84px tall). */
-  bottom: 106px;
+  /* Ends 10px above the timebar (one row: 12px from the bottom, 52px tall). */
+  bottom: 74px;
   display: flex;
   align-items: flex-start;
 }
@@ -56,7 +56,7 @@
 .zoom {
   position: absolute;
   right: 27px;
-  bottom: 115px;
+  bottom: 83px;
 }
 
 .timebar {

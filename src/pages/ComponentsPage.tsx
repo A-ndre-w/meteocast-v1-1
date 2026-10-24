@@ -219,6 +219,7 @@ export function ComponentsPage() {
         figma="Timebar/Daychip · 2010:10046"
         props="mode: 'live' | 'archive' | 'forecast', offset"
         note="Text + icon + colour, never colour alone. Live uses a neutral dot: green is reserved for alerts."
+        unused="Left the timeline on 2026-10-24 (one-row Timebar): the ModePill above the map names the mode and the offset."
       >
         <Variant label="live">
           <ModeBadge mode="live" />

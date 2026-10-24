@@ -136,7 +136,7 @@ Varianti: Default (archive), Variant2 (forecast). Nessuna variante live (coerent
 3. **Contrasto AA:** nuovi token `mode/forecast-strong #655BDE` (bianco 5,2:1 · su bg/forecast 4,9:1) e `accent/strong #2563D8` (su bianco 5,4:1 · su bg/deep 4,6:1), usati solo per testo e fondi con testo. Strisce, bordi e tinte restano con mode/forecast #8D84FF e accent/default #3B7EFF.
 4. **Screen 03 "Blocca e avvisa":** alcuni livelli real-time non hanno archivio (es. Lightning, Rainfall rate). Per loro i giorni e le ore passate sono "unavailable"; se l'utente prova ad andarci compare il Toast warning e il tempo non si sposta.
 
-Altre scelte: "adesso" simulato = Thu 15 Oct 2026 13:00; i livelli a 5 minuti si muovono a passi di 1 ora; mappa = map.png più sovrapposizioni SVG per livello; font Geist via @fontsource; Vite `base: './'` con routing a hash; striscia della Timebar 3px (brief) invece di 5px (Figma); scala del Readout a 11px invece di 8px.
+Altre scelte: "adesso" simulato = Thu 15 Oct 2026 13:00; i livelli a 5 minuti si muovono a passi di 5 minuti (dal 2026-10-24; prima di 1 ora); mappa = map.png più sovrapposizioni SVG per livello; font Geist via @fontsource; Vite `base: './'` con routing a hash; striscia della Timebar 3px (brief) invece di 5px (Figma); scala del Readout a 11px invece di 8px.
 
 ## Modello dati e comportamenti — decisioni (2026-10-19, prima del passo 5)
 
@@ -164,7 +164,7 @@ Altre scelte: "adesso" simulato = Thu 15 Oct 2026 13:00; i livelli a 5 minuti si
 
 - **Pannello livelli:** una voce per dato (stream), senza sezioni Real time / Forecast. Ogni voce mostra le icone delle modalità disponibili (ModeAvailability). Aggiornamento del 2026-10-21: sostituisce la CoverageBar, poco intuitiva (UX audit H12, scelta B).
 - **Nessuna voce bloccata:** sostituisce la regola 7 del brief. Se si sceglie un dato senza valori nell'istante selezionato, il tempo va all'istante più vicino che li ha, con Toast e Undo. Per i dati solo previsione il testo è quello di Screen 02 (regola 5).
-- **Segnali di modalità:** rimossa la cornice attorno allo schermo. Restano ModePill, tag del Readout, striscia + tinta + badge della Timebar.
+- **Segnali di modalità:** rimossa la cornice attorno allo schermo. Restano ModePill, tag del Readout, striscia + tinta + badge della Timebar (il badge è uscito dalla Timebar il 2026-10-24).
 - SectionLabel resta nel design system ma non è più usato nella schermata.
 
 ## Decisioni del 2026-10-21
@@ -176,6 +176,8 @@ Altre scelte: "adesso" simulato = Thu 15 Oct 2026 13:00; i livelli a 5 minuti si
 - **Forecast petrolio (2026-10-22):** il viola stonava con l'accent verde. Forecast diventa petrolio: `mode/forecast` #4F98A5, `mode/forecast-strong` #1B6573, `bg/forecast` #F2F8F9. Di conseguenza la neve passa dal ciano a una scala lavanda (`data/snow-1…5` #EFECFA → #43337F).
 - **Accent verde (2026-10-22):** torna il verde MeteoCast / RadarMeteo #00A644 come accent (testo e pulsanti pieni #00782F, AA). Il Live resta neutro. Gli allarmi usano solo giallo, arancione e rosso (modifica della regola del brief). "Now" sotto la traccia; tacche della timeline ridisegnate in un SVG allineato ai pixel.
 - **Timebar compatta (concept A, 2026-10-22):** due righe. Riga 1: ‹ ▶ ›, pulsante velocità che cicla 1× → 2× → 4×, badge, data, Back to live, giorni. Riga 2: traccia a tutta larghezza, 00 e 24 alle estremità, tacche lunghe ogni 6 ore. Tolti i tre chip della velocità e "Time interval". 84px invece di circa 150.
+- **Timebar in una riga (2026-10-24):** 52px. ▶ e velocità · ‹ giorno › con il giorno grande (16px semibold) che apre il calendario (DayChip in un popover; Esc o clic fuori per chiudere) · l'ora · la traccia delle 24 ore (NOW sopra, 00 06 12 18 24 sotto) · Back to live. Escono il badge di modalità, i ‹ › delle ore e la DayStrip. Da riportare in Figma: Timeline in una riga, popover del calendario.
+- **Risoluzione per dato (2026-10-24):** `stepMin: 5` in layers.json per Rainfall rate, Lightning, raffiche e celle temporalesche; gli altri dati restano orari. Frecce, trascinamento e Play usano il passo del dato; i dati orari arrotondano all'ora (in avanti quando ci si muove in avanti). Le previsioni restano orarie. Play a 5 minuti: 24 fotogrammi, cioè 2 ore.
 - **Data viz a classi:** cinque classi per famiglia di colore (token `data/<ramp>-1…5`), le stesse per campo, etichette e legenda del Readout. ValueLabel ha due prop nuove, `ramp` e `level`, per il riempimento di classe.
 - **Rete di stazioni:** 88 stazioni con gerarchia (puntini per tutte, valori solo dove piove senza sovrapposizioni, nome e valore al passaggio del mouse) e campo interpolato dalle stazioni. Risponde al prima / dopo: l'originale mostrava tutte le stazioni, il prototipo solo 3–4 valori.
 

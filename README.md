@@ -89,10 +89,10 @@ Fonte: file Figma *UXChallenge_RadarMeteo*, pagina "🎨 Stile & Componenti". Le
 | Menu Section label | `SectionLabel` | `children` |
 | Set header | `PresetHeader` | `icon`, `title`, `preset`, `layerCount` |
 | Live view button | `LiveViewButton` | `status: on \| off` — il pulsante "Now" |
-| Timebar/Daychip | `ModeBadge` | `mode`, `offset` |
+| Timebar/Daychip | `ModeBadge` | `mode`, `offset` — non più sulla schermata (2026-10-24) |
 | DayChip | `DayChip` | `time: past \| today \| future`, `selected`, `unavailable`, `mode` |
-| Daystrip | `DayStrip` | `days`, `selectedDay`, `mode` |
-| Timeline | `Timebar` | `mode`, `selectedDay`, `selectedHour`, `interval: hour \| day` |
+| Daystrip | `DayStrip` | `days`, `selectedDay`, `mode` — non più sulla schermata: i DayChip stanno nel calendario della Timebar |
+| Timeline | `Timebar` | `mode`, `selectedDay`, `selectedMinute`, `stepMin`, `interval: hour \| day` — una riga, 52px |
 | Layer Card | `Readout` | `mode`, `location`, `coords`, `layer`, `value`, `unit`, `time`, `state: updated \| stale \| noData` |
 | Map Pill | `ModePill` | `mode`, `time`, `relative` |
 | — | `Toast` | `mode`, `tone`, `message`, `onUndo` |
@@ -119,7 +119,7 @@ La mappa è quella reale dell'area del prodotto originale (Trentino – Veneto, 
 Tutte le regole sono funzioni pure in [src/state/rules.ts](src/state/rules.ts): (vista, intenzione) → (nuova vista, avviso).
 
 1. **Modalità dall'istante:** Live solo a "adesso", prima Archive, dopo Forecast, anche dentro la giornata di oggi.
-2. **Modalità sempre con testo, icona e colore:** ModePill in alto (nascosta in Live), tag nel Readout, striscia di 3px, tinta e badge della Timebar. Rosso, arancione e verde restano agli allarmi.
+2. **Modalità sempre con testo, icona e colore:** ModePill in alto (nascosta in Live), tag nel Readout, striscia di 3px e tinta della Timebar. Rosso, arancione e verde restano agli allarmi.
 3. **Traccia:** piena per il dato osservato, tratteggiata per la previsione, marcatore NOW su oggi. Chip: passati pieni, oggi con puntino, futuri tratteggiati, selezionato nel colore della modalità.
 4. **Now:** disattivato in Live, in evidenza in Archive e Forecast.
 5. **Cambio automatico:** un livello solo previsione scelto in Live o Archive porta al primo istante di previsione. Il Toast offre Undo, che ripristina lo stato precedente anche se era Archive, e sparisce dopo 6 secondi (in pausa con hover o focus).
