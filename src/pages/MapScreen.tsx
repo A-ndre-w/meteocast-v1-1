@@ -11,7 +11,7 @@ import { SearchBar } from '../components/SearchBar/SearchBar'
 import { Timebar } from '../components/Timebar/Timebar'
 import { Toast } from '../components/Toast/Toast'
 import { ZoomControl } from '../components/ZoomControl/ZoomControl'
-import { coordsOf, groups, instantAvailable, stepOf, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
+import { coordsOf, finestStep, groups, inNowcast, instantAvailable, sourceAt, stepOf, isPatchy, location, stations, stationValues, streamDayAvailable, streamInstantAvailable, valueAt } from '../data'
 import { breaksOf, classOf } from '../scale'
 import { useMeteo } from '../state/useMeteo'
 import {
@@ -86,10 +86,18 @@ export function MapScreen() {
         ? layer.liveDelayMin!
         : 0
       : mode === 'archive'
-        ? minutesBetween(NOW, daily ? { day: addDays(sel.day, 1), hour: 0 } : shiftMinutes(sel, stepOf(layer)))
-        : 60 * (NOW.hour % 6)
+        ? minutesBetween(NOW, daily ? { day: addDays(sel.day, 1), hour: 0 } : shiftMinutes(sel, stepOf(layer, sel)))
+        : inNowcast(layer, sel)
+          ? 0
+          : 60 * (NOW.hour % 6)
   const updatedHint =
-    mode === 'live' ? 'Last reading of the station' : mode === 'archive' ? 'When this value was recorded' : `${layer.source} run at ${pad2(NOW.hour - (NOW.hour % 6))}:00`
+    mode === 'live'
+      ? 'Last reading of the station'
+      : mode === 'archive'
+        ? 'When this value was recorded'
+        : inNowcast(layer, sel)
+          ? `${sourceAt(layer, sel)} issued at ${pad2(NOW.hour)}:00, every 5 minutes`
+          : `${layer.source} run at ${pad2(NOW.hour - (NOW.hour % 6))}:00`
 
   // Rule 8: what the stream (layer + twin) can show on the timeline.
   const unavailableHours = Array.from({ length: 24 }, (_, h) => h).filter((h) => !streamInstantAvailable(layer, { day: sel.day, hour: h }))
@@ -191,7 +199,7 @@ export function MapScreen() {
 
       {/* The legend stays at the top right for scanning the whole map; the triangle marks the selected point. */}
       <div className={styles.legend} data-map-obstacle data-map-legend>
-        <Legend layer={layer.name} unit={layer.unit} source={layer.source} ramp={layer.scale.ramp} max={layer.scale.max} breaks={breaks} value={value} />
+        <Legend layer={layer.name} unit={layer.unit} source={sourceAt(layer, sel)} ramp={layer.scale.ramp} max={layer.scale.max} breaks={breaks} value={value} />
       </div>
 
       <div className={styles.zoom} data-map-obstacle>
@@ -213,7 +221,8 @@ export function MapScreen() {
           mode={mode}
           selectedDay={sel.day}
           selectedMinute={minuteOfDay(sel)}
-          stepMin={stepOf(layer)}
+          stepMin={finestStep(layer)}
+          offset={fmtOffset(sel)}
           interval={layer.interval}
           days={days.map((d) => ({ ...d, unavailable: !streamDayAvailable(layer, d.day) }))}
           nowHour={NOW.hour}
@@ -223,6 +232,7 @@ export function MapScreen() {
           onSelectDay={actions.selectDay}
           onSelectTime={actions.selectTime}
           onStep={actions.step}
+          onStepHour={actions.stepHour}
           onStepDay={actions.stepDay}
           atStart={sel.day === days[0].day}
           atEnd={sel.day === days[days.length - 1].day}

@@ -47,6 +47,7 @@ function TimebarAt({
       selectedDay={sel.day}
       selectedMinute={minuteOfDay(sel)}
       stepMin={stepMin}
+      offset={fmtOffset(sel)}
       interval={interval}
       days={days}
       nowHour={NOW.hour}
@@ -66,6 +67,7 @@ function TimebarPlayground() {
       selectedDay={sel.day}
       selectedMinute={minuteOfDay(sel)}
       stepMin={5}
+      offset={fmtOffset(sel)}
       interval="hour"
       days={days}
       nowHour={NOW.hour}
@@ -73,7 +75,8 @@ function TimebarPlayground() {
       onSpeedChange={setSpeed}
       onSelectDay={(day) => setSel({ ...sel, day })}
       onSelectTime={(m) => setSel(shiftMinutes({ day: sel.day, hour: 0 }, m))}
-      onStep={(d) => setSel(clampDay(shiftMinutes(sel, d * 5)))}
+      onStep={(d) => setSel((s) => clampDay(shiftMinutes(s, d * 5)))}
+      onStepHour={(d) => setSel((s) => clampDay(shiftMinutes(s, d * 60)))}
       onStepDay={(d) => setSel(clampDay({ ...sel, day: addDays(sel.day, d) }))}
       atStart={sel.day === days[0].day}
       atEnd={sel.day === days[days.length - 1].day}
@@ -109,10 +112,10 @@ export function BigSpecimens() {
       <Specimen
         name="Timebar"
         figma="Timeline · 2010:10063"
-        props="mode, selectedDay, selectedMinute, stepMin, interval: 'hour' | 'day', days, nowHour, unavailableHours, playing, speed, on…"
-        note="One row, 52px. Mode shows in the 3px top stripe and the tint. The day opens the calendar; ‹ › move by a day. Track: solid = observed, dashed = forecast, NOW on today; it moves in the data's own step (5 min or 1 h)."
+        props="mode, selectedDay, selectedMinute, stepMin, offset, interval: 'hour' | 'day', days, nowHour, unavailableHours, playing, speed, on…"
+        note="One row, 52px. Under the time, the mode in words with the distance from now (FORECAST +5min), plus the 3px top stripe and the tint. The time can be typed (Enter) and its ‹ › run while held. The day opens the calendar; ‹ › move by a day. Track: solid = observed, dashed = forecast, NOW on today; it moves in the data's own step (5 min or 1 h)."
       >
-        <Variant label="interactive · 5-minute data — try ← → (5 min), Shift+← → (days), drag, the day (calendar), Now" wide>
+        <Variant label="interactive · 5-minute data — type a time, hold ‹ ›, ← → (5 min), PageUp/Down (hour), Shift+← → (days), the calendar, Now" wide>
           <div className={styles.full}>
             <TimebarPlayground />
           </div>

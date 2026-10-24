@@ -1,5 +1,5 @@
 import type { IconName } from '../icons/Icon'
-import { addDays, dayDiff, modeOf, NOW, shiftHours, type TimeSel } from '../time'
+import { addDays, dayDiff, minutesBetween, modeOf, NOW, shiftHours, type TimeSel } from '../time'
 import type { Mode } from '../types'
 import catalogue from './layers.json'
 
@@ -19,6 +19,11 @@ export type Layer = {
   interval: 'hour' | 'day'
   /** Resolution in minutes for data measured more often than hourly (5: radar, lightning, gusts). Default 60. */
   stepMin?: number
+  /**
+   * Forecasts that start with a nowcast: for the first `minutes` after "now" the radar (or the lightning network) is
+   * extrapolated every `stepMin` minutes; after that the hourly model takes over.
+   */
+  nowcast?: { minutes: number; stepMin: number; source: string }
   archiveDays: number
   horizonDays: number
   scale: { max: number; ramp: Ramp }
@@ -51,8 +56,8 @@ export function dayAvailable(layer: Layer, day: string, now: TimeSel = NOW): boo
 /** Does this layer have data at this exact instant? */
 export function instantAvailable(layer: Layer, sel: TimeSel, now: TimeSel = NOW): boolean {
   if (!dayAvailable(layer, sel.day, now)) return false
-  // Only on the layer's own grid: hourly data have no 12:55.
-  if (layer.interval === 'hour' && ((sel.minute ?? 0) % stepOf(layer) !== 0)) return false
+  // Only on the layer's own grid at that instant: hourly data have no 12:55.
+  if (layer.interval === 'hour' && ((sel.minute ?? 0) % stepOf(layer, sel, now) !== 0)) return false
   // Daily layers: one value per day. Past/future days are decided by the day; today needs the mode too,
   // so a live-only daily layer is not available at a forecast hour of today (rule 7 disables it).
   if (layer.interval === 'day') return dayDiff(sel.day, now.day) !== 0 || layer.modes.includes(modeOf(sel, now))
@@ -64,8 +69,31 @@ export function firstForecastInstant(layer: Layer, now: TimeSel = NOW): TimeSel 
   return layer.interval === 'day' ? { day: addDays(now.day, 1), hour: now.hour } : shiftHours(now, 1)
 }
 
-/** Step of the timeline for this layer, in minutes: 5 for 5-minute data, 60 for hourly, a whole day for daily. */
-export const stepOf = (layer: Layer) => (layer.interval === 'day' ? 1440 : (layer.stepMin ?? 60))
+/** Is this instant inside the layer's nowcast (the first minutes after "now")? */
+export function inNowcast(layer: Layer, sel: TimeSel, now: TimeSel = NOW): boolean {
+  if (!layer.nowcast) return false
+  const m = minutesBetween(sel, now)
+  return m > 0 && m <= layer.nowcast.minutes
+}
+
+/**
+ * Step of the timeline for this layer at this instant, in minutes: 5 for 5-minute data and nowcasts, 60 for hourly,
+ * a whole day for daily. Without an instant: the layer's own resolution, outside any nowcast.
+ */
+export function stepOf(layer: Layer, sel?: TimeSel, now: TimeSel = NOW): number {
+  if (layer.interval === 'day') return 1440
+  if (sel && inNowcast(layer, sel, now)) return layer.nowcast!.stepMin
+  return layer.stepMin ?? 60
+}
+
+/** The finest step anywhere in the stream (layer + twin): what dragging on the track snaps to. */
+export function finestStep(layer: Layer): number {
+  if (layer.interval === 'day') return 1440
+  return Math.min(...[layer, twinOf(layer)].flatMap((l) => (l ? [l.stepMin ?? 60, l.nowcast?.stepMin ?? 60] : [])))
+}
+
+/** Product, network or model behind the value at this instant: the nowcast has its own source. */
+export const sourceAt = (layer: Layer, sel: TimeSel) => (inNowcast(layer, sel) ? layer.nowcast!.source : layer.source)
 
 export const offersMode = (layer: Layer, mode: Mode) => layer.modes.includes(mode)
 

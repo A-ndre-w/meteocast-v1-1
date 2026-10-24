@@ -157,12 +157,76 @@
   flex: none;
 }
 
-.time {
+/* ---- The time ---- */
+
+.timeGroup {
   flex: none;
-  width: 48px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* The time over its distance from now: "13:05" / "FORECAST +5min". */
+.timeStack {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  min-width: 100px;
+}
+
+.timeInput {
+  width: 64px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  font: inherit;
   font-size: var(--font-size-lg);
-  color: var(--text-secondary);
+  font-weight: 600;
+  line-height: 1;
+  color: var(--text-primary);
+  text-align: center;
   font-variant-numeric: tabular-nums;
+}
+
+.timeInput:hover {
+  background: var(--surface-sunken);
+}
+
+.timeInput:focus {
+  background: var(--surface-raised);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+
+/* Mode in words, in the mode's colour (live: neutral, with the same dot as the badge). */
+.modeLine {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--mode-text);
+}
+
+.modeLine[data-mode='live'] {
+  color: var(--text-secondary);
+}
+
+.offset {
+  text-transform: none;
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--text-primary);
 }
 
 .spacer {

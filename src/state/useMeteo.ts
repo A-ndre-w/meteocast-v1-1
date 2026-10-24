@@ -81,10 +81,12 @@ export function useMeteo() {
   const actions = {
     // Manual gestures = explicit intent: may cross "now" (on the twin layer) or be blocked with a warning.
     selectDay: (day: string) => apply((v) => moveExplicit(v, { ...v.sel, day })),
-    // A point on the 24 h track, in minutes from midnight: the rules snap it to the data's own step.
-    selectTime: (minute: number) => apply((v) => moveExplicit(v, shiftMinutes({ day: v.sel.day, hour: 0 }, minute))),
-    // One step of the selected data's own resolution: 5 minutes, an hour, or a day for daily data.
-    step: (d: number) => apply((v) => moveExplicit(v, shiftMinutes(v.sel, d * stepOf(layerById(v.layerId))))),
+    // A point on the 24 h track or a typed time, in minutes from midnight: snapped to the nearest instant of the data.
+    selectTime: (minute: number) => apply((v) => moveExplicit(v, shiftMinutes({ day: v.sel.day, hour: 0 }, minute), 'nearest')),
+    // One step of the selected data's own resolution at that instant: 5 minutes (also in a nowcast), an hour, a day.
+    step: (d: number) => apply((v) => moveExplicit(v, shiftMinutes(v.sel, d * stepOf(layerById(v.layerId), v.sel)))),
+    /** ±1 hour, whatever the data's resolution (PageUp / PageDown). */
+    stepHour: (d: number) => apply((v) => moveExplicit(v, shiftMinutes(v.sel, d * 60))),
     stepDay: (d: number) => apply((v) => moveExplicit(v, stepDayTarget(v.sel, d))),
     goNow: () => apply((v) => goLive(v)),
     // Changing the data pauses Play: the loop would silently change scope, e.g. hours → days (UX audit H14).

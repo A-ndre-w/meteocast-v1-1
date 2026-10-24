@@ -45,10 +45,13 @@ export const shiftHours = (sel: TimeSel, hours: number): TimeSel => shiftMinutes
 /** Minute of the day, 0–1439. */
 export const minuteOfDay = (sel: TimeSel) => sel.hour * 60 + (sel.minute ?? 0)
 
-/** Snap to a step in minutes (60 for hourly data): down, or up when moving forward. */
-export function snapTo(sel: TimeSel, step: number, up = false): TimeSel {
+export type Snap = 'down' | 'up' | 'nearest'
+
+/** Snap to a step in minutes (60 for hourly data): down, up (moving forward) or to the nearest (a typed time). */
+export function snapTo(sel: TimeSel, step: number, how: Snap = 'down'): TimeSel {
   const m = minuteOfDay(sel)
-  const snapped = (up ? Math.ceil(m / step) : Math.floor(m / step)) * step
+  const round = how === 'up' ? Math.ceil : how === 'nearest' ? Math.round : Math.floor
+  const snapped = round(m / step) * step
   return snapped === m ? sel : shiftMinutes({ day: sel.day, hour: 0 }, snapped)
 }
 

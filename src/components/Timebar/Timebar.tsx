@@ -1,7 +1,7 @@
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react'
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type MouseEvent, type PointerEvent } from 'react'
 import { Icon } from '../../icons/Icon'
 import { fmtDayLong, fmtDayMedium, fmtDayShort, pad2 } from '../../time'
-import { modeLabel, type Mode } from '../../types'
+import { modeIcon, modeLabel, type Mode } from '../../types'
 import { DayChip } from '../DayChip/DayChip'
 import type { DayStripDay } from '../DayStrip/DayStrip'
 import { LiveViewButton } from '../LiveViewButton/LiveViewButton'
@@ -14,8 +14,11 @@ export type TimebarProps = {
   selectedDay: string
   /** Selected time of day in minutes from midnight (13:00 = 780, 12:55 = 775). */
   selectedMinute: number
-  /** Resolution of the selected data in minutes: 5 for radar, lightning and gusts, 60 for hourly data. */
+  /** Finest resolution of the selected data in minutes (5 for radar, lightning, gusts and nowcasts; 60 for hourly
+   *  data): dragging on the track snaps to it. */
   stepMin?: number
+  /** Distance from now under the time, e.g. "+1h", "−5min" (the mode word comes from `mode`). */
+  offset?: string
   /** "day" hides the hour track (rule 6). */
   interval: 'hour' | 'day'
   days: DayStripDay[]
@@ -30,7 +33,9 @@ export type TimebarProps = {
   onSelectTime?: (minute: number) => void
   /** ±1 step of the data's resolution (arrows on the track) — may cross days. */
   onStep?: (delta: number) => void
-  /** ±1 day (the ‹ › buttons, Shift+arrows, PageUp/Down). */
+  /** ±1 hour (PageUp / PageDown), whatever the resolution. */
+  onStepHour?: (delta: number) => void
+  /** ±1 day (the ‹ › of the day, Shift+arrows). */
   onStepDay?: (delta: number) => void
   /** First / last day of the timeline: the day buttons are shown disabled (UX audit H3). */
   atStart?: boolean
@@ -45,6 +50,44 @@ const LABELS = [0, 6, 12, 18, 24]
 const SPEEDS: Speed[] = [1, 2, 4]
 const pct = (minute: number) => `${(minute / 1440) * 100}%`
 const fmtMinute = (m: number) => `${pad2(Math.floor(m / 60))}:${pad2(m % 60)}`
+
+/** A typed time: "12:47", "12.47", "1247", "9" → minutes from midnight, or null when it is not a time. */
+function parseTime(text: string): number | null {
+  const m = text.trim().match(/^(\d{1,2})(?:[:.\s]?(\d{2}))?$/)
+  if (!m) return null
+  const h = Number(m[1])
+  const min = Number(m[2] ?? 0)
+  return h < 24 && min < 60 ? h * 60 + min : null
+}
+
+/** A button that repeats while held: one step on press, then a step every 90 ms after 400 ms. */
+function useHold(fn: () => void) {
+  const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const fnRef = useRef(fn)
+  fnRef.current = fn
+  const stop = () => {
+    clearTimeout(timer.current)
+    clearInterval(timer.current)
+  }
+  useEffect(() => stop, [])
+  return {
+    onPointerDown: (e: PointerEvent<HTMLButtonElement>) => {
+      if (e.button !== 0) return
+      fnRef.current()
+      stop()
+      timer.current = setTimeout(() => {
+        timer.current = setInterval(() => fnRef.current(), 90)
+      }, 400)
+    },
+    onPointerUp: stop,
+    onPointerLeave: stop,
+    onPointerCancel: stop,
+    // Keyboard (Enter / Space): one step per press; pointer clicks were already handled on pointerdown.
+    onClick: (e: MouseEvent<HTMLButtonElement>) => {
+      if (e.detail === 0) fnRef.current()
+    },
+  }
+}
 
 /** What one Play loop covers: 24 frames of the data's own step. */
 function playSpan(daily: boolean, step: number) {
@@ -63,6 +106,7 @@ export function Timebar({
   selectedDay,
   selectedMinute,
   stepMin = 60,
+  offset,
   interval,
   days,
   nowHour,
@@ -72,6 +116,7 @@ export function Timebar({
   onSelectDay,
   onSelectTime,
   onStep,
+  onStepHour,
   onStepDay,
   atStart = false,
   atEnd = false,
@@ -83,9 +128,11 @@ export function Timebar({
   const dayBtnRef = useRef<HTMLButtonElement>(null)
   const popRef = useRef<HTMLDivElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
+  const timeRef = useRef<HTMLInputElement>(null)
   const playHintId = useId()
   const dayHintId = useId()
   const popId = useId()
+  const timeHintId = useId()
   const [calendarOpen, setCalendarOpen] = useState(false)
   // The time on the thumb shows while the time moves: dragging, keys on the slider, Play.
   const [scrubbing, setScrubbing] = useState(false)
@@ -97,6 +144,27 @@ export function Timebar({
   // Rule 3: observed data = solid, forecast = dashed.
   const solidTo = selected?.time === 'past' ? 1440 : selected?.time === 'today' ? (nowHour ?? 0) * 60 : 0
   const time = fmtMinute(selectedMinute)
+  // The typed time while the field is being edited; null = show the selected time.
+  const [draft, setDraft] = useState<string | null>(null)
+  const earlier = useHold(() => onStep?.(-1))
+  const later = useHold(() => onStep?.(1))
+  // While the field has focus, a new time (arrows, Enter, the track) is selected again: the next digits replace it.
+  useEffect(() => {
+    if (document.activeElement === timeRef.current) timeRef.current?.select()
+  }, [selectedMinute, selectedDay])
+  const commitDraft = () => {
+    const m = draft === null ? null : parseTime(draft)
+    if (m !== null && m !== selectedMinute) onSelectTime?.(m)
+    setDraft(null)
+  }
+  // Under the time: where it is relative to now, in words. Without it the tint seemed to change at random.
+  const modeLine = (
+    <span className={styles.modeLine} data-mode={mode}>
+      {modeIcon[mode] ? <Icon name={modeIcon[mode]!} size={12} strokeWidth={2} /> : <span className={styles.liveDot} aria-hidden="true" />}
+      {modeLabel[mode]}
+      {mode !== 'live' && offset && <span className={styles.offset}>{offset}</span>}
+    </span>
+  )
 
   const minuteFromPointer = (e: PointerEvent) => {
     const r = trackRef.current!.getBoundingClientRect()
@@ -117,10 +185,11 @@ export function Timebar({
     }
   }
 
-  // Keyboard model: arrows = one step of the data (5 min or 1 h), Shift+arrows / PageUp/Down = days.
-  // In the calendar the arrows walk the days.
+  // Keyboard model: arrows = one step of the data (5 min or 1 h), PageUp/Down = an hour, Shift+arrows = a day.
+  // In the calendar the arrows walk the days. The time field handles its own keys.
   const onKeyDown = (e: KeyboardEvent<HTMLElement>) => {
     const target = e.target as HTMLElement
+    if (target.tagName === 'INPUT') return
     const onSlider = target.getAttribute('role') === 'slider'
     const onChip = target.closest('[data-daystrip]') !== null
     const dir = e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? -1 : e.key === 'ArrowRight' || e.key === 'ArrowUp' ? 1 : 0
@@ -135,7 +204,7 @@ export function Timebar({
       onStep?.(dir)
     } else if (onSlider && (e.key === 'PageUp' || e.key === 'PageDown')) {
       e.preventDefault()
-      onStepDay?.(e.key === 'PageUp' ? 1 : -1)
+      onStepHour?.(e.key === 'PageUp' ? 1 : -1)
     } else if (onSlider && (e.key === 'Home' || e.key === 'End')) {
       e.preventDefault()
       onSelectTime?.(e.key === 'Home' ? 0 : lastMinute)
@@ -163,7 +232,7 @@ export function Timebar({
     return () => document.removeEventListener('pointerdown', onDown)
   }, [calendarOpen])
 
-  const valueText = `${fmtDayLong(selectedDay)}${daily ? '' : `, ${time}`} — ${modeLabel[mode]}`
+  const valueText = `${fmtDayLong(selectedDay)}${daily ? '' : `, ${time}`} — ${modeLabel[mode]}${mode !== 'live' && offset ? ` ${offset}` : ''}`
   const thumbAt = pct(selectedMinute)
 
   return (
@@ -247,11 +316,69 @@ export function Timebar({
         </button>
       </div>
 
+      {daily && <span className={styles.timeStack}>{modeLine}</span>}
+
       {!daily && (
         <>
-          <span className={styles.time} aria-hidden="true">
-            {time}
-          </span>
+          {/* The time: typed by hand ("12:47" → the nearest instant of the data) or moved with ‹ ›, held to run. */}
+          <div className={styles.timeGroup}>
+            <button type="button" className={styles.dayStep} aria-label="Earlier" title="Earlier (hold to run)" {...earlier}>
+              <Icon name="chevron-left" size={16} />
+            </button>
+            <span className={styles.timeStack}>
+              <input
+                ref={timeRef}
+                className={styles.timeInput}
+                type="text"
+                inputMode="numeric"
+                aria-label="Time"
+                aria-describedby={timeHintId}
+                maxLength={5}
+                value={draft ?? time}
+                // A click selects the whole time (instead of placing the caret), ready to be typed over.
+                onMouseDown={(e) => {
+                  if (document.activeElement !== e.currentTarget) {
+                    e.preventDefault()
+                    e.currentTarget.focus()
+                  }
+                }}
+                onFocus={(e) => {
+                  setDraft(time)
+                  e.currentTarget.select()
+                }}
+                onChange={(e) => setDraft(e.target.value)}
+                onBlur={commitDraft}
+                onKeyDown={(e) => {
+                  const dir = e.key === 'ArrowUp' ? 1 : e.key === 'ArrowDown' ? -1 : 0
+                  if (e.key === 'Enter') {
+                    const field = e.currentTarget
+                    commitDraft()
+                    // After React puts the time back in the field: selected, ready for the next one.
+                    requestAnimationFrame(() => field.select())
+                  } else if (e.key === 'Escape') {
+                    setDraft(null)
+                    e.currentTarget.blur()
+                  } else if (dir) {
+                    e.preventDefault()
+                    setDraft(null)
+                    if (e.shiftKey) onStepDay?.(dir)
+                    else onStep?.(dir)
+                  } else if (e.key === 'PageUp' || e.key === 'PageDown') {
+                    e.preventDefault()
+                    setDraft(null)
+                    onStepHour?.(e.key === 'PageUp' ? 1 : -1)
+                  }
+                }}
+              />
+              {modeLine}
+            </span>
+            <span id={timeHintId} className="visually-hidden">
+              {valueText}. Type a time and press Enter; up and down arrows move one step, Page up and Page down an hour.
+            </span>
+            <button type="button" className={styles.dayStep} aria-label="Later" title="Later (hold to run)" {...later}>
+              <Icon name="chevron-right" size={16} />
+            </button>
+          </div>
 
           <div className={styles.trackWrap}>
             <div
@@ -308,7 +435,7 @@ export function Timebar({
                 aria-valuemax={lastMinute}
                 aria-valuenow={selectedMinute}
                 aria-valuetext={valueText}
-                aria-keyshortcuts="ArrowLeft ArrowRight Shift+ArrowLeft Shift+ArrowRight PageUp PageDown Home End"
+                aria-keyshortcuts="ArrowLeft ArrowRight PageUp PageDown Shift+ArrowLeft Shift+ArrowRight Home End"
               />
             </div>
           </div>

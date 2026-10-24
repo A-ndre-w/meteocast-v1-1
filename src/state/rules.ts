@@ -13,7 +13,7 @@ import {
   twinOf,
   type Layer,
 } from '../data'
-import { addDays, dayDiff, dayWindow, minutesBetween, modeOf, NOW, shiftMinutes, snapTo, type TimeSel } from '../time'
+import { addDays, dayDiff, dayWindow, minutesBetween, modeOf, NOW, shiftMinutes, snapTo, type Snap, type TimeSel } from '../time'
 import type { Mode } from '../types'
 
 /** What the user is looking at. Undo restores a whole View. */
@@ -61,23 +61,24 @@ export const modeOfView = (view: View) => modeOf(view.sel)
  * Hourly data snap to the hour (up when moving forward, so a 5-minute step past "now" lands on the next hour of
  * an hourly forecast twin instead of bouncing back); 5-minute data keep the minute.
  */
-export function normalize(layer: Layer, sel: TimeSel, forward = false): TimeSel {
+export function normalize(layer: Layer, sel: TimeSel, how: Snap = 'down'): TimeSel {
   if (layer.interval === 'day') return sel.day === NOW.day ? { day: sel.day, hour: NOW.hour } : { day: sel.day, hour: sel.hour }
-  return snapTo(sel, stepOf(layer), forward)
+  return snapTo(sel, stepOf(layer, sel), how)
 }
 
-export function moveExplicit(view: View, rawTarget: TimeSel): Result {
+export function moveExplicit(view: View, rawTarget: TimeSel, snap?: Snap): Result {
   if (!inWindow(rawTarget)) {
     const edge = rawTarget.day < windowDays[0] ? 'start' : 'end'
     return { view, notice: { type: 'windowEdge', edge, day: edge === 'start' ? windowDays[0] : windowDays.at(-1)! } }
   }
   const layer = layerById(view.layerId)
-  const forward = minutesBetween(rawTarget, view.sel) > 0
-  const target = normalize(layer, rawTarget, forward)
+  // Steps snap in their direction; a typed or clicked time snaps to the nearest instant of the data.
+  const how = snap ?? (minutesBetween(rawTarget, view.sel) > 0 ? 'up' : 'down')
+  const target = normalize(layer, rawTarget, how)
   if (instantAvailable(layer, target)) return { view: { ...view, sel: target } }
 
   const twin = twinOf(layer)
-  const twinTarget = twin && normalize(twin, rawTarget, forward)
+  const twinTarget = twin && normalize(twin, rawTarget, how)
   if (twin && twinTarget && instantAvailable(twin, twinTarget)) {
     return {
       view: { groupId: groupIdOf(twin), layerId: twin.id, sel: twinTarget },
@@ -171,16 +172,16 @@ export function playStep(view: View, origin: TimeSel): View {
   // Loop span (designer decision, 2026-10-21): from where Play was pressed, 24 frames forward — across "now"
   // into the forecast when the stream has it — then back to the start. A frame is the data's own step: 24 hours
   // for hourly data, 2 hours for 5-minute data. Daily data: one frame per day while the stream has days.
-  const step = Math.min(...stream.map(stepOf))
-  const next = layer.interval === 'day' ? { ...view.sel, day: addDays(view.sel.day, 1) } : shiftMinutes(view.sel, stepOf(layer))
+  const step = stepOf(stream.find((l) => instantAvailable(l, origin)) ?? layer, origin)
+  const next = layer.interval === 'day' ? { ...view.sel, day: addDays(view.sel.day, 1) } : shiftMinutes(view.sel, stepOf(layer, view.sel))
   const span = layer.interval === 'day' ? windowDays.length * 1440 : 24 * step
-  const carrier = stream.find((l) => instantAvailable(l, normalize(l, next, true)))
+  const carrier = stream.find((l) => instantAvailable(l, normalize(l, next, 'up')))
   if (!inWindow(next) || minutesBetween(next, origin) >= span || !carrier) {
     const back = stream.find((l) => instantAvailable(l, origin)) ?? layer
     return { groupId: groupIdOf(back), layerId: back.id, sel: origin }
   }
   // Crossing "now" hands over to the twin layer, as a manual move does (no toast).
-  return { groupId: groupIdOf(carrier), layerId: carrier.id, sel: normalize(carrier, next, true) }
+  return { groupId: groupIdOf(carrier), layerId: carrier.id, sel: normalize(carrier, next, 'up') }
 }
 
 export const stepDayTarget = (sel: TimeSel, d: number): TimeSel => ({ ...sel, day: addDays(sel.day, d) })
