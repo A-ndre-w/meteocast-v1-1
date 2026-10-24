@@ -89,7 +89,7 @@ export function MapScreen() {
         ? minutesBetween(NOW, daily ? { day: addDays(sel.day, 1), hour: 0 } : shiftMinutes(sel, stepOf(layer)))
         : 60 * (NOW.hour % 6)
   const updatedHint =
-    mode === 'live' ? 'Last reading of the station' : mode === 'archive' ? 'When this value was recorded' : `Forecast model run at ${pad2(NOW.hour - (NOW.hour % 6))}:00`
+    mode === 'live' ? 'Last reading of the station' : mode === 'archive' ? 'When this value was recorded' : `${layer.source} run at ${pad2(NOW.hour - (NOW.hour % 6))}:00`
 
   // Rule 8: what the stream (layer + twin) can show on the timeline.
   const unavailableHours = Array.from({ length: 24 }, (_, h) => h).filter((h) => !streamInstantAvailable(layer, { day: sel.day, hour: h }))
@@ -191,7 +191,7 @@ export function MapScreen() {
 
       {/* The legend stays at the top right for scanning the whole map; the triangle marks the selected point. */}
       <div className={styles.legend} data-map-obstacle data-map-legend>
-        <Legend layer={layer.name} unit={layer.unit} ramp={layer.scale.ramp} max={layer.scale.max} breaks={breaks} value={value} />
+        <Legend layer={layer.name} unit={layer.unit} source={layer.source} ramp={layer.scale.ramp} max={layer.scale.max} breaks={breaks} value={value} />
       </div>
 
       <div className={styles.zoom} data-map-obstacle>

@@ -13,6 +13,8 @@ export type Layer = {
   meta: string
   icon: IconName
   unit: string
+  /** Where the values come from: the product or network for observed data, the model for forecasts. */
+  source: string
   modes: Mode[]
   interval: 'hour' | 'day'
   /** Resolution in minutes for data measured more often than hourly (5: radar, lightning, gusts). Default 60. */

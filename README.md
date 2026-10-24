@@ -96,6 +96,7 @@ Fonte: file Figma *UXChallenge_RadarMeteo*, pagina "🎨 Stile & Componenti". Le
 | Layer Card | `Readout` | `mode`, `location`, `coords`, `layer`, `value`, `unit`, `time`, `state: updated \| stale \| noData` |
 | Map Pill | `ModePill` | `mode`, `time`, `relative` |
 | — | `Toast` | `mode`, `tone`, `message`, `onUndo` |
+| — | `Legend` | `layer`, `unit`, `source`, `ramp`, `max`, `breaks`, `value` — legenda fissa con il tag della fonte del dato |
 | Search bar · Alert Icon · Zoom Controls · Data Map Label | `SearchBar` · `NotificationBell` · `ZoomControl` · `ValueLabel` | |
 | Panel · Logo | `LayerPanel` · `Logo` | |
 | — | `MapPin`, `Rail`, `MapView` | Componenti di schermata |

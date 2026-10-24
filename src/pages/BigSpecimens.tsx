@@ -183,14 +183,14 @@ export function BigSpecimens() {
       <Specimen
         name="Legend"
         figma="— (was the scale at the bottom of the Layer Card)"
-        props="layer, unit, ramp, max, breaks?, value?"
-        note="Fixed at the top right, for scanning the whole map. Five classes, the same colours as the field and the value labels; the triangle marks the selected point."
+        props="layer, unit, source?, ramp, max, breaks?, value?"
+        note="Fixed at the top right, for scanning the whole map. Five classes, the same colours as the field and the value labels; the triangle marks the selected point. The tag names the product or model the values come from."
       >
         <Variant label="rain · 4.2 mm">
-          <Legend layer="Hourly rainfall" unit="mm" ramp={rain.ramp} max={rain.max} value={4.2} />
+          <Legend layer="Hourly rainfall" unit="mm" source="GisMeteotrigger" ramp={rain.ramp} max={rain.max} value={4.2} />
         </Variant>
         <Variant label="snow · 15 %">
-          <Legend layer="Snow probability" unit="%" ramp={snow.ramp} max={snow.max} value={15} />
+          <Legend layer="Snow probability" unit="%" source="ICON-2I" ramp={snow.ramp} max={snow.max} value={15} />
         </Variant>
       </Specimen>
 

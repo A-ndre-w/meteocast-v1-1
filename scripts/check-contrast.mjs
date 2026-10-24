@@ -39,6 +39,7 @@ const pairs = [
   ['text/tertiary', 'bg/deep', 4.5, 'archive timebar labels'],
   ['text/tertiary', 'bg/forecast', 4.5, 'forecast timebar labels'],
   ['text/tertiary', 'surface/sunken', 4.5, 'speed chips, Now (off)'],
+  ['text/secondary', 'surface/sunken', 4.5, 'data source tag in the legend'],
   ['text/primary', 'surface/default', 4.5, 'day chips'],
   ['icon/selected', 'mode/archive', 4.5, 'ARCHIVE badge, selected archive chip'],
   ['icon/selected', 'mode/forecast-strong', 4.5, 'FORECAST badge, selected forecast chip'],

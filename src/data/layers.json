@@ -6,19 +6,19 @@
       "title": "Water & Storms",
       "icon": "drizzle",
       "layers": [
-        { "id": "rain-1h", "stream": "water/hourly-rainfall", "name": "Hourly rainfall", "meta": "mm - hourly", "icon": "drizzle", "unit": "mm", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 20, "ramp": "rain" } },
-        { "id": "rain-acc-1h", "stream": "water/accumulated-rainfall-per-hour", "name": "Accumulated rainfall per hour", "meta": "mm - hourly", "icon": "drizzle", "unit": "mm", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 20, "ramp": "rain" } },
-        { "id": "precip-24h", "stream": "water/accumulated-precipitation-in-24h", "name": "Accumulated precipitation in 24h", "meta": "mm - daily", "icon": "drizzle", "unit": "mm", "modes": ["live", "archive"], "interval": "day", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 60, "ramp": "rain" } },
-        { "id": "rain-rate", "stream": "water/rainfall-rate", "name": "Rainfall rate", "meta": "mm/h - 5min", "icon": "drizzle", "unit": "mm/h", "modes": ["live", "archive"], "interval": "hour", "stepMin": 5, "archiveDays": 2, "horizonDays": 0, "scale": { "max": 20, "ramp": "rain" } },
-        { "id": "lightning", "stream": "water/lightning", "name": "Lightning", "meta": "last 60 min - 5min", "icon": "sever-thunderstorm", "unit": "strikes", "modes": ["live"], "interval": "hour", "stepMin": 5, "archiveDays": 0, "horizonDays": 0, "scale": { "max": 50, "ramp": "rain" } },
-        { "id": "hydro", "stream": "water/hydrometric-level", "name": "Hydrometric level", "meta": "cm - hourly", "icon": "humidity", "unit": "cm", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 400, "ramp": "rain" }, "liveDelayMin": 40 },
-        { "id": "leaf", "stream": "water/leaf-wetness", "name": "Leaf wetness", "meta": "h - hourly", "icon": "humidity", "unit": "h", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 24, "ramp": "rain" }, "noDataHours": [[-1,9,11],[0,12,13]] },
-        { "id": "rain-1h-fc", "stream": "water/hourly-rainfall", "name": "Hourly rainfall", "meta": "mm - hourly", "icon": "drizzle", "unit": "mm", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 20, "ramp": "rain" } },
-        { "id": "rain-acc-1h-fc", "stream": "water/accumulated-rainfall-per-hour", "name": "Accumulated rainfall per hour", "meta": "mm - hourly", "icon": "drizzle", "unit": "mm", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 20, "ramp": "rain" } },
-        { "id": "rain-rate-fc", "stream": "water/rainfall-rate", "name": "Rainfall rate", "meta": "mm/h - 5min", "icon": "drizzle", "unit": "mm/h", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 2, "scale": { "max": 20, "ramp": "rain" } },
-        { "id": "lightning-fc", "stream": "water/lightning", "name": "Lightning", "meta": "last 60 min - 5min", "icon": "sever-thunderstorm", "unit": "strikes", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 2, "scale": { "max": 50, "ramp": "rain" } },
-        { "id": "hydro-fc", "stream": "water/hydrometric-level", "name": "Hydrometric level", "meta": "cm - hourly", "icon": "humidity", "unit": "cm", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 3, "scale": { "max": 400, "ramp": "rain" } },
-        { "id": "leaf-fc", "stream": "water/leaf-wetness", "name": "Leaf wetness", "meta": "h - hourly", "icon": "humidity", "unit": "h", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 3, "scale": { "max": 24, "ramp": "rain" } }
+        { "id": "rain-1h", "stream": "water/hourly-rainfall", "name": "Hourly rainfall", "meta": "mm - hourly", "icon": "drizzle", "unit": "mm", "source": "GisMeteotrigger", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 20, "ramp": "rain" } },
+        { "id": "rain-acc-1h", "stream": "water/accumulated-rainfall-per-hour", "name": "Accumulated rainfall per hour", "meta": "mm - hourly", "icon": "drizzle", "unit": "mm", "source": "GisMeteotrigger", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 20, "ramp": "rain" } },
+        { "id": "precip-24h", "stream": "water/accumulated-precipitation-in-24h", "name": "Accumulated precipitation in 24h", "meta": "mm - daily", "icon": "drizzle", "unit": "mm", "source": "GisMeteotrigger", "modes": ["live", "archive"], "interval": "day", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 60, "ramp": "rain" } },
+        { "id": "rain-rate", "stream": "water/rainfall-rate", "name": "Rainfall rate", "meta": "mm/h - 5min", "icon": "drizzle", "unit": "mm/h", "source": "RadarCast", "modes": ["live", "archive"], "interval": "hour", "stepMin": 5, "archiveDays": 2, "horizonDays": 0, "scale": { "max": 20, "ramp": "rain" } },
+        { "id": "lightning", "stream": "water/lightning", "name": "Lightning", "meta": "last 60 min - 5min", "icon": "sever-thunderstorm", "unit": "strikes", "source": "Lightning network", "modes": ["live"], "interval": "hour", "stepMin": 5, "archiveDays": 0, "horizonDays": 0, "scale": { "max": 50, "ramp": "rain" } },
+        { "id": "hydro", "stream": "water/hydrometric-level", "name": "Hydrometric level", "meta": "cm - hourly", "icon": "humidity", "unit": "cm", "source": "Hydrometric stations", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 400, "ramp": "rain" }, "liveDelayMin": 40 },
+        { "id": "leaf", "stream": "water/leaf-wetness", "name": "Leaf wetness", "meta": "h - hourly", "icon": "humidity", "unit": "h", "source": "Weather stations", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 24, "ramp": "rain" }, "noDataHours": [[-1,9,11],[0,12,13]] },
+        { "id": "rain-1h-fc", "stream": "water/hourly-rainfall", "name": "Hourly rainfall", "meta": "mm - hourly", "icon": "drizzle", "unit": "mm", "source": "ICON-2I", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 20, "ramp": "rain" } },
+        { "id": "rain-acc-1h-fc", "stream": "water/accumulated-rainfall-per-hour", "name": "Accumulated rainfall per hour", "meta": "mm - hourly", "icon": "drizzle", "unit": "mm", "source": "ICON-2I", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 20, "ramp": "rain" } },
+        { "id": "rain-rate-fc", "stream": "water/rainfall-rate", "name": "Rainfall rate", "meta": "mm/h - 5min", "icon": "drizzle", "unit": "mm/h", "source": "ICON-2I", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 2, "scale": { "max": 20, "ramp": "rain" } },
+        { "id": "lightning-fc", "stream": "water/lightning", "name": "Lightning", "meta": "last 60 min - 5min", "icon": "sever-thunderstorm", "unit": "strikes", "source": "ICON-2I", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 2, "scale": { "max": 50, "ramp": "rain" } },
+        { "id": "hydro-fc", "stream": "water/hydrometric-level", "name": "Hydrometric level", "meta": "cm - hourly", "icon": "humidity", "unit": "cm", "source": "ICON-2I", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 3, "scale": { "max": 400, "ramp": "rain" } },
+        { "id": "leaf-fc", "stream": "water/leaf-wetness", "name": "Leaf wetness", "meta": "h - hourly", "icon": "humidity", "unit": "h", "source": "ICON-2I", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 3, "scale": { "max": 24, "ramp": "rain" } }
       ]
     },
     {
@@ -26,11 +26,11 @@
       "title": "Snow",
       "icon": "snow",
       "layers": [
-        { "id": "snow-ground", "stream": "snow/snow-on-the-ground", "name": "Snow on the ground", "meta": "cm - hourly", "icon": "snow", "unit": "cm", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 100, "ramp": "snow" } },
-        { "id": "snow-acc-1h", "stream": "snow/accumulated-snow-per-hour", "name": "Accumulated snow per hour", "meta": "mm - hourly", "icon": "snow", "unit": "mm", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 20, "ramp": "snow" } },
-        { "id": "snow-prob", "stream": "snow/snow-probability", "name": "Snow probability", "meta": "% - daily", "icon": "snow", "unit": "%", "modes": ["forecast"], "interval": "day", "archiveDays": 0, "horizonDays": 3, "scale": { "max": 100, "ramp": "snow" } },
-        { "id": "snow-acc", "stream": "snow/accumulated-snow", "name": "Accumulated snow", "meta": "cm - daily", "icon": "snow", "unit": "cm", "modes": ["forecast"], "interval": "day", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 100, "ramp": "snow" } },
-        { "id": "snow-acc-run", "stream": "snow/accumulated-snow-run", "name": "Accumulated snow (run)", "meta": "cm - daily", "icon": "snow", "unit": "cm", "modes": ["forecast"], "interval": "day", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 100, "ramp": "snow" } }
+        { "id": "snow-ground", "stream": "snow/snow-on-the-ground", "name": "Snow on the ground", "meta": "cm - hourly", "icon": "snow", "unit": "cm", "source": "Weather stations", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 100, "ramp": "snow" } },
+        { "id": "snow-acc-1h", "stream": "snow/accumulated-snow-per-hour", "name": "Accumulated snow per hour", "meta": "mm - hourly", "icon": "snow", "unit": "mm", "source": "GisMeteotrigger", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 20, "ramp": "snow" } },
+        { "id": "snow-prob", "stream": "snow/snow-probability", "name": "Snow probability", "meta": "% - daily", "icon": "snow", "unit": "%", "source": "ICON-2I", "modes": ["forecast"], "interval": "day", "archiveDays": 0, "horizonDays": 3, "scale": { "max": 100, "ramp": "snow" } },
+        { "id": "snow-acc", "stream": "snow/accumulated-snow", "name": "Accumulated snow", "meta": "cm - daily", "icon": "snow", "unit": "cm", "source": "ICON-2I", "modes": ["forecast"], "interval": "day", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 100, "ramp": "snow" } },
+        { "id": "snow-acc-run", "stream": "snow/accumulated-snow-run", "name": "Accumulated snow (run)", "meta": "cm - daily", "icon": "snow", "unit": "cm", "source": "ICON-2I", "modes": ["forecast"], "interval": "day", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 100, "ramp": "snow" } }
       ]
     },
     {
@@ -38,9 +38,9 @@
       "title": "Clouds",
       "icon": "cloudy",
       "layers": [
-        { "id": "cloud-cover", "stream": "clouds/cloud-cover", "name": "Cloud cover", "meta": "% - hourly", "icon": "cloudy", "unit": "%", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 100, "ramp": "neutral" } },
-        { "id": "cloud-cover-fc", "stream": "clouds/cloud-cover", "name": "Cloud cover", "meta": "% - hourly", "icon": "cloudy", "unit": "%", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 100, "ramp": "neutral" } },
-        { "id": "fog-fc", "stream": "clouds/fog-probability", "name": "Fog probability", "meta": "% - hourly", "icon": "fog", "unit": "%", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 2, "scale": { "max": 100, "ramp": "neutral" } }
+        { "id": "cloud-cover", "stream": "clouds/cloud-cover", "name": "Cloud cover", "meta": "% - hourly", "icon": "cloudy", "unit": "%", "source": "Satellite", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 100, "ramp": "neutral" } },
+        { "id": "cloud-cover-fc", "stream": "clouds/cloud-cover", "name": "Cloud cover", "meta": "% - hourly", "icon": "cloudy", "unit": "%", "source": "ICON-2I", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 100, "ramp": "neutral" } },
+        { "id": "fog-fc", "stream": "clouds/fog-probability", "name": "Fog probability", "meta": "% - hourly", "icon": "fog", "unit": "%", "source": "ICON-2I", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 2, "scale": { "max": 100, "ramp": "neutral" } }
       ]
     },
     {
@@ -48,9 +48,9 @@
       "title": "Temperature",
       "icon": "thermometer",
       "layers": [
-        { "id": "temp", "stream": "temperature/air-temperature", "name": "Air temperature", "meta": "°C - hourly", "icon": "thermometer", "unit": "°C", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 40, "ramp": "temp" } },
-        { "id": "temp-fc", "stream": "temperature/air-temperature", "name": "Air temperature", "meta": "°C - hourly", "icon": "thermometer", "unit": "°C", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 40, "ramp": "temp" } },
-        { "id": "temp-max-fc", "stream": "temperature/maximum-temperature", "name": "Maximum temperature", "meta": "°C - daily", "icon": "thermometer", "unit": "°C", "modes": ["forecast"], "interval": "day", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 40, "ramp": "temp" } }
+        { "id": "temp", "stream": "temperature/air-temperature", "name": "Air temperature", "meta": "°C - hourly", "icon": "thermometer", "unit": "°C", "source": "Weather stations", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 40, "ramp": "temp" } },
+        { "id": "temp-fc", "stream": "temperature/air-temperature", "name": "Air temperature", "meta": "°C - hourly", "icon": "thermometer", "unit": "°C", "source": "ICON-2I", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 40, "ramp": "temp" } },
+        { "id": "temp-max-fc", "stream": "temperature/maximum-temperature", "name": "Maximum temperature", "meta": "°C - daily", "icon": "thermometer", "unit": "°C", "source": "ICON-2I", "modes": ["forecast"], "interval": "day", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 40, "ramp": "temp" } }
       ]
     },
     {
@@ -58,8 +58,8 @@
       "title": "Sun & Radiation",
       "icon": "sunny",
       "layers": [
-        { "id": "radiation", "stream": "sun/solar-radiation", "name": "Solar radiation", "meta": "W/m² - hourly", "icon": "sunny", "unit": "W/m²", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 1000, "ramp": "temp" } },
-        { "id": "uv-fc", "stream": "sun/uv-index", "name": "UV index", "meta": "index - daily", "icon": "sunny", "unit": "UV", "modes": ["forecast"], "interval": "day", "archiveDays": 0, "horizonDays": 3, "scale": { "max": 11, "ramp": "temp" } }
+        { "id": "radiation", "stream": "sun/solar-radiation", "name": "Solar radiation", "meta": "W/m² - hourly", "icon": "sunny", "unit": "W/m²", "source": "Weather stations", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 1000, "ramp": "temp" } },
+        { "id": "uv-fc", "stream": "sun/uv-index", "name": "UV index", "meta": "index - daily", "icon": "sunny", "unit": "UV", "source": "ICON-2I", "modes": ["forecast"], "interval": "day", "archiveDays": 0, "horizonDays": 3, "scale": { "max": 11, "ramp": "temp" } }
       ]
     },
     {
@@ -67,9 +67,9 @@
       "title": "Wind",
       "icon": "wind",
       "layers": [
-        { "id": "wind-speed", "stream": "wind/wind-speed", "name": "Wind speed", "meta": "km/h - hourly", "icon": "wind", "unit": "km/h", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 100, "ramp": "neutral" } },
-        { "id": "wind-gust", "stream": "wind/wind-gusts", "name": "Wind gusts", "meta": "km/h - 5min", "icon": "wind", "unit": "km/h", "modes": ["live"], "interval": "hour", "stepMin": 5, "archiveDays": 0, "horizonDays": 0, "scale": { "max": 120, "ramp": "neutral" } },
-        { "id": "wind-speed-fc", "stream": "wind/wind-speed", "name": "Wind speed", "meta": "km/h - hourly", "icon": "wind", "unit": "km/h", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 100, "ramp": "neutral" } }
+        { "id": "wind-speed", "stream": "wind/wind-speed", "name": "Wind speed", "meta": "km/h - hourly", "icon": "wind", "unit": "km/h", "source": "Weather stations", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 100, "ramp": "neutral" } },
+        { "id": "wind-gust", "stream": "wind/wind-gusts", "name": "Wind gusts", "meta": "km/h - 5min", "icon": "wind", "unit": "km/h", "source": "Weather stations", "modes": ["live"], "interval": "hour", "stepMin": 5, "archiveDays": 0, "horizonDays": 0, "scale": { "max": 120, "ramp": "neutral" } },
+        { "id": "wind-speed-fc", "stream": "wind/wind-speed", "name": "Wind speed", "meta": "km/h - hourly", "icon": "wind", "unit": "km/h", "source": "ICON-2I", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 100, "ramp": "neutral" } }
       ]
     },
     {
@@ -77,8 +77,8 @@
       "title": "Thunderstorms",
       "icon": "sever-thunderstorm",
       "layers": [
-        { "id": "storm-cells", "stream": "storms/storm-cells", "name": "Storm cells", "meta": "dBZ - 5min", "icon": "sever-thunderstorm", "unit": "dBZ", "modes": ["live", "archive"], "interval": "hour", "stepMin": 5, "archiveDays": 2, "horizonDays": 0, "scale": { "max": 70, "ramp": "rain" } },
-        { "id": "storm-prob-fc", "stream": "storms/thunderstorm-probability", "name": "Thunderstorm probability", "meta": "% - hourly", "icon": "sever-thunderstorm", "unit": "%", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 2, "scale": { "max": 100, "ramp": "rain" } }
+        { "id": "storm-cells", "stream": "storms/storm-cells", "name": "Storm cells", "meta": "dBZ - 5min", "icon": "sever-thunderstorm", "unit": "dBZ", "source": "RadarCast", "modes": ["live", "archive"], "interval": "hour", "stepMin": 5, "archiveDays": 2, "horizonDays": 0, "scale": { "max": 70, "ramp": "rain" } },
+        { "id": "storm-prob-fc", "stream": "storms/thunderstorm-probability", "name": "Thunderstorm probability", "meta": "% - hourly", "icon": "sever-thunderstorm", "unit": "%", "source": "ICON-2I", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 2, "scale": { "max": 100, "ramp": "rain" } }
       ]
     },
     {
@@ -86,8 +86,8 @@
       "title": "Sea & Rivers",
       "icon": "waves",
       "layers": [
-        { "id": "wave-height", "stream": "sea/wave-height", "name": "Wave height", "meta": "m - hourly", "icon": "waves", "unit": "m", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 6, "ramp": "rain" } },
-        { "id": "wave-height-fc", "stream": "sea/wave-height", "name": "Wave height", "meta": "m - hourly", "icon": "waves", "unit": "m", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 6, "ramp": "rain" } }
+        { "id": "wave-height", "stream": "sea/wave-height", "name": "Wave height", "meta": "m - hourly", "icon": "waves", "unit": "m", "source": "Wave buoys", "modes": ["live", "archive"], "interval": "hour", "archiveDays": 7, "horizonDays": 0, "scale": { "max": 6, "ramp": "rain" } },
+        { "id": "wave-height-fc", "stream": "sea/wave-height", "name": "Wave height", "meta": "m - hourly", "icon": "waves", "unit": "m", "source": "ICON-2I", "modes": ["forecast"], "interval": "hour", "archiveDays": 0, "horizonDays": 5, "scale": { "max": 6, "ramp": "rain" } }
       ]
     }
   ]

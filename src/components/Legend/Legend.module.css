@@ -10,6 +10,15 @@
   box-shadow: var(--shadow-md);
 }
 
+/* Title on the left, the source tag on the right; the tag wraps under a long title. */
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 8px;
+}
+
 .title {
   margin: 0;
   font-size: var(--font-size-sm);
@@ -20,6 +29,18 @@
 .unit {
   font-weight: 400;
   color: var(--text-secondary);
+}
+
+/* The data source: a quiet tag, the same mono as the other data labels. */
+.source {
+  margin: 0;
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+  background: var(--surface-sunken);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-xs);
+  color: var(--text-secondary);
+  white-space: nowrap;
 }
 
 /* Five classes, the same colours as the map (src/scale.ts). No red, orange or green: reserved for alerts. */
