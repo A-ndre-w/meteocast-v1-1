@@ -128,11 +128,16 @@ export function valueAt(layerId: string, sel: TimeSel): number | null {
   if (!s || d < 0 || i >= s.values.length) return null
   const v = s.values[i]
   const minute = sel.minute ?? 0
-  if (!minute || v === null) return v
-  const next = s.values[i + 1] ?? v
+  if (!minute) return v
+  // Between two hours; at an edge of the series (a nowcast starts before the first hourly forecast step) the one
+  // hour that exists stands for both.
+  const next = s.values[i + 1] ?? null
+  if (v === null && next === null) return null
+  const from = v ?? next!
+  const to = next ?? v!
   const t = minute / 60
   const wobble = 1 + 0.08 * Math.sin(i * 1.7 + minute * 0.9)
-  return Number(Math.max(0, (v + ((next ?? v) - v) * t) * wobble).toFixed(s.decimals))
+  return Number(Math.max(0, (from + (to - from) * t) * wobble).toFixed(s.decimals))
 }
 
 // ---- Stations: the network around the selected location (src/data/geo.json, real towns) ----
