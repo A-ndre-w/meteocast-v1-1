@@ -165,6 +165,14 @@ export function Timebar({
       {mode !== 'live' && offset && <span className={styles.offset}>{offset}</span>}
     </span>
   )
+  // Back to live beside the time (designer, 2026-10-26): it is where the pointer already is after changing the day
+  // or the time, and it reads with the mode line ("ARCHIVE −24h · Back to live"). Always in place, off in Live, so
+  // the track never changes width.
+  const backToLive = (
+    <span className={styles.live}>
+      <LiveViewButton status={mode === 'live' ? 'off' : 'on'} onClick={onNow} />
+    </span>
+  )
 
   const minuteFromPointer = (e: PointerEvent) => {
     const r = trackRef.current!.getBoundingClientRect()
@@ -316,7 +324,12 @@ export function Timebar({
         </button>
       </div>
 
-      {daily && <span className={styles.timeStack}>{modeLine}</span>}
+      {daily && (
+        <>
+          <span className={styles.timeStack}>{modeLine}</span>
+          {backToLive}
+        </>
+      )}
 
       {!daily && (
         <>
@@ -379,6 +392,8 @@ export function Timebar({
               <Icon name="chevron-right" size={16} />
             </button>
           </div>
+
+          {backToLive}
 
           <div className={styles.trackWrap}>
             <div
@@ -443,8 +458,6 @@ export function Timebar({
       )}
 
       {daily && <span className={styles.spacer} />}
-
-      <LiveViewButton status={mode === 'live' ? 'off' : 'on'} onClick={onNow} />
     </section>
   )
 }

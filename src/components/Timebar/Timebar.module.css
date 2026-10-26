@@ -222,11 +222,19 @@
   text-transform: none;
 }
 
+/* Live in green (designer, 2026-10-26): the same green as Back to live, which brings you here. */
 .liveDot {
   width: 6px;
   height: 6px;
   border-radius: var(--radius-pill);
-  background: var(--text-primary);
+  background: var(--accent-default);
+}
+
+/* A little more room after the time's › than the bar's gap: the two buttons do very different things. */
+.live {
+  flex: none;
+  display: flex;
+  margin-left: 6px;
 }
 
 .spacer {
