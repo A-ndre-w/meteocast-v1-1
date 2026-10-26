@@ -4,3 +4,6 @@ dist
 .DS_Store
 .vite
 .cache
+
+# html.to.design exports, used to bring the coded screens into Figma: kept locally, not in the repository
+assets/html to figma/
